@@ -52,20 +52,20 @@
         <div id="errorMessages1"
              class="assertive"
              ng-if="value.type !== 'password'" ng-messages="form[key].$error" multiple>
-          <p class="row" ng-if="!form[key].$pristine" ng-repeat="(messageKey, messageValue) in value.errorMessages"
+          <p class="row" ng-if="form.$submitted || !form[key].$pristine" ng-repeat="(messageKey, messageValue) in value.errorMessages"
              ng-message="{{messageKey}}">
             {{messageValue}}</p>
         </div>
       </div>
       <div id="errorMessages2" ng-if="value.type === 'password'" ng-messages="form[key].$error" multiple
            class="row assertive">
-        <p class="col" ng-if="!form[key].$pristine" ng-repeat="(messageKey, messageValue) in value.errorMessages"
+        <p class="col" ng-if="form.$submitted || !form[key].$pristine" ng-repeat="(messageKey, messageValue) in value.errorMessages"
            ng-message="{{messageKey}}">
           {{messageValue}}</p>
       </div>
     </div>
     <div id="invalidMessages">
-      <p class="row" ng-repeat="invalidMessage in invalidMessages">{{invalidMessage}}</p>
+      <p class="row assertive" ng-repeat="invalidMessage in invalidMessages">{{invalidMessage}}</p>
     </div>
     <div class="row">
       <div class="col">

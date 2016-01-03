@@ -33,58 +33,114 @@ angular.module('app.controllers', [])
       }
     };
   })
-  .controller('UserCtrl', function ($scope, UserFormFactory, FirebaseFactory, $stateParams) {
-    if ($stateParams.uid !== undefined) {
-      $scope.isNewUser = false;
-    } else {
-      $scope.isNewUser = true;
-    }
-    if (!$scope.isNewUser) {
-      $scope.options = [
-        {
+  .controller('UserCtrl', function ($scope, UserFormFactory, FirebaseFactory, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+
+    $scope.init = function () {
+      if (!$scope.isNewUser) {
+        $scope.options = [
+          {
+            description: 'Dados Pessoais',
+            templateUrl: "templates/user.personal.html",
+            callback: function () {
+              $scope.currentOption = this;
+              console.log('ok');
+            }
+          }, {
+            description: 'Atividade Física',
+            templateUrl: "templates/user.biometric.html",
+            callback: function () {
+              $scope.currentOption = this;
+              console.log($scope.currentOption);
+            }
+          }, {
+            description: 'Exercícios Recomendados',
+            templateUrl: "templates/user.biometric.html",
+            callback: function () {
+              $scope.currentOption = this;
+              console.log($scope.currentOption);
+            }
+          }, {
+            description: 'Dados Biométricos',
+            templateUrl: "templates/user.biometric.html",
+            callback: function () {
+              $scope.currentOption = this;
+              console.log($scope.currentOption);
+            }
+          }
+        ];
+        $scope.currentOption = $scope.options[$stateParams.option ? $stateParams.option : 0];
+      } else {
+        $scope.currentOption = {
           description: 'Dados Pessoais',
           templateUrl: "templates/user.personal.html",
           callback: function () {
             $scope.currentOption = this;
             console.log('ok');
           }
-        }, {
-          description: 'Atividade Física',
-          templateUrl: "templates/user.biometric.html",
-          callback: function () {
-            $scope.currentOption = this;
-            console.log($scope.currentOption);
-          }
-        }, {
-          description: 'Exercícios Recomendados',
-          templateUrl: "templates/user.biometric.html",
-          callback: function () {
-            $scope.currentOption = this;
-            console.log($scope.currentOption);
-          }
-        }, {
-          description: 'Dados Biométricos',
-          templateUrl: "templates/user.biometric.html",
-          callback: function () {
-            $scope.currentOption = this;
-            console.log($scope.currentOption);
-          }
-        }
-      ];
-      $scope.currentOption = $scope.options[0];
-    } else {
-      $scope.currentOption = {
-        description: 'Dados Pessoais',
-        templateUrl: "templates/user.personal.html",
-        callback: function () {
-          $scope.currentOption = this;
-          console.log('ok');
-        }
-      };
+        };
 
+      }
+    };
+    $scope.removeUser = function () {
+      var myPopup = $ionicPopup.show({
+        title: 'Remover Utilizador',
+        subTitle: 'Ao confirmar esta ação, o utente será removido da plataforma e não poderá mais iniciar sessão na mesma',
+        scope: $scope,
+        buttons: [
+          {
+            text: 'Cancelar',
+          },
+          {
+            text: 'Remover',
+            type: 'button-positive',
+            onTap: function (e) {
+              return true;
+            }
+          }
+        ]
+      });
+
+      myPopup.then(function (res) {
+        if (res) {
+          $ionicLoading.show({template: "A remover utente..."});
+          var dbConnection = FirebaseFactory.getDBConnetion();
+          dbConnection.child('users').child($stateParams.uid).once('value', function (snap) {
+            console.log(snap);
+            console.log(snap.val());
+            var profileImageUid = snap.val().profileImageUid;
+            if (profileImageUid) {
+              dbConnection.child('profileImages').child(profileImageUid).remove(function () {
+                console.log("Profile Image Removed");
+              });
+            }
+            dbConnection.child('users').child($stateParams.uid).remove(function () {
+              $ionicLoading.hide();
+              $state.go('app.users');
+            });
+          });
+        }
+      });
+    };
+    $rootScope.$on('changeOption', function (e, data) {
+      $state.go('app.useredit', {uid: data.userId, option: data.option});
+    });
+
+    if ($stateParams.uid !== undefined) {
+
+      FirebaseFactory.getDBConnetion().child("users").child($stateParams.uid).on('value', function (snap) {
+        console.log(snap.val());
+        $scope.isNewUser = true;
+        if (snap.val()) {
+          $scope.isNewUser = false;
+        }
+        $scope.init();
+      });
+    } else {
+      $scope.isNewUser = true;
+      $scope.init();
     }
   })
-  .controller('UserPersonalCtrl', function ($scope, $timeout, $window, $state, UserFormFactory, FirebaseFactory, $stateParams, $ionicLoading, $ionicPopup) {
+  .controller('UserPersonalCtrl', function ($scope, $timeout, $window, $state, UserFormFactory, FirebaseFactory, $stateParams, $ionicLoading, $ionicPopup, $rootScope) {
     var dbConnection = FirebaseFactory.getDBConnetion();
     //If you want to use URL attributes before the website is loaded
     $scope.init = function () {
@@ -120,7 +176,9 @@ angular.module('app.controllers', [])
       $scope.init();
       $scope.retrievedUser = {};
     }
-
+    $scope.generatePassword = function (value) {
+      value.value = Math.random().toString(36).slice(-8);
+    };
     $scope.saveimage = function (e1) {
       var filename = e1[0];
       var fr = new FileReader();
@@ -132,9 +190,6 @@ angular.module('app.controllers', [])
         }
       };
       fr.readAsDataURL(filename);
-    };
-    $scope.generatePassword = function (value) {
-      value.value = Math.random().toString(36).slice(-8);
     };
     $scope.saveImageData = function (userId, image) {
       /**
@@ -167,17 +222,17 @@ angular.module('app.controllers', [])
               console.log(error);
             } else {
               console.log('Image updated');
-              $scope.redirectToUsersList();
+              $scope.redirectToUsersList(userId);
             }
           });
         }
       } else {
         console.log('no need for any update on the image');
-        $scope.redirectToUsersList();
+        $scope.redirectToUsersList(userId);
       }
 
     };
-    $scope.redirectToUsersList = function () {
+    $scope.redirectToUsersList = function (userId) {
       $ionicLoading.hide();
       if ($scope.isNewUser) {
         var myPopup = $ionicPopup.show({
@@ -205,6 +260,13 @@ angular.module('app.controllers', [])
                 $scope.init();
                 $scope.retrievedUser = {};
               }
+            },
+            {
+              text: 'Editar atividade física do utilizador',
+              type: 'button-positive',
+              onTap: function (e) {
+                $rootScope.$broadcast('changeOption', {userId: userId, option: 1});
+              }
             }
           ]
         });
@@ -214,98 +276,99 @@ angular.module('app.controllers', [])
         });
         return;
       }
-      $state.go('app.users');
+      //$state.go('app.users');
     };
     $scope.saveUser = function (form) {
       $scope.invalidMessages = {};
-      if (form.$valid) {
-        $ionicLoading.show({template: "A gravar informação..."});
-        angular.forEach($scope.user, function (userValue, userKey) {
-          var changed = false;
-          angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
-            if (!changed && retrievedUserKey === userKey) {
-              $scope.retrievedUser[retrievedUserKey] = userValue.value;
-              changed = true;
-            }
-          });
-          if (!changed) {
-            $scope.retrievedUser[userKey] = userValue.value;
+      if (form.$invalid) {
+        console.log(form);
+        return;
+      }
+      $ionicLoading.show({template: "A gravar informação..."});
+      angular.forEach($scope.user, function (userValue, userKey) {
+        var changed = false;
+        angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
+          if (!changed && retrievedUserKey === userKey) {
+            $scope.retrievedUser[retrievedUserKey] = userValue.value;
+            changed = true;
           }
         });
+        if (!changed) {
+          $scope.retrievedUser[userKey] = userValue.value;
+        }
+      });
 
+      console.log($scope.retrievedUser);
+      console.log("----");
+      console.log($scope.user);
+
+      var image = $scope.retrievedUser.profileImage;
+      delete  $scope.retrievedUser.profileImage;
+
+      var usersRef = dbConnection.child("users");
+      var userId = $stateParams.uid;
+      console.log("new user? " + $scope.isNewUser);
+      if ($scope.isNewUser) {
+        /**
+         * SAVE THE NEW USER INFO
+         */
         console.log($scope.retrievedUser);
-        console.log("----");
-        console.log($scope.user);
-
-        var image = $scope.retrievedUser.profileImage;
-        delete  $scope.retrievedUser.profileImage;
-
-        var usersRef = dbConnection.child("users");
-        var userId = $stateParams.uid;
-        console.log("new user? " + $scope.isNewUser);
-        if ($scope.isNewUser) {
-          /**
-           * SAVE THE NEW USER INFO
-           */
-          console.log($scope.retrievedUser);
-          dbConnection.createUser({
-            email: $scope.retrievedUser.email,
-            password: $scope.retrievedUser.password
+        dbConnection.createUser({
+          email: $scope.retrievedUser.email,
+          password: $scope.retrievedUser.password
+        }, function (error, userData) {
+          console.log("aqui");
+          if (error) {
+            switch (error.code) {
+              case "EMAIL_TAKEN":
+                $scope.invalidMessages = ["O email introduzido já se encontra em utilização, por favor insira outro email."];
+                break;
+              case "INVALID_EMAIL":
+                $scope.invalidMessages = ["O email introduzido não é válido. Por favor, reveja-o e submeta a informação novamente."];
+                break;
+              default:
+                $scope.invalidMessages = ["A definição de uma palavra-passe para o utente é obrigatória"];
+                console.log("Error creating user:", error);
+            }
+            $ionicLoading.hide();
+          } else {
+            console.log($scope.retrievedUser.uid);
+            $scope.retrievedUser.uid = userData.uid;
+            delete  $scope.retrievedUser.password;
+            usersRef = usersRef.push($scope.retrievedUser);
+            userId = usersRef.key();
+            console.log(usersRef.key());
+            console.log("Successfully created user account with uid:", userData.uid);
+            $scope.saveImageData(userId, image);
+          }
+        });
+      } else {
+        /**
+         * SAVE THE CURRENT USER NEW INFO
+         */
+        console.log($scope.user.password);
+        if ($scope.user.password.value) {
+          dbConnection.resetPassword({
+            email: $scope.retrievedUser.email
           }, function (error, userData) {
-            console.log("aqui");
             if (error) {
               switch (error.code) {
-                case "EMAIL_TAKEN":
-                  $scope.invalidMessages = ["O email introduzido já se encontra em utilização, por favor insira outro email."];
-                  form.$setValidity('emailinuse', false);
-                  break;
-                case "INVALID_EMAIL":
-                  $scope.invalidMessages = ["O email introduzido não é válido. Por favor, reveja-o e submeta a informação novamente."];
+                case "INVALID_USER":
+                  console.log("The specified user account does not exist.");
                   break;
                 default:
-                  $scope.invalidMessages = ["A definição de uma palavra-passe para o utente é obrigatória"];
-                  console.log("Error creating user:", error);
+                  console.log("Error resetting password:", error);
               }
-              $ionicLoading.hide();
             } else {
-              console.log($scope.retrievedUser.uid);
-              $scope.retrievedUser.uid = userData.uid;
-              delete  $scope.retrievedUser.password;
-              usersRef = usersRef.push($scope.retrievedUser);
-              userId = usersRef.key();
-              console.log(usersRef.key());
-              console.log("Successfully created user account with uid:", userData.uid);
-              $scope.saveImageData(userId, image);
+              console.log("Password reset email sent successfully!");
             }
           });
-        } else {
-          /**
-           * SAVE THE CURRENT USER NEW INFO
-           */
-          console.log($scope.user.password);
-          if ($scope.user.password.value) {
-            dbConnection.resetPassword({
-              email: $scope.retrievedUser.email
-            }, function (error, userData) {
-              if (error) {
-                switch (error.code) {
-                  case "INVALID_USER":
-                    console.log("The specified user account does not exist.");
-                    break;
-                  default:
-                    console.log("Error resetting password:", error);
-                }
-              } else {
-                console.log("Password reset email sent successfully!");
-              }
-            });
-          }
-          delete  $scope.retrievedUser.password;
-          usersRef.child($stateParams.uid).update($scope.retrievedUser, function () {
-            console.log("user update");
-          });
-          $scope.saveImageData(userId, image);
         }
+        delete  $scope.retrievedUser.password;
+        usersRef.child($stateParams.uid).update($scope.retrievedUser, function () {
+          console.log("user update");
+        });
+        $scope.saveImageData(userId, image);
       }
     }
   })

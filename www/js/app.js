@@ -65,7 +65,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
         }
       })
       .state('app.useredit', {
-        url: '/user/:uid',
+        url: '/user/:uid?:option',
         views: {
           'menuContent': {
             templateUrl: 'templates/user.html',
