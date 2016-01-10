@@ -1,0 +1,69 @@
+<style type="text/css">
+  #map {
+    display: block;
+    /*width: 100%;*/
+    /*height: 100%;*/
+    min-width: 300px;
+    min-height: 300px;
+    z-index: 4;
+  }
+
+  .scroll {
+    height: 100%;
+  }
+</style>
+<ion-view view-title="{{newEvent? 'Novo' : 'Editar'}} Evento">
+  <ion-content>
+    <form name="form" class="row responsive-sm" novalidate ng-submit="saveEvent(form)">
+      <div class="col col-offset-10 col-34">
+        <div id="map" data-tap-disabled="true"></div>
+        <span class="input input-label">Localização</span>
+        <span class="input item-input">
+          {{event.location}}
+        </span>
+      </div>
+      <div class="col col-34 list list-inset">
+        <div class="row">
+          <div class="col">
+            <label class="item item-input">
+              <input type="text" ng-required="true" ng-model="event.name" name="name" placeholder="Nome do Evento">
+            </label>
+            <div class="padding" ng-show="form.$submitted">
+              <p ng-show="form.$submitted && form.username.$error.required" class="invalid-input-label">Insira o nome do
+                evento</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label class="item item-input">
+              <textarea type="text" ng-required="true" rows="8" ng-model="event.description" name="name"
+                        placeholder="Descrição do Evento"></textarea>
+            </label>
+            <div class="padding" ng-show="form.$submitted">
+              <p ng-show="form.$submitted && form.username.$error.required" class="invalid-input-label">Insira o nome do
+                evento</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h3 class="positive">Participantes Convidados</h3>
+            <button type="button" class="button button-small button-clear button-positive"
+                    ng-click="openModalFriends()"><i
+              class="icon ion-ios-plus-outline"></i>
+              Convidar Amigos
+            </button>
+            <ion-list class="list list-inset">
+              <ion-item class="item item-avatar" ng-repeat="friend in event.friends">
+                <img ng-src="{{friend.profileImage}}">
+                <h2>{{friend.name}}</h2>
+              </ion-item>
+            </ion-list>
+          </div>
+        </div>
+      </div>
+      </div>
+    </form>
+  </ion-content>
+</ion-view>

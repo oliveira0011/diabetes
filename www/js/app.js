@@ -45,40 +45,48 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
           }
         }
       })
-
+      .state('app.events', {
+        url: '/events',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/events.html',
+            controller: 'EventsCtrl'
+          }
+        }
+      })
+      .state('app.eventcreate', {
+        url: '/event',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/event.html',
+            controller: 'EventCtrl'
+          }
+        }
+      })
+      .state('app.eventedit', {
+        url: '/event/:id/edit',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/event.html',
+            controller: 'EventCtrl'
+          }
+        }
+      })
+      .state('app.eventfind', {
+        url: '/event/:id',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/eventfind.html',
+            controller: 'EventFindCtrl'
+          }
+        }
+      })
       .state('app.main', {
         url: '/main',
         views: {
           'menuContent': {
             templateUrl: 'templates/main-page.html',
             controller: 'MainCtrl'
-          }
-        }
-      })
-      .state('app.users', {
-        url: '/users',
-        views: {
-          'menuContent': {
-            templateUrl: 'templates/users.html',
-            controller: 'UsersCtrl'
-          }
-        }
-      })
-      .state('app.useredit', {
-        url: '/user/:uid?:option',
-        views: {
-          'menuContent': {
-            templateUrl: 'templates/user.html',
-            controller: 'UserCtrl'
-          }
-        }
-      })
-      .state('app.usercreate', {
-        url: '/user',
-        views: {
-          'menuContent': {
-            templateUrl: 'templates/user.html',
-            controller: 'UserCtrl'
           }
         }
       })
@@ -91,7 +99,6 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
           }
         }
       })
-
       .state('app.single', {
         url: '/biometricos/:biometricoId',
         views: {

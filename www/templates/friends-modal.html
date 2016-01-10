@@ -1,0 +1,35 @@
+<ion-modal-view>
+  <ion-header-bar>
+    <div class="buttons">
+      <button class="button button-clear button-positive" ng-click="toggleAll()">
+        Cancelar
+      </button>
+    </div>
+    <h1 class="title">Convidar Amigos</h1>
+    <div class="buttons">
+      <button class="button button-clear button-positive" ng-click="toggleAll()">
+        {{selectAll ? 'Selecionar Todos' : 'Limpar Todos'}}
+      </button>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <div class="row">
+      <div class="col">
+        <span ng-repeat="friend in friends">
+            <ion-checkbox class="item-checkbox-right" ng-model="friend.selected" toggle-class="toggle-positive"
+                          ng-change="toggleFriend(friend)">
+              <img class="item-checkbox-img" ng-src="{{friend.profileImage}}">
+              <p style="margin-left: 60px;">{{friend.name}}</p>
+            </ion-checkbox>
+          </span>
+      </div>
+    </div>
+  </ion-content>
+  <ion-footer-bar align-title="left" class="">
+    <h1 class="title"></h1>
+    <div class="buttons">
+      <button class="button button-positive" ng-click="closeModal()">Confirmar</button>
+    </div>
+  </ion-footer-bar>
+</ion-modal-view>
+

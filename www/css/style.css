@@ -49,3 +49,13 @@
   color: #E00000;
   opacity: 1;
 }
+
+
+
+.item-checkbox-img {
+  vertical-align: middle;
+  position: absolute;
+  top: 0px;
+  left: 15px;
+  height:100%;
+}
