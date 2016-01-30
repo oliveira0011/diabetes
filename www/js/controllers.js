@@ -1,17 +1,17 @@
 angular.module('app.controllers', [])
-/**
- *
- * APPLICATION CONTROLLER
- */
+  /**
+   *
+   * APPLICATION CONTROLLER
+   */
   .controller('AppCtrl', function ($scope, $state, FirebaseFactory) {
     $scope.logout = function () {
       FirebaseFactory.getDBConnetion().unauth();
       $state.go('login');
     }
   })
-/**
- * USERS CONTROLLERS
- */
+  /**
+   * USERS CONTROLLERS
+   */
   .controller('UsersCtrl', function ($scope, $timeout, $window, $state, UserFormFactory, FirebaseFactory) {
     var dbConnection = FirebaseFactory.getDBConnetion();
     dbConnection.child("users").on('value', function (snap) {
@@ -23,14 +23,12 @@ angular.module('app.controllers', [])
     });
     $scope.loadImage = function (user) {
       console.log(user);
-      if (user.profileImageUid && user.profileImageUid !== '') {
-        return dbConnection.child("profileImages").child(user.profileImageUid).on('value', function (data) {
-          user.profileImage = data.val().image;
-          if (!$scope.$$phase) {
-            $scope.$apply();
-          }
-        });
-      }
+      return dbConnection.child("profileImages").child(user.id).on('value', function (data) {
+        user.profileImage = data.val().image;
+        if (!$scope.$$phase) {
+          $scope.$apply();
+        }
+      });
     };
   })
   .controller('UserCtrl', function ($scope, UserFormFactory, FirebaseFactory, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
@@ -157,12 +155,14 @@ angular.module('app.controllers', [])
         });
       });
 
-      if (!$scope.isNewUser && $scope.retrievedUser && $scope.retrievedUser.profileImageUid && $scope.retrievedUser.profileImageUid !== '') {
-        dbConnection.child("profileImages").child($scope.retrievedUser.profileImageUid).on('value', function (data) {
-          $scope.user.profileImage.value = data.val().image;
-          console.log($scope.user.profileImage.value);
-          if (!$scope.$$phase) {
-            $scope.$apply();
+      if (!$scope.isNewUser && $scope.retrievedUser && $scope.retrievedUser.id && $scope.retrievedUser.id !== '') {
+        dbConnection.child("profileImages").child($scope.retrievedUser.id).on('value', function (data) {
+          if (data.val() != null) {
+            $scope.user.profileImage.value = data.val().image;
+            console.log($scope.user.profileImage.value);
+            if (!$scope.$$phase) {
+              $scope.$apply();
+            }
           }
         });
       }
@@ -170,6 +170,7 @@ angular.module('app.controllers', [])
     if ($stateParams.uid !== undefined) {
       dbConnection.child('users').child($stateParams.uid).on('value', function (user) {
         $scope.retrievedUser = user.val();
+        $scope.retrievedUser.id = $stateParams.uid;
         $scope.init();
       });
     } else {
@@ -202,19 +203,15 @@ angular.module('app.controllers', [])
           console.log(userId);
           console.log($scope.retrievedUser);
           delete image.changed;
-          var newImagesRef = dbConnection.child("profileImages").push({
-            image: image,
-            uid: userId
+          var newImagesRef = dbConnection.child("profileImages").child(userId).set({
+            image: image
           });
-          console.log("saved image with uid: " + newImagesRef.key());
-          dbConnection.child("users").child(userId).update({profileImageUid: newImagesRef.key()}, function () {
-            console.log('new Image saved');
-            $scope.redirectToUsersList();
-          });
+          console.log("saved image with uid: " + userId);
+          $scope.redirectToUsersList();
         } else {
           console.log("update");
           console.log(image);
-          dbConnection.child("profileImages").child($scope.retrievedUser.profileImageUid).update({
+          dbConnection.child("profileImages").child(userId).update({
             image: image
           }, function (error) {
             if (error) {
@@ -276,7 +273,7 @@ angular.module('app.controllers', [])
         });
         return;
       }
-      //$state.go('app.users');
+      $state.go('app.users');
     };
     $scope.saveUser = function (form) {
       $scope.invalidMessages = {};
@@ -333,11 +330,12 @@ angular.module('app.controllers', [])
             $ionicLoading.hide();
           } else {
             console.log($scope.retrievedUser.uid);
-            $scope.retrievedUser.uid = userData.uid;
+            userId = userData.uid;
             delete  $scope.retrievedUser.password;
-            usersRef = usersRef.push($scope.retrievedUser);
-            userId = usersRef.key();
-            console.log(usersRef.key());
+            delete  $scope.retrievedUser.uid;
+            usersRef = usersRef.child(userId).set($scope.retrievedUser);
+            //userId = usersRef.key();
+            console.log(userId);
             console.log("Successfully created user account with uid:", userData.uid);
             $scope.saveImageData(userId, image);
           }
