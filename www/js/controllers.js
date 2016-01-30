@@ -3,9 +3,13 @@ angular.module('app.controllers', [])
    *
    * APPLICATION CONTROLLER
    */
-  .controller('AppCtrl', function ($scope, $state) {
+  .controller('AppCtrl', function ($scope, $state, FirebaseFactory) {
+    $scope.logout = function () {
+      FirebaseFactory.getDBConnetion().unauth();
+      $state.go('login');
+    }
   })
-  .controller('MainCtrl', function ($scope, $timeout, $window, $state) {
+  .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform) {
     $scope.options = [
       {name: "Eventos", color: "positive", icon: "ion-android-walk", link: "#/app/events"},
       {name: "Amigos", color: "positive", icon: "ion-person-stalker", link: "#/app/search"},
@@ -16,6 +20,56 @@ angular.module('app.controllers', [])
     $scope.redirect = function () {
       $state.go('app.search');
     };
+
+    $scope.options = {
+      frequency: 500, // Measure every 100ms
+      deviation: 25  // We'll use deviation to determine the shake event, best values in the range between 25 and 30
+    };
+
+    $scope.threshold = 10;
+    $scope.numSteps = 0;
+    $scope.currentY = 0;
+    $scope.previousY = 0;
+    $scope.startWatching = function () {
+
+      // Device motion configuration
+      $scope.watch = $cordovaDeviceMotion.watchAcceleration($scope.options);
+
+      // Device motion initilaization
+      $scope.watch.then(null, function (error) {
+        console.log('Error');
+      }, function (result) {
+
+        var x = result.x;
+        var y = result.y;
+        var z = result.z;
+
+        $scope.currentY = y;
+
+        if (Math.abs($scope.currentY - $scope.previousY) > $scope.threshold) {
+          $scope.numSteps++;
+        }
+
+        $scope.x = x;
+        $scope.y = y;
+        $scope.z = z;
+        $scope.previousY = $scope.currentY;
+        $scope.timestamp = result.timestamp;
+
+
+      });
+    };
+    $scope.stopWatching = function () {
+      $scope.watch.clearWatch();
+    };
+    $ionicPlatform.ready(function () {
+      $scope.startWatching();
+    });
+
+
+    $scope.$on('$ionicView.beforeLeave', function () {
+      $scope.watch.clearWatch(); // Turn off motion detection watcher
+    });
   })
   .controller('BiometricosCtrl', function ($scope) {
     $scope.biometricos = [
@@ -28,18 +82,145 @@ angular.module('app.controllers', [])
     ];
   })
   .controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseFactory, $ionicPopup, $ionicLoading) {
-    $scope.loginData = {username: "email", password: "pass  "};
+    $scope.loginData = {};
     $scope.doLogin = function (form) {
       delete $scope.errorMessage;
       //console.log(form.$valid);
       if (form.$valid) {
         $ionicLoading.show({template: 'A autenticar...'});
-        $state.go('app.main');
-        $scope.loginData = {};
-        form.$setPristine(false);
-        $ionicLoading.hide();
+        console.log($scope.loginData);
+        var dbConnection = FirebaseFactory.getDBConnetion();
+
+        function authHandler(error, authData) {
+          if (error) {
+            console.log("Login Failed!", error);
+          } else {
+            console.log("Authenticated successfully with payload:", authData);
+            FirebaseFactory.setCurrentUserUid(authData.uid);
+            if (authData.password.isTemporaryPassword) {
+              $ionicLoading.hide();
+              var tempPass = $scope.loginData.password;
+              $scope.data = {};
+              var myPopup = $ionicPopup.show({
+                template: '<input type="password" ng-model="data.newPassword">',
+                title: 'Nova Palavra-Passe',
+                subTitle: 'A palavra-passe introduzida, apesar de válida, é uma palavra-passe temporária, por favor introduza uma nova palavra passe. Esta passará a ser a sua palavra-chave de autenticação na plataforma',
+                scope: $scope,
+                buttons: [
+                  {text: 'Cancelar'},
+                  {
+                    text: '<b>Gravar</b>',
+                    type: 'button-positive',
+                    onTap: function (e) {
+                      console.log(!$scope.data.newPassword);
+                      if (!$scope.data.newPassword) {
+                        e.preventDefault();
+                      } else {
+                        return $scope.data.newPassword;
+                      }
+                    }
+                  }
+                ]
+              });
+
+              myPopup.then(function (res) {
+                console.log(res);
+                delete $scope.data;
+                dbConnection.changePassword({
+                  email: $scope.loginData.username,
+                  newPassword: res,
+                  oldPassword: tempPass
+                }, function (error) {
+                  if (error) {
+                    switch (error.code) {
+                      case "INVALID_PASSWORD":
+                        console.log("The specified user account password is incorrect.");
+                        break;
+                      case "INVALID_USER":
+                        console.log("The specified user account does not exist.");
+                        break;
+                      default:
+                        console.log("Error changing password:", error);
+                    }
+                  } else {
+                    console.log("User password changed successfully!");
+
+                    dbConnection.authWithPassword({
+                      email: $scope.loginData.username,
+                      password: res
+                    }, authHandler);
+
+                  }
+                });
+              });
+              return;
+            }
+
+            $state.go('app.main');
+            $scope.loginData = {};
+            form.$setPristine(false);
+          }
+          $ionicLoading.hide();
+        }
+
+        dbConnection.authWithPassword({
+          email: $scope.loginData.username,
+          password: $scope.loginData.password
+        }, authHandler);
+
       }
       return false;
+      //if($scope.loginData.username.trim().length == 0){
+      //
+      //}
+    };
+
+    $scope.resetPassword = function () {
+      $scope.data = {};
+      var myPopup = $ionicPopup.show({
+        template: '<input type="email" ng-model="data.email">',
+        title: 'Recuperar Palavra-Passe',
+        subTitle: 'Introduza o seu email de acesso à plataforma. Ser-lhe-à enviado um email com uma palavra-passe temporária.',
+        scope: $scope,
+        buttons: [
+          {text: 'Cancelar'},
+          {
+            text: '<b>Gravar</b>',
+            type: 'button-positive',
+            onTap: function (e) {
+              console.log(!$scope.data.email);
+              if (!$scope.data.email) {
+                e.preventDefault();
+              } else {
+                return $scope.data.email;
+              }
+            }
+          }
+        ]
+      });
+
+      myPopup.then(function (res) {
+        $ionicLoading.show({
+          template: "A enviar email de reposição de palavra-passe..."
+        });
+        console.log(res);
+        FirebaseFactory.getDBConnetion().resetPassword({
+          email: res
+        }, function (error) {
+          if (error === null) {
+            console.log("Password reset email sent successfully");
+            $scope.infoMessages = ["Email de recuperação de palavra-passe enviado com sucesso"];
+          } else {
+            console.log("Error sending password reset email:", error);
+            $scope.errorMessages =
+              ["Lamentamos mas não foi possível enviar o email de recuperação de palavra-passe.",
+                "Por favor, verifique se o email introduzido é válido e/ou tente mais tarde."];
+            $scope.$apply();
+          }
+          delete $scope.data;
+          $ionicLoading.hide();
+        });
+      });
     };
   })
   .controller('PlaylistCtrl', function ($scope, $stateParams) {
@@ -224,5 +405,103 @@ angular.module('app.controllers', [])
       alert('Example of infowindow with ng-click')
     };
 
+  })
+  .controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseFactory, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+
+    $scope.init = function () {
+      if (!$scope.isNewUser) {
+        $scope.options = [
+          {
+            description: 'Dados Pessoais',
+            templateUrl: "templates/user.personal.html",
+            callback: function () {
+              $scope.currentOption = this;
+              console.log('ok');
+            }
+          }, {
+            description: 'Atividade Física',
+            templateUrl: "templates/user.biometric.html",
+            callback: function () {
+              $scope.currentOption = this;
+              console.log($scope.currentOption);
+            }
+          }, {
+            description: 'Exercícios Recomendados',
+            templateUrl: "templates/user.biometric.html",
+            callback: function () {
+              $scope.currentOption = this;
+              console.log($scope.currentOption);
+            }
+          }, {
+            description: 'Dados Biométricos',
+            templateUrl: "templates/user.biometric.html",
+            callback: function () {
+              $scope.currentOption = this;
+              console.log($scope.currentOption);
+            }
+          }
+        ];
+        $scope.currentOption = $scope.options[$stateParams.option ? $stateParams.option : 0];
+      } else {
+        $scope.currentOption = {
+          description: 'Dados Pessoais',
+          templateUrl: "templates/user.personal.html",
+          callback: function () {
+            $scope.currentOption = this;
+            console.log('ok');
+          }
+        };
+
+      }
+    };
+    $scope.removeUser = function () {
+      var myPopup = $ionicPopup.show({
+        title: 'Remover Utilizador',
+        subTitle: 'Ao confirmar esta ação, o utente será removido da plataforma e não poderá mais iniciar sessão na mesma',
+        scope: $scope,
+        buttons: [
+          {
+            text: 'Cancelar',
+          },
+          {
+            text: 'Remover',
+            type: 'button-positive',
+            onTap: function (e) {
+              return true;
+            }
+          }
+        ]
+      });
+
+      myPopup.then(function (res) {
+        if (res) {
+          $ionicLoading.show({template: "A remover utente..."});
+          var dbConnection = FirebaseFactory.getDBConnetion();
+          dbConnection.child('users').child($stateParams.uid).once('value', function (snap) {
+            console.log(snap);
+            console.log(snap.val());
+            var profileImageUid = snap.val().profileImageUid;
+            if (profileImageUid) {
+              dbConnection.child('profileImages').child(profileImageUid).remove(function () {
+                console.log("Profile Image Removed");
+              });
+            }
+            dbConnection.child('users').child($stateParams.uid).remove(function () {
+              $ionicLoading.hide();
+              $state.go('app.users');
+            });
+          });
+        }
+      });
+    };
+    console.log(FirebaseFactory.currentUserUid);
+
+    FirebaseFactory.getDBConnetion().child("users").startAt("e345c357-6062-428e-8c80-0a742acb9ce5").endAt("e345c357-6062-428e-8c80-0a742acb9ce5").on('value', function (snap) {
+      console.log(snap.val());
+      $scope.isNewUser = true;
+      if (snap.val()) {
+        $scope.isNewUser = false;
+      }
+      $scope.init();
+    });
   });
-;

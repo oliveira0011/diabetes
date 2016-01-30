@@ -1,10 +1,15 @@
 <ion-view>
   <ion-content id="pnlContent">
     <div class="list card">
-      <a href="{{option.link}}" class="item item-icon-left"  ng-repeat="option in options">
+      <a href="{{option.link}}" class="item item-icon-left" ng-repeat="option in options">
         <span class="icon {{option.icon}}"></span>
         <h2>{{option.name}}</h2>
       </a>
     </div>
+    Current x: {{x}}<br/>
+    Current y: {{y}}<br/>
+    Current z: {{z}}<br/>
+    Current Steps number: {{numSteps}}<br/>
+    Current timestamp: {{timestamp}}
   </ion-content>
 </ion-view>
