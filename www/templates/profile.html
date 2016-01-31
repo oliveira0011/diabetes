@@ -1,85 +1,140 @@
 <ion-view view-title="Perfil Utilizador">
   <ion-content id="pnlContent">
     <div class="row responsive-sm">
-      <form name="form" novalidate ng-submit="saveUser(form)">
+      <form name="form" novalidate class="col-offset-25 col col-50" ng-submit="saveUser(form)">
         <div class="list">
-          <div class="{{value.type !== 'password' ? 'row' : ''}}" ng-repeat="(key, value) in user">
-            <div ng-if="value.type === 'image'" class="col">
-              <div class="row">
-                <img id="profileImageImg" class="avatar" ng-src="{{value.value || '//:0' }}"
-                     style="width:200px; height:200px;margin: auto;">
-              </div>
-              <br/>
-              <input type="file" ng-model="value.value"
-                     onchange="angular.element(this).scope().saveimage(this.files)" accept="image/*" capture="camera"
-                     class="row"
-                     id="profileImage">
+          <div class="col">
+            <div class="row">
+              <img id="profileImageImg" class="avatar" ng-src="{{user.profileImage || '//:0' }}"
+                   style="width:200px; height:200px;margin: auto;">
             </div>
-            <div ng-if="value.type === 'resetpassword'" class="col col-90">
-              <li class="item item-toggle positive">
-                Repor password
-                <label class="toggle toggle-positive">
-                  <input type="checkbox" name="{{key}}" ng-model="value.value">
-                  <div class="track">
-                    <div class="handle"></div>
-                  </div>
-                </label>
-              </li>
-            </div>
-            <div ng-if="value.type !== 'image' && value.type !== 'resetpassword'"
-                 class="{{value.type === 'password' ? 'row' : 'col'}}">
-              <label class="col-90 item item-input">
-              <span
-                class="positive input-label">{{value.required ? '*' : ''}} {{value.placeHolder}}</span>
-                <span style="color: #c8c8c8" ng-if="value.type === 'label'">{{value.value}}</span>
+            <br/>
+            <input type="file" ng-model="user.profileImage"
+                   onchange="angular.element(this).scope().saveimage(this.files)" accept="image/*" capture="camera"
+                   class="row"
+                   id="profileImage">
+          </div>
+          <div class="col">
+            <label class="item item-input">
+              <span class="positive input-label">Primeiro Nome</span>
+              <span style="color: #c8c8c8"></span>
+              <label>
+                {{user.firstName}}
+              </label>
+          </div>
+          <div class="col">
+            <label class="item item-input">
+              <span class="positive input-label">Apelido</span>
+              <span style="color: #c8c8c8"></span>
+              <label>
+                {{user.lastName}}
+              </label>
+          </div>
+          <div class="col">
+            <label class="item item-input">
+              <span class="positive input-label">Email</span>
+              <span style="color: #c8c8c8"></span>
+              <label>
+                {{user.email}}
+              </label>
+          </div>
+          <div class="col">
+            <label class="item item-input">
+              <span class="positive input-label">Morada</span>
+              <span style="color: #c8c8c8"></span>
+              <label>
+                {{user.address}}
+              </label>
+          </div>
+          <div class="col">
+            <li class="item item-toggle positive">
+              Repor password
+              <label class="toggle toggle-positive">
+                <input type="checkbox" name="resetPassword" ng-model="user.resetPassword">
+                <div class="track">
+                  <div class="handle"></div>
+                </div>
+              </label>
+            </li>
+          </div>
+          <div class="col" ng-if="user.resetPassword">
+            <label class="item item-input">
+              <span class="positive input-label">Palavra-Passe Atual</span>
+              <span style="color: #c8c8c8"></span>
+              <label ng-model="user.oldPassword">
                 <input
-                  ng-if="value.type !== 'label'"
-                  type="{{value.type}}"
+                  type="password"
                   required
-                  pattern
-                  minlength
-                  maxlength
-                  dyn-attr="value"
-                  ng-model="value.value" name="{{key}}"
-                  placeholder="{{value.placeHolder}}">
-
+                  ng-model="user.oldPassword" name="oldPassword"
+                  placeholder="Palavra-Passe Atual">
               </label>
-            <span class="col-10">
-                <a name="generate" class="button button-icon positive"
-                   ng-if="value.type === 'password'"
-                   ng-click="generatePassword(value)">
-                  <i ng-if="value.type == 'password'" class="icon ion-shuffle"></i>
-                </a>
-            </span>
-
-              <div id="errorMessages1"
-                   class="assertive"
-                   ng-if="value.type !== 'password'" ng-messages="form[key].$error" multiple>
-                <p class="row" ng-if="form.$submitted || !form[key].$pristine" ng-repeat="(messageKey, messageValue) in value.errorMessages"
-                   ng-message="{{messageKey}}">
-                  {{messageValue}}</p>
-              </div>
-            </div>
-            <div id="errorMessages2" ng-if="value.type === 'password'" ng-messages="form[key].$error" multiple
-                 class="row assertive">
-              <p class="col" ng-if="form.$submitted || !form[key].$pristine" ng-repeat="(messageKey, messageValue) in value.errorMessages"
-                 ng-message="{{messageKey}}">
-                {{messageValue}}</p>
-            </div>
           </div>
-          <div id="invalidMessages">
-            <p class="row assertive" ng-repeat="invalidMessage in invalidMessages">{{invalidMessage}}</p>
-          </div>
-          <div class="row">
-            <div class="col">
-              <label class="">
-                <button class="col-90 button button-block button-positive" type="submit">Editar Utilizador
-                </button>
+          <div class="col" ng-if="user.resetPassword">
+            <label class="item item-input">
+              <span class="positive input-label">Nova Palavra-Passe</span>
+              <span style="color: #c8c8c8"></span>
+              <label ng-model="user.oldPassword">
+                <input
+                  type="password"
+                  required
+                  ng-model="user.newPassword" name="newPassword"
+                  placeholder="Nova Palavra-Passe">
               </label>
-            </div>
+          </div>
+          <div id="errorMessages2" ng-messages="form['password'].$error" multiple class="row assertive">
+            <p class="col" ng-if="form.$submitted || !form['password'].$pristine" ng-message="required">
+              A definição de uma palavra-passe para o utente é obrigatória
+            </p>
+          </div>
+
+
+          <!--<div class="row">-->
+          <!--<label class="item item-input">-->
+          <!--<span class="positive input-label">{{value.required ? '*' : ''}} {{value.placeHolder}}</span>-->
+          <!--<span style="color: #c8c8c8"></span>-->
+          <!--<label ng-model="value.value">-->
+          <!--<input-->
+          <!--ng-if="value.type !== 'label'"-->
+          <!--type="{{value.type}}"-->
+          <!--required-->
+          <!--pattern-->
+          <!--minlength-->
+          <!--maxlength-->
+          <!--dyn-attr="value"-->
+          <!--ng-model="value.value" name="{{key}}"-->
+          <!--placeholder="{{value.placeHolder}}">-->
+          <!--</label>-->
+
+          <!--<div id="errorMessages1"-->
+          <!--class="assertive"-->
+          <!--ng-if="value.type !== 'password'" ng-messages="form[key].$error" multiple>-->
+          <!--<p class="row" ng-if="form.$submitted || !form[key].$pristine"-->
+          <!--ng-repeat="(messageKey, messageValue) in value.errorMessages"-->
+          <!--ng-message="{{messageKey}}">-->
+          <!--{{messageValue}}</p>-->
+          <!--</div>-->
+          <!--</div>-->
+          <!--<div id="errorMessages2" ng-if="value.type === 'password'" ng-messages="form[key].$error" multiple-->
+          <!--class="row assertive">-->
+          <!--<p class="col" ng-if="form.$submitted || !form[key].$pristine"-->
+          <!--ng-repeat="(messageKey, messageValue) in value.errorMessages"-->
+          <!--ng-message="{{messageKey}}">-->
+          <!--{{messageValue}}</p>-->
+          <!--</div>-->
+        </div>
+        <div id="invalidMessages">
+          <p class="row assertive" ng-repeat="invalidMessage in invalidMessages">{{invalidMessage}}</p>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label class="">
+              <button class="col button button-block button-positive" type="submit">Atualizar Dados Pessoais
+              </button>
+            </label>
           </div>
         </div>
-      </form>
+    </div>
+    </form>
 
     </div>
   </ion-content>

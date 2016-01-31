@@ -48,7 +48,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
         }
       })
       .state('app.events', {
-        url: '/events',
+        url: '/event',
         views: {
           'menuContent': {
             templateUrl: 'templates/events.html',
@@ -56,8 +56,8 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
           }
         }
       })
-      .state('app.eventcreate', {
-        url: '/event',
+      .state('app.eventCreate', {
+        url: '/event/new',
         views: {
           'menuContent': {
             templateUrl: 'templates/event.html',
@@ -65,7 +65,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
           }
         }
       })
-      .state('app.eventedit', {
+      .state('app.eventEdit', {
         url: '/event/:id/edit',
         views: {
           'menuContent': {
@@ -74,7 +74,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
           }
         }
       })
-      .state('app.eventfind', {
+      .state('app.eventFind', {
         url: '/event/:id',
         views: {
           'menuContent': {
@@ -92,21 +92,21 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
           }
         }
       })
-      .state('app.biometricos', {
-        url: '/biometricos',
+      .state('app.hemoglobin', {
+        url: '/hemoglobin',
         views: {
           'menuContent': {
-            templateUrl: 'templates/biometricos-main.html',
-            controller: 'BiometricosCtrl'
+            templateUrl: 'templates/hemoglobin.html',
+            controller: 'HemoGlobinCtrl'
           }
         }
       })
-      .state('app.single', {
-        url: '/biometricos/:biometricoId',
+      .state('app.hemoglobinRegistry', {
+        url: '/hemoglobin/registry',
         views: {
           'menuContent': {
-            templateUrl: 'templates/biometricos.html',
-            controller: 'PlaylistCtrl'
+            templateUrl: 'templates/hemoglobin-registry.html',
+            controller: 'HemoGlobinRegistryCtrl'
           }
         }
       });

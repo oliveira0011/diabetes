@@ -31,7 +31,9 @@ angular.module('app.controllers', [])
     $scope.currentY = 0;
     $scope.previousY = 0;
     $scope.startWatching = function () {
-
+      if ($cordovaDeviceMotion !== undefined) {
+        return;
+      }
       // Device motion configuration
       $scope.watch = $cordovaDeviceMotion.watchAcceleration($scope.options);
 
@@ -60,7 +62,9 @@ angular.module('app.controllers', [])
       });
     };
     $scope.stopWatching = function () {
-      $scope.watch.clearWatch();
+      if($scope.watch !== undefined){
+        $scope.watch.clearWatch();
+      }
     };
     $ionicPlatform.ready(function () {
       $scope.startWatching();
@@ -68,18 +72,10 @@ angular.module('app.controllers', [])
 
 
     $scope.$on('$ionicView.beforeLeave', function () {
-      $scope.watch.clearWatch(); // Turn off motion detection watcher
+      if($scope.watch !== undefined){
+        $scope.watch.clearWatch(); // Turn off motion detection watcher
+      }
     });
-  })
-  .controller('BiometricosCtrl', function ($scope) {
-    $scope.biometricos = [
-      {title: 'Reggae', id: 1},
-      {title: 'Chill', id: 2},
-      {title: 'Dubstep', id: 3},
-      {title: 'Indie', id: 4},
-      {title: 'Rap', id: 5},
-      {title: 'Cowbell', id: 6}
-    ];
   })
   .controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseFactory, $ionicPopup, $ionicLoading) {
     $scope.loginData = {};
@@ -407,26 +403,23 @@ angular.module('app.controllers', [])
 
   })
   .controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseFactory, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+    //$scope.user = {firstName:1,lastName:1,address:1,oldPassword:1};
+    $scope.user = {};
     var dbConnection = FirebaseFactory.getDBConnetion();
     //If you want to use URL attributes before the website is loaded
     $scope.init = function () {
-      $scope.user = UserFormFactory.getUserStructure(false);
-
+      //$scope.user = UserFormFactory.getUserStructure(false);
       angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
-        var changed = false;
-        angular.forEach($scope.user, function (userValue, userKey) {
-          if (!changed && retrievedUserKey === userKey) {
-            userValue.value = retrievedUserValue;
-            changed = true;
-          }
-        });
+        $scope.user[retrievedUserKey] = retrievedUserValue;
       });
+      console.log($scope.user);
 
       if ($scope.retrievedUser && $scope.retrievedUser.id && $scope.retrievedUser.id !== '') {
-        dbConnection.child("profileImages").child($scope.retrievedUser.id).on('value', function (data) {
+        dbConnection.child("profileImages").child($scope.retrievedUser.id).once('value', function (data) {
           if (data.val() != null) {
-            $scope.user.profileImage.value = data.val().image;
+            $scope.user.profileImage = data.val().image;
             //console.log($scope.user.profileImage.value);
+            console.log($scope.user);
             if (!$scope.$$phase) {
               $scope.$apply();
             }
@@ -435,12 +428,17 @@ angular.module('app.controllers', [])
       }
     };
     if (FirebaseFactory.currentUserUid !== undefined) {
-      dbConnection.child('users').child(FirebaseFactory.currentUserUid).on('value', function (user) {
+      dbConnection.child('users').child(FirebaseFactory.currentUserUid).once('value', function (user) {
         $scope.retrievedUser = user.val();
         $scope.retrievedUser.id = FirebaseFactory.currentUserUid;
         $scope.init();
+        console.log(1);
       });
     } else {
       $state.go('login');
     }
+  })
+  .controller('HemoGlobinCtrl', function ($scope) {
+  })
+  .controller('HemoGlobinRegistryCtrl', function ($scope) {
   });
