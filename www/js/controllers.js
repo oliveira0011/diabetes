@@ -407,101 +407,40 @@ angular.module('app.controllers', [])
 
   })
   .controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseFactory, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
-
+    var dbConnection = FirebaseFactory.getDBConnetion();
+    //If you want to use URL attributes before the website is loaded
     $scope.init = function () {
-      if (!$scope.isNewUser) {
-        $scope.options = [
-          {
-            description: 'Dados Pessoais',
-            templateUrl: "templates/user.personal.html",
-            callback: function () {
-              $scope.currentOption = this;
-              console.log('ok');
-            }
-          }, {
-            description: 'Atividade Física',
-            templateUrl: "templates/user.biometric.html",
-            callback: function () {
-              $scope.currentOption = this;
-              console.log($scope.currentOption);
-            }
-          }, {
-            description: 'Exercícios Recomendados',
-            templateUrl: "templates/user.biometric.html",
-            callback: function () {
-              $scope.currentOption = this;
-              console.log($scope.currentOption);
-            }
-          }, {
-            description: 'Dados Biométricos',
-            templateUrl: "templates/user.biometric.html",
-            callback: function () {
-              $scope.currentOption = this;
-              console.log($scope.currentOption);
-            }
-          }
-        ];
-        $scope.currentOption = $scope.options[$stateParams.option ? $stateParams.option : 0];
-      } else {
-        $scope.currentOption = {
-          description: 'Dados Pessoais',
-          templateUrl: "templates/user.personal.html",
-          callback: function () {
-            $scope.currentOption = this;
-            console.log('ok');
-          }
-        };
+      $scope.user = UserFormFactory.getUserStructure(false);
 
-      }
-    };
-    $scope.removeUser = function () {
-      var myPopup = $ionicPopup.show({
-        title: 'Remover Utilizador',
-        subTitle: 'Ao confirmar esta ação, o utente será removido da plataforma e não poderá mais iniciar sessão na mesma',
-        scope: $scope,
-        buttons: [
-          {
-            text: 'Cancelar',
-          },
-          {
-            text: 'Remover',
-            type: 'button-positive',
-            onTap: function (e) {
-              return true;
-            }
+      angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
+        var changed = false;
+        angular.forEach($scope.user, function (userValue, userKey) {
+          if (!changed && retrievedUserKey === userKey) {
+            userValue.value = retrievedUserValue;
+            changed = true;
           }
-        ]
+        });
       });
 
-      myPopup.then(function (res) {
-        if (res) {
-          $ionicLoading.show({template: "A remover utente..."});
-          var dbConnection = FirebaseFactory.getDBConnetion();
-          dbConnection.child('users').child($stateParams.uid).once('value', function (snap) {
-            console.log(snap);
-            console.log(snap.val());
-            var profileImageUid = snap.val().profileImageUid;
-            if (profileImageUid) {
-              dbConnection.child('profileImages').child(profileImageUid).remove(function () {
-                console.log("Profile Image Removed");
-              });
+      if ($scope.retrievedUser && $scope.retrievedUser.id && $scope.retrievedUser.id !== '') {
+        dbConnection.child("profileImages").child($scope.retrievedUser.id).on('value', function (data) {
+          if (data.val() != null) {
+            $scope.user.profileImage.value = data.val().image;
+            //console.log($scope.user.profileImage.value);
+            if (!$scope.$$phase) {
+              $scope.$apply();
             }
-            dbConnection.child('users').child($stateParams.uid).remove(function () {
-              $ionicLoading.hide();
-              $state.go('app.users');
-            });
-          });
-        }
-      });
-    };
-    console.log(FirebaseFactory.currentUserUid);
-
-    FirebaseFactory.getDBConnetion().child("users").startAt("e345c357-6062-428e-8c80-0a742acb9ce5").endAt("e345c357-6062-428e-8c80-0a742acb9ce5").on('value', function (snap) {
-      console.log(snap.val());
-      $scope.isNewUser = true;
-      if (snap.val()) {
-        $scope.isNewUser = false;
+          }
+        });
       }
-      $scope.init();
-    });
+    };
+    if (FirebaseFactory.currentUserUid !== undefined) {
+      dbConnection.child('users').child(FirebaseFactory.currentUserUid).on('value', function (user) {
+        $scope.retrievedUser = user.val();
+        $scope.retrievedUser.id = FirebaseFactory.currentUserUid;
+        $scope.init();
+      });
+    } else {
+      $state.go('login');
+    }
   });
