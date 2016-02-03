@@ -92,21 +92,21 @@ angular.module('app', ['ionic', 'app.controllers', 'app.directives', 'app.factor
           }
         }
       })
-      .state('app.hemoglobin', {
-        url: '/hemoglobin',
+      .state('app.biomedic', {
+        url: '/biomedic',
         views: {
           'menuContent': {
-            templateUrl: 'templates/hemoglobin.html',
-            controller: 'HemoGlobinCtrl'
+            templateUrl: 'templates/biomedic.html',
+            controller: 'BiomedicCtrl'
           }
         }
       })
-      .state('app.hemoglobinRegistry', {
-        url: '/hemoglobin/registry',
+      .state('app.biomedicRegistry', {
+        url: '/biomedic/registry',
         views: {
           'menuContent': {
-            templateUrl: 'templates/hemoglobin-registry.html',
-            controller: 'HemoGlobinRegistryCtrl'
+            templateUrl: 'templates/biomedic-registry.html',
+            controller: 'BiomedicRegistryCtrl'
           }
         }
       });

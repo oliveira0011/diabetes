@@ -62,7 +62,7 @@ angular.module('app.controllers', [])
       });
     };
     $scope.stopWatching = function () {
-      if($scope.watch !== undefined){
+      if ($scope.watch !== undefined) {
         $scope.watch.clearWatch();
       }
     };
@@ -72,7 +72,7 @@ angular.module('app.controllers', [])
 
 
     $scope.$on('$ionicView.beforeLeave', function () {
-      if($scope.watch !== undefined){
+      if ($scope.watch !== undefined) {
         $scope.watch.clearWatch(); // Turn off motion detection watcher
       }
     });
@@ -438,7 +438,14 @@ angular.module('app.controllers', [])
       $state.go('login');
     }
   })
-  .controller('HemoGlobinCtrl', function ($scope) {
+  .controller('BiomedicCtrl', function ($scope) {
   })
-  .controller('HemoGlobinRegistryCtrl', function ($scope) {
+  .controller('BiomedicRegistryCtrl', function ($scope) {
+    $scope.active = 'hemoglobin';
+    $scope.setActive = function (type) {
+      $scope.active = type;
+    };
+    $scope.isActive = function (type) {
+      return type === $scope.active;
+    };
   });

@@ -1,0 +1,24 @@
+<div class="col">
+  <label class="item item-input">
+    <span class="positive input-label">Hemoglobina (mg/dl)</span>
+    <span style="color: #c8c8c8"></span>
+    <input type="number" min="0">
+  </label>
+</div>
+<div class="col">
+  <label class="item item-input">
+    <span class="positive input-label">Data</span>
+    <span style="color: #c8c8c8"></span>
+    <input type="date" min="0">
+</div>
+<div id="invalidMessages">
+  <p class="row assertive" ng-repeat="invalidMessage in invalidMessages">{{invalidMessage}}</p>
+</div>
+<div class="row">
+  <div class="col">
+    <label class="">
+      <button class="col button button-block button-positive" type="submit">Registar Hemoglobina
+      </button>
+    </label>
+  </div>
+</div>
