@@ -467,14 +467,33 @@ angular.module('app.controllers', [])
         return;
       }
       var records = [];
+      var colors = {};
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
+          colors = {
+            fillColor: "#F15854",
+            strokeColor: "#B22222",
+            pointColor: "#800000",
+            pointStrokeColor: "#800000",
+          };
           records = $scope.hemoglobinRecords;
           break;
         case BiomedicType.BLOOD_PRESSURE:
           records = $scope.bloodPressureRecords;
+          colors = {
+            fillColor: "#FAA43A",
+            strokeColor: "#FF8C00",
+            pointColor: "#FF4500",
+            pointStrokeColor: "#FF4500"
+          };
           break;
         case BiomedicType.CHOLESTEROL:
+          colors = {
+            fillColor: "#F17CB0",
+            strokeColor: "#F08080",
+            pointColor: "#CD5C5C",
+            pointStrokeColor: "#CD5C5C"
+          };
           records = $scope.cholesterolRecords;
           break;
       }
@@ -493,10 +512,10 @@ angular.module('app.controllers', [])
         labels: labels,
         datasets: [
           {
-            fillColor: "rgba(220,220,220,0.5)",
-            strokeColor: "rgba(220,220,220,1)",
-            pointColor: "rgba(220,220,220,1)",
-            pointStrokeColor: "#fff",
+            fillColor: colors.fillColor,
+            strokeColor: colors.strokeColor,
+            pointColor: colors.pointColor,
+            pointStrokeColor: colors.pointStrokeColor,
             data: records
           }
         ]
@@ -509,6 +528,7 @@ angular.module('app.controllers', [])
           $scope.chartBloodPressure = {data: data};
           break;
         case BiomedicType.CHOLESTEROL:
+          console.log(data);
           $scope.chartCholesterol = {data: data};
           break;
       }
@@ -518,12 +538,12 @@ angular.module('app.controllers', [])
     var init = function () {
       BiomedicService.getHemoglobinRecords(handler);
       BiomedicService.getBloodPressureRecords(handler);
-      //BiomedicService.getCholesterolRecords(handler);
+      BiomedicService.getCholesterolRecords(handler);
     };
 
     init();
   })
-  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, Hemoglobin, BloodPressure  , Cholesterol, BiomedicType, $ionicLoading, $state) {
+  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, Hemoglobin, BloodPressure, Cholesterol, BiomedicType, $ionicLoading, $state) {
     $scope.maxDate = new Date();
     $scope.maxDate.setDate($scope.maxDate.getDate() + 1);
     $scope.biomedic = {};

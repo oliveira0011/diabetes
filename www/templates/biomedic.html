@@ -2,17 +2,29 @@
   <ion-nav-buttons side="secondary">
     <a class="button button-clear button-positive" href="/#/app/biomedic/registry">
       <i class="icon ion-ios-plus-outline"></i>
-      Registar Hemoglobina
+      Novo Dado Biomédico
     </a>
   </ion-nav-buttons>
   <ion-content>
-    <div class="row responsive-sm">
-      <div class="col col-50 col-offset-25">
-        <chart value="chartHemoglobin"></chart>
-        <chart value="chartBloodPressure"></chart>
-        <chart value="chartCholesterol"></chart>
-        <ng-include></ng-include>
+    <div class="row responsive-md">
+      <div class="col-offset-10 col">
+        <label for="chartHemoglobin">XPO
+          <chart id="chartHemoglobin" value="chartHemoglobin"></chart>
+        </label>
       </div>
+      <div class="col">
+        <label for="chartBloodPressure">XPO
+          <chart id="chartBloodPressure" value="chartBloodPressure"></chart>
+        </label>
+      </div>
+    </div>
+    <div class="row responsive-md">
+      <div class="col-offset-33 col">
+        <label for="chartCholesterol">XPO
+          <chart id="chartCholesterol" value="chartCholesterol"></chart>
+        </label>
+      </div>
+    </div>
     </div>
   </ion-content>
 </ion-view>

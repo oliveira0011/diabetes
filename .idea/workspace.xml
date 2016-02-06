@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d2701ed3-0294-42ed-a1e6-1389f1c2657b" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/js/controllers.js" afterPath="$PROJECT_DIR$/www/js/controllers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/js/services.js" afterPath="$PROJECT_DIR$/www/js/services.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/templates/biomedic.html" afterPath="$PROJECT_DIR$/www/templates/biomedic.html" />
     </list>
     <ignored path="Diabetes.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -36,11 +36,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="controllers.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="controllers.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/www/js/controllers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="519" column="6" selection-start-line="519" selection-start-column="6" selection-end-line="519" selection-end-column="6" />
+            <state vertical-scroll-proportion="0.46263346">
+              <caret line="493" column="32" selection-start-line="493" selection-start-column="32" selection-end-line="493" selection-end-column="32" />
               <folding>
                 <element signature="e#2145#2182#0" expanded="false" />
                 <element signature="e#2981#5771#0" expanded="false" />
@@ -52,7 +52,7 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/www/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.375">
+            <state vertical-scroll-proportion="-14.375">
               <caret line="23" column="50" selection-start-line="23" selection-start-column="50" selection-end-line="23" selection-end-column="50" />
               <folding />
             </state>
@@ -62,8 +62,8 @@
       <file leaf-file-name="biomedic.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/www/templates/biomedic.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.5">
-              <caret line="12" column="38" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="38" />
+            <state vertical-scroll-proportion="-2.5">
+              <caret line="4" column="25" selection-start-line="4" selection-start-column="25" selection-end-line="4" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -84,10 +84,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="services.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="services.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/www/js/services.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.75088966">
+            <state vertical-scroll-proportion="0.0">
               <caret line="125" column="18" selection-start-line="125" selection-start-column="18" selection-end-line="125" selection-end-column="18" />
               <folding>
                 <element signature="e#82#1312#0" expanded="false" />
@@ -146,9 +146,9 @@
         <option value="$PROJECT_DIR$/www/templates/biomedic-blood-pressure-tpl.html" />
         <option value="$PROJECT_DIR$/www/js/app.js" />
         <option value="$PROJECT_DIR$/www/index.html" />
+        <option value="$PROJECT_DIR$/www/js/services.js" />
         <option value="$PROJECT_DIR$/www/templates/biomedic.html" />
         <option value="$PROJECT_DIR$/www/js/controllers.js" />
-        <option value="$PROJECT_DIR$/www/js/services.js" />
       </list>
     </option>
   </component>
@@ -933,12 +933,12 @@
       <workItem from="1454270897226" duration="193000" />
       <workItem from="1454277596174" duration="3332000" />
       <workItem from="1454528441439" duration="2202000" />
-      <workItem from="1454717395454" duration="10516000" />
+      <workItem from="1454717395454" duration="12279000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="128640000" />
+    <option name="totallyTimeSpent" value="130403000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="963" extended-state="6" />
@@ -1347,14 +1347,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/www/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.375">
-          <caret line="23" column="50" selection-start-line="23" selection-start-column="50" selection-end-line="23" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/www/templates/biomedic-cholesterol-tpl.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-2.5">
@@ -1395,14 +1387,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/www/templates/biomedic.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.5">
-          <caret line="12" column="38" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/www/js/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1411,23 +1395,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/www/js/controllers.js">
+    <entry file="file://$PROJECT_DIR$/www/js/services.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="519" column="6" selection-start-line="519" selection-start-column="6" selection-end-line="519" selection-end-column="6" />
+          <caret line="125" column="18" selection-start-line="125" selection-start-column="18" selection-end-line="125" selection-end-column="18" />
           <folding>
-            <element signature="e#2145#2182#0" expanded="false" />
-            <element signature="e#2981#5771#0" expanded="false" />
+            <element signature="e#82#1312#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/www/js/services.js">
+    <entry file="file://$PROJECT_DIR$/www/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.75088966">
-          <caret line="125" column="18" selection-start-line="125" selection-start-column="18" selection-end-line="125" selection-end-column="18" />
+        <state vertical-scroll-proportion="-14.375">
+          <caret line="23" column="50" selection-start-line="23" selection-start-column="50" selection-end-line="23" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/templates/biomedic.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.5">
+          <caret line="4" column="25" selection-start-line="4" selection-start-column="25" selection-end-line="4" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/js/controllers.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.46263346">
+          <caret line="493" column="32" selection-start-line="493" selection-start-column="32" selection-end-line="493" selection-end-column="32" />
           <folding>
-            <element signature="e#82#1312#0" expanded="false" />
+            <element signature="e#2145#2182#0" expanded="false" />
+            <element signature="e#2981#5771#0" expanded="false" />
           </folding>
         </state>
       </provider>
