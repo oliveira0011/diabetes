@@ -1,4 +1,54 @@
 angular.module('app.factories', [])
+  .factory('BiomedicType', function () {
+    return {
+      HEMOGLOBIN: 'hemoglobin',
+      BLOOD_PRESSURE: 'blood-pressure',
+      CHOLESTEROL: 'cholesterol'
+    }
+  })
+  .factory('Biomedic', function () {
+    function Biomedic(biomedicDate, value) {
+      if (this.constructor === Biomedic) {
+        throw new Error("Can't instantiate abstract class!");
+      }
+      this.id = 0;
+      this.biomedicDate = biomedicDate;
+      this.value = value;
+    }
+
+    Biomedic.prototype.type = function () {
+      throw new Error("Abstract method!");
+    };
+    return Biomedic;
+  })
+  .factory('Hemoglobin', function (Biomedic, BiomedicType) {
+    var Hemoglobin = function () {
+      Biomedic.apply(this, arguments);
+      this.type = BiomedicType.HEMOGLOBIN;
+    };
+    Hemoglobin.prototype = Object.create(Biomedic.prototype);
+    Hemoglobin.prototype.constructor = Hemoglobin;
+
+    return Hemoglobin;
+  })
+  .factory('BloodPressure', function (Biomedic, BiomedicType) {
+    var BloodPressure = function () {
+      Biomedic.apply(this, arguments);
+      this.type = BiomedicType.BLOOD_PRESSURE;
+    };
+    BloodPressure.prototype = Object.create(Biomedic.prototype);
+    BloodPressure.prototype.constructor = BloodPressure;
+    return BloodPressure;
+  })
+  .factory('Cholesterol', function (Biomedic, BiomedicType) {
+    var Cholesterol = function () {
+      Biomedic.apply(this, arguments);
+      this.type = BiomedicType.CHOLESTEROL;
+    };
+    Cholesterol.prototype = Object.create(Biomedic.prototype);
+    Cholesterol.prototype.constructor = Cholesterol;
+    return Cholesterol;
+  })
   .factory('Friend', function () {
     function Friend(id, name, profileImage) {
       this.id = id;
@@ -7,7 +57,8 @@ angular.module('app.factories', [])
     }
 
     return Friend;
-  }).factory('Event', function (Friend) {
+  })
+  .factory('Event', function (Friend) {
     function Event(id, name, location, description, friends, image, owner) {
       this.id = id;
       this.name = name;
@@ -46,16 +97,6 @@ angular.module('app.factories', [])
       }
     };
     return Event;
-  })
-  .factory('FirebaseFactory', function ($firebaseObject) {
-    var firebaseFactory = {};
-    firebaseFactory.setCurrentUserUid = function (currentUserUid) {
-      firebaseFactory.currentUserUid = currentUserUid;
-    };
-    firebaseFactory.getDBConnetion = function () {
-      return new Firebase("https://diabetes.firebaseio.com");
-    };
-    return firebaseFactory;
   })
   .factory('UserFormFactory', function () {
     ///returns the form structure needed for the creation of a user

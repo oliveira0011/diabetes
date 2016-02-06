@@ -3,9 +3,10 @@ angular.module('app.controllers', [])
    *
    * APPLICATION CONTROLLER
    */
-  .controller('AppCtrl', function ($scope, $state, FirebaseFactory) {
+  .controller('AppCtrl', function ($scope, $state, FirebaseService) {
     $scope.logout = function () {
-      FirebaseFactory.getDBConnetion().unauth();
+      FirebaseService.getDBConnection().unauth();
+      FirebaseService.setCurrentUserUid();
       $state.go('login');
     }
   })
@@ -77,7 +78,11 @@ angular.module('app.controllers', [])
       }
     });
   })
-  .controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseFactory, $ionicPopup, $ionicLoading) {
+  .controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
+    console.log(FirebaseService.isUserLogged());
+    if (FirebaseService.isUserLogged()) {
+      $state.go('app.main');
+    }
     $scope.loginData = {};
     $scope.doLogin = function (form) {
       delete $scope.errorMessage;
@@ -85,14 +90,14 @@ angular.module('app.controllers', [])
       if (form.$valid) {
         $ionicLoading.show({template: 'A autenticar...'});
         console.log($scope.loginData);
-        var dbConnection = FirebaseFactory.getDBConnetion();
+        var dbConnection = FirebaseService.getDBConnection();
 
         function authHandler(error, authData) {
           if (error) {
             console.log("Login Failed!", error);
           } else {
             console.log("Authenticated successfully with payload:", authData);
-            FirebaseFactory.setCurrentUserUid(authData.uid);
+            FirebaseService.setCurrentUserUid(authData.uid);
             if (authData.password.isTemporaryPassword) {
               $ionicLoading.hide();
               var tempPass = $scope.loginData.password;
@@ -200,7 +205,7 @@ angular.module('app.controllers', [])
           template: "A enviar email de reposição de palavra-passe..."
         });
         console.log(res);
-        FirebaseFactory.getDBConnetion().resetPassword({
+        FirebaseService.getDBConnection().resetPassword({
           email: res
         }, function (error) {
           if (error === null) {
@@ -402,10 +407,10 @@ angular.module('app.controllers', [])
     };
 
   })
-  .controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseFactory, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+  .controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
     //$scope.user = {firstName:1,lastName:1,address:1,oldPassword:1};
     $scope.user = {};
-    var dbConnection = FirebaseFactory.getDBConnetion();
+    var dbConnection = FirebaseService.getDBConnection();
     //If you want to use URL attributes before the website is loaded
     $scope.init = function () {
       //$scope.user = UserFormFactory.getUserStructure(false);
@@ -427,10 +432,10 @@ angular.module('app.controllers', [])
         });
       }
     };
-    if (FirebaseFactory.currentUserUid !== undefined) {
-      dbConnection.child('users').child(FirebaseFactory.currentUserUid).once('value', function (user) {
+    if (FirebaseService.currentUserUid !== undefined) {
+      dbConnection.child('users').child(FirebaseService.currentUserUid).once('value', function (user) {
         $scope.retrievedUser = user.val();
-        $scope.retrievedUser.id = FirebaseFactory.currentUserUid;
+        $scope.retrievedUser.id = FirebaseService.currentUserUid;
         $scope.init();
         console.log(1);
       });
@@ -438,14 +443,126 @@ angular.module('app.controllers', [])
       $state.go('login');
     }
   })
-  .controller('BiomedicCtrl', function ($scope) {
+  .controller('BiomedicCtrl', function ($scope, BiomedicService, BiomedicType) {
+    $scope.hemoglobinRecords = [];
+    $scope.bloodPressureRecords = [];
+    $scope.cholesterolRecords = [];
+    function getFormattedDate(timestamp) {
+      var date = new Date(timestamp);
+      var month = date.getMonth() + 1;
+      month = month < 10 ? '0' + month : month;
+      var year = date.getFullYear();
+      return month + '-' + year;
+    }
+
+    var handler = function (type, retrievedRecords) {
+      console.log(retrievedRecords);
+      if (!retrievedRecords) {
+        return;
+      }
+      var arr = Object.keys(retrievedRecords).map(function (k) {
+        return retrievedRecords[k]
+      });
+      if (arr.length == 0) {
+        return;
+      }
+      var records = [];
+      switch (type) {
+        case BiomedicType.HEMOGLOBIN:
+          records = $scope.hemoglobinRecords;
+          break;
+        case BiomedicType.BLOOD_PRESSURE:
+          records = $scope.bloodPressureRecords;
+          break;
+        case BiomedicType.CHOLESTEROL:
+          records = $scope.cholesterolRecords;
+          break;
+      }
+      var labels = [];
+      arr.sort(function (a, b) {
+        return parseFloat(b.biomedicDate) - parseFloat(a.biomedicDate);
+      });
+
+      angular.forEach(arr, function (record) {
+        console.log(record);
+        records.push(record.value);
+        labels.push(getFormattedDate(record.biomedicDate));
+      });
+      var data = {
+        //labels: ["January", "February", "March", "April", "May", "June", "July"],
+        labels: labels,
+        datasets: [
+          {
+            fillColor: "rgba(220,220,220,0.5)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            data: records
+          }
+        ]
+      };
+      switch (type) {
+        case BiomedicType.HEMOGLOBIN:
+          $scope.chartHemoglobin = {data: data};
+          break;
+        case BiomedicType.BLOOD_PRESSURE:
+          $scope.chartBloodPressure = {data: data};
+          break;
+        case BiomedicType.CHOLESTEROL:
+          $scope.chartCholesterol = {data: data};
+          break;
+      }
+    };
+
+
+    var init = function () {
+      BiomedicService.getHemoglobinRecords(handler);
+      //BiomedicService.getBloodPressureRecords(handler);
+      //BiomedicService.getCholesterolRecords(handler);
+    };
+
+    init();
   })
-  .controller('BiomedicRegistryCtrl', function ($scope) {
-    $scope.active = 'hemoglobin';
-    $scope.setActive = function (type) {
-      $scope.active = type;
+  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, Hemoglobin, BiomedicType, $ionicLoading, $state) {
+    $scope.maxDate = new Date();
+    $scope.maxDate.setDate($scope.maxDate.getDate() + 1);
+    $scope.biomedic = {};
+    $scope.biomedic.type = 'blood-pressure';
+    $scope.setType = function (type) {
+      $scope.biomedic = {
+        biomedicDate: new Date(),
+        type: type
+      };
     };
+    $scope.setType('hemoglobin');
     $scope.isActive = function (type) {
-      return type === $scope.active;
+      return type === $scope.biomedic.type;
     };
-  });
+
+    $scope.saveBiomedic = function (form) {
+      console.log(form);
+      if (form.$invalid) {
+        console.log(form);
+        return;
+      }
+      var label = "";
+      switch ($scope.biomedic.type) {
+        case BiomedicType.HEMOGLOBIN:
+          label = "Hemoglobina";
+          break;
+        case BiomedicType.BLOOD_PRESSURE:
+          label = "Tensão Arterial";
+          break;
+        case BiomedicType.CHOLESTEROL:
+          label = "Colesterol";
+          break;
+
+      }
+      $ionicLoading.show({template: "A gravar " + label + "..."});
+      BiomedicService.addHemoglobinRecord(new Hemoglobin($scope.biomedic.biomedicDate, $scope.biomedic.value), function () {
+        $ionicLoading.hide();
+        $state.go('app.biomedic');
+      });
+    }
+  })
+;

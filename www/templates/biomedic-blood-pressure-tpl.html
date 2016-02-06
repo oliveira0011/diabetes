@@ -2,22 +2,29 @@
   <label class="item item-input">
     <span class="positive input-label">Tensão Arterial (mmHg)</span>
     <span style="color: #c8c8c8"></span>
-    <input type="number" min="0">
+    <input required ng-model="biomedic.value" name="value" type="number" min="0">
   </label>
+</div>
+<div ng-messages="form.value.$error" ng-if="form.$invalid && form.$submitted" role="alert">
+  <div class="row assertive" ng-message="required">O valor da Tensão Arterial é obrigatório.</div>
+  <div class="row assertive" ng-message="min">O valor introduzido deve ser superior a 0.</div>
 </div>
 <div class="col">
   <label class="item item-input">
     <span class="positive input-label">Data</span>
     <span style="color: #c8c8c8"></span>
-    <input type="date" min="0">
+    <input ng-model="biomedic.biomedicDate" name="biomedicDate" type="date" max="{{maxDate | date:'yyyy-MM-dd'}}">
 </div>
-<div id="invalidMessages">
-  <p class="row assertive" ng-repeat="invalidMessage in invalidMessages">{{invalidMessage}}</p>
+<div ng-messages="form.biomedicDate.$error" ng-if="form.$invalid && form.$submitted" role="alert">
+  <div class="row assertive" ng-message="required">A data associada ao valor da Tensão Arterial é obrigatória.</div>
+  <div class="row assertive" ng-message="max">A data associada ao valor da Tensão Arterial não deve ser superior ao dia
+    atual.
+  </div>
 </div>
 <div class="row">
   <div class="col">
     <label class="">
-      <button class="col button button-block button-positive" type="submit">Registar Hemoglobina
+      <button class="col button button-block button-positive" type="submit">Registar Tensão Arterial
       </button>
     </label>
   </div>

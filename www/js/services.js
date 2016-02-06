@@ -69,4 +69,94 @@ angular.module('app.services', [])
 
     return EventsService;
   })
-;
+  .service('FirebaseService', function ($cookieStore) {
+    var firebaseService = {};
+    firebaseService.setCurrentUserUid = function (currentUserUid) {
+      $cookieStore.put('currentUserUid', currentUserUid);
+    };
+    firebaseService.getCurrentUserUid = function () {
+      return $cookieStore.get('currentUserUid');
+    };
+
+    firebaseService.isUserLogged = function () {
+      return $cookieStore.get('currentUserUid') !== undefined;
+    };
+    firebaseService.getDBConnection = function () {
+      return new Firebase("https://diabetes.firebaseio.com");
+    };
+    return firebaseService;
+  })
+  .service('BiomedicService', function (FirebaseService, Hemoglobin, BloodPressure, Cholesterol, BiomedicType) {
+    function BiomedicService() {
+    }
+
+    BiomedicService.addHemoglobinRecord = function (biomedic, handler) {
+      if (!biomedic instanceof Hemoglobin) {
+        throw 'The data passed to persist must be a Hemoglobin class.';
+      }
+      console.log(biomedic);
+      var dbConnection = FirebaseService.getDBConnection();
+      console.log(FirebaseService.getCurrentUserUid());
+      console.log(biomedic.biomedicDate);
+      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
+        .push({
+          value: biomedic.value,
+          biomedicDate: biomedic.biomedicDate.getTime()
+        }, handler);
+    };
+
+    BiomedicService.getHemoglobinRecords = function (handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child(BiomedicType.HEMOGLOBIN).child(FirebaseService.getCurrentUserUid()).once('value', function (data) {
+        var results = data.val();
+        handler(BiomedicType.HEMOGLOBIN, results);
+      });
+    };
+    BiomedicService.addBloodPressureRecord = function (biomedic) {
+      if (!biomedic instanceof BloodPressure) {
+        throw 'The data passed to persist must be a BloodPressure class.';
+      }
+      console.log(biomedic);
+      var dbConnection = FirebaseService.getDBConnection();
+      console.log(FirebaseService.getCurrentUserUid());
+      console.log(biomedic.biomedicDate);
+      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
+        .push({
+          biomedicDate: biomedic.biomedicDate,
+          value: biomedic.value
+        });
+    };
+
+    BiomedicService.getBloodPressureRecords = function (handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child(BiomedicType.BLOOD_PRESSURE).child(FirebaseService.getCurrentUserUid()).once('value', function (data) {
+        var results = data.val();
+        console.log(results);
+        handler(BiomedicType.BLOOD_PRESSURE, results);
+      });
+    };
+    BiomedicService.addCholesterolRecord = function (biomedic) {
+      if (!biomedic instanceof Cholesterol) {
+        throw 'The data passed to persist must be a Cholesterol class.';
+      }
+      console.log(biomedic);
+      var dbConnection = FirebaseService.getDBConnection();
+      console.log(FirebaseService.getCurrentUserUid());
+      console.log(biomedic.biomedicDate);
+      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
+        .push({
+          biomedicDate: biomedic.biomedicDate,
+          value: biomedic.value
+        });
+    };
+
+    BiomedicService.getCholesterolRecords = function (handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child(BiomedicType.CHOLESTEROL).child(FirebaseService.getCurrentUserUid()).once('value', function (data) {
+        var results = data.val();
+        console.log(results);
+        handler(BiomedicType.CHOLESTEROL, results);
+      });
+    };
+    return BiomedicService;
+  });

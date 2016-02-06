@@ -20,6 +20,9 @@
   <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyB16sGmIekuGIvYOfNoW9T44377IU2d2Es&sensor=true"></script>
   <!-- cordova script (this will be a 404 during development) -->
   <script src="lib/ngCordova/dist/ng-cordova.min.js"></script>
+  <script src="lib/angular-cookies/angular-cookies.min.js"></script>
+  <script src="lib/chartjs/Chart.min.js"></script>
+  <script src="lib/angular-chartjs-directive/chartjs-directive.js"></script>
   <script src="cordova.js"></script>
 
   <!-- your app's js -->
@@ -29,7 +32,8 @@
   <script src="js/factories.js"></script>
   <script src="js/services.js"></script>
 
-  <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
 </head>
 
 <body ng-app="app">
