@@ -480,7 +480,7 @@ angular.module('app.controllers', [])
       }
       var labels = [];
       arr.sort(function (a, b) {
-        return parseFloat(b.biomedicDate) - parseFloat(a.biomedicDate);
+        return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
       });
 
       angular.forEach(arr, function (record) {
@@ -517,13 +517,13 @@ angular.module('app.controllers', [])
 
     var init = function () {
       BiomedicService.getHemoglobinRecords(handler);
-      //BiomedicService.getBloodPressureRecords(handler);
+      BiomedicService.getBloodPressureRecords(handler);
       //BiomedicService.getCholesterolRecords(handler);
     };
 
     init();
   })
-  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, Hemoglobin, BiomedicType, $ionicLoading, $state) {
+  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, Hemoglobin, BloodPressure  , Cholesterol, BiomedicType, $ionicLoading, $state) {
     $scope.maxDate = new Date();
     $scope.maxDate.setDate($scope.maxDate.getDate() + 1);
     $scope.biomedic = {};
@@ -559,10 +559,24 @@ angular.module('app.controllers', [])
 
       }
       $ionicLoading.show({template: "A gravar " + label + "..."});
-      BiomedicService.addHemoglobinRecord(new Hemoglobin($scope.biomedic.biomedicDate, $scope.biomedic.value), function () {
+
+
+      var handler = function () {
         $ionicLoading.hide();
         $state.go('app.biomedic');
-      });
+      };
+      switch ($scope.biomedic.type) {
+        case BiomedicType.HEMOGLOBIN:
+          BiomedicService.addHemoglobinRecord(new Hemoglobin($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
+          break;
+        case BiomedicType.BLOOD_PRESSURE:
+          BiomedicService.addBloodPressureRecord(new BloodPressure($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
+          break;
+        case BiomedicType.CHOLESTEROL:
+          BiomedicService.addCholesterolRecord(new Cholesterol($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
+          break;
+      }
+      ;
     }
   })
 ;
