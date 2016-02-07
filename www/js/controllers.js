@@ -3,12 +3,24 @@ angular.module('app.controllers', [])
    *
    * APPLICATION CONTROLLER
    */
-  .controller('AppCtrl', function ($scope, $state, FirebaseService) {
+  .controller('AppCtrl', function ($scope, $state, FirebaseService, NotificationService) {
     $scope.logout = function () {
       FirebaseService.getDBConnection().unauth();
       FirebaseService.logoutCurrentUser();
       $state.go('login');
-    }
+    };
+    $scope.$on('logoutUser', function () {
+      $scope.logout();
+    });
+    $scope.newNotificationsNumber = 0;
+    $scope.$on('new_notification', function (e, value) {
+      $scope.newNotificationsNumber++;
+    });
+    NotificationService.registerNewNotificationsListener();
+    //NotificationService.getNotifications(function (notifications) {
+    //  $scope.newNotificationsNumber = notifications.length;
+    //  NotificationService.registerNewNotificationsListener();
+    //});
   })
   .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http) {
     $scope.$on('deviceUpdated', function (e, deviceId) {
@@ -695,7 +707,21 @@ angular.module('app.controllers', [])
           BiomedicService.addCholesterolRecord(new Cholesterol($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
           break;
       }
-      ;
     }
   })
-;
+  .controller('NotificationsCtrl', function ($scope, NotificationService) {
+    $scope.notifications = [];
+    $scope.$on('new_notification', function (e, value) {
+      $scope.notifications.unshift(value);
+      if (!$scope.$$phase) {
+        $scope.$apply();
+      }
+    });
+    //NotificationService.getNotifications(function (notifications) {
+    //  $scope.notifications = notifications;
+    //  console.log($scope.notifications);
+    //  if (!$scope.$$phase) {
+    //    $scope.$apply();
+    //  }
+    //});
+  });

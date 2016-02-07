@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('app', ['ionic', 'ionic.service.core','ngCordova', 'app.controllers', 'app.directives', 'app.factories', 'app.services', 'firebase', 'ngMessages',  'chart.js'])
+angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controllers', 'app.directives', 'app.factories', 'app.services', 'firebase', 'ngMessages', 'chart.js'])
   .run(function ($ionicPlatform, FirebaseService) {
     $ionicPlatform.ready(function () {
       if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -108,6 +108,15 @@ angular.module('app', ['ionic', 'ionic.service.core','ngCordova', 'app.controlle
           'menuContent': {
             templateUrl: 'templates/biomedic-registry.html',
             controller: 'BiomedicRegistryCtrl'
+          }
+        }
+      })
+      .state('app.notifications', {
+        url: '/notification',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/notifications.html',
+            controller: 'NotificationsCtrl'
           }
         }
       });

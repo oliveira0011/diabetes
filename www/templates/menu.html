@@ -4,8 +4,9 @@
       <ion-nav-back-button>
       </ion-nav-back-button>
 
-      <ion-nav-buttons side="left">
+      <ion-nav-buttons side="buttons left-buttons">
         <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
+          <i ng-if="newNotificationsNumber > 0" class="badge badge-assertive">{{newNotificationsNumber}}</i>
         </button>
       </ion-nav-buttons>
     </ion-nav-bar>
@@ -23,6 +24,10 @@
         </ion-item>
         <ion-item menu-close href="#/app/biomedic">
           Hemoglobina
+        </ion-item>
+        <ion-item menu-close href="#/app/notification">
+          Notificações
+          <i ng-if="newNotificationsNumber > 0" class="badge badge-assertive">{{newNotificationsNumber}}</i>
         </ion-item>
         <ion-item menu-close class="ion ion-log-out" ng-click="logout()"></ion-item>
       </ion-list>

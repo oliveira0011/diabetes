@@ -76,7 +76,11 @@ angular.module('app.services', [])
     firebaseService.logoutCurrentUser = function () {
       window.localStorage.removeItem('currentUserUid');
       if (deviceToken) {
-        push.unregister();
+        try {
+          push.unregister();
+        } catch (e) {
+          console.log("push notification is not present, ignored");
+        }
       }
     };
     firebaseService.setCurrentUserUid = function (currentUserUid) {
@@ -113,7 +117,11 @@ angular.module('app.services', [])
           }
         }
       });
-      push.register(callback);
+      try {
+        push.register(callback);
+      } catch (e) {
+        console.log("push notification is not present, ignored");
+      }
       console.log("registering started for device");
     };
     firebaseService.checkDeviceToken = function () {
@@ -213,4 +221,45 @@ angular.module('app.services', [])
       });
     };
     return BiomedicService;
+  })
+  .service('NotificationService', function ($rootScope, FirebaseService) {
+
+    var notificationsService = {};
+    var notifications = [];
+    notificationsService.getNotifications = function (handler) {
+      if (!FirebaseService.isUserLogged()) {
+        console.log('invalidUser');
+        $rootScope.$broadcast('logoutUser');
+      }
+      var ref = FirebaseService.getDBConnection().child('notifications').child(FirebaseService.getCurrentUserUid());
+      //ref.push({title:'Nova Recomendação do seu Médico', body:'Após rever a sua evolução dos seus dados biomédicos, decidi atualizar o seu nível de atividade física para níveis mais convenientes.'});
+      //ref.push({title:'Novo Evento: Caminhada pela cidade', body:'Foi convidado para o Evento \'Caminhada pela cidade\'.', link:'#app/event/1'});
+      //ref.push({title:'Novo Evento: Caminhada pela peneda', body:'Foi convidado para o Evento \'Caminhada pela peneda\'.', link:'#app/event/1'});
+      ref.once('value', function (snap) {
+        var value = snap.val();
+        var retrievedNotifications = [];
+        if (handler) {
+          angular.forEach(value, function (notification, key) {
+            notification.id = key;
+            retrievedNotifications.push(notification);
+          });
+          notifications = retrievedNotifications;
+          handler(notifications.slice());
+        }
+      });
+    };
+    notificationsService.registerNewNotificationsListener = function () {
+      if (!FirebaseService.isUserLogged()) {
+        console.log('invalidUser');
+        $rootScope.$broadcast('logoutUser');
+      }
+      var ref = FirebaseService.getDBConnection().child('notifications').child(FirebaseService.getCurrentUserUid());
+      ref.on('child_added', function (snap) {
+        var value = snap.val();
+        value.id = snap.key();
+        notifications.push(value);
+        $rootScope.$broadcast('new_notification', value);
+      });
+    };
+    return notificationsService;
   });
