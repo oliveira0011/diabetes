@@ -1,30 +1,42 @@
 <ion-view view-title="Hemoglobina">
   <ion-nav-buttons side="secondary">
-    <a class="button button-clear button-positive" href="/#/app/biomedic/registry">
+    <a class="button button-clear button-positive" href="#/app/biomedic/registry">
       <i class="icon ion-ios-plus-outline"></i>
-      Novo Dado Biomédico
+      <!--Novo Dado Biomédico-->
     </a>
   </ion-nav-buttons>
   <ion-content>
-    <div class="row responsive-md">
-      <div class="col-offset-10 col">
-        <label for="chartHemoglobin">XPO
-          <chart id="chartHemoglobin" value="chartHemoglobin"></chart>
-        </label>
+    <div class="row responsive-lg">
+      <div class="col col-33">
+        <div class="card">
+          <div class="item item-body">
+            <canvas id="lineHemoglobin" class="chart chart-line" chart-data="chartHemoglobin.data"
+                    chart-labels="chartHemoglobin.labels" chart-legend="true"
+                    chart-series="chartHemoglobin.series" chart-colours="chartHemoglobin.colours">
+            </canvas>
+          </div>
+        </div>
       </div>
-      <div class="col">
-        <label for="chartBloodPressure">XPO
-          <chart id="chartBloodPressure" value="chartBloodPressure"></chart>
-        </label>
+      <div class="col col-33">
+        <div class="card">
+          <div class="item item-body">
+            <canvas id="lineBloodPressure" class="chart chart-line" chart-data="chartBloodPressure.data"
+                    chart-labels="chartBloodPressure.labels" chart-legend="true"
+                    chart-series="chartBloodPressure.series" chart-colours="chartBloodPressure.colours">
+            </canvas>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="row responsive-md">
-      <div class="col-offset-33 col">
-        <label for="chartCholesterol">XPO
-          <chart id="chartCholesterol" value="chartCholesterol"></chart>
-        </label>
+      <div class="col col-33">
+        <div class="card">
+          <div class="item item-body">
+            <canvas id="lineCholesterol" class="chart chart-line" chart-data="chartCholesterol.data"
+                    chart-labels="chartCholesterol.labels" chart-legend="true"
+                    chart-series="chartCholesterol.series" chart-colours="chartCholesterol.colours">
+            </canvas>
+          </div>
+        </div>
       </div>
-    </div>
     </div>
   </ion-content>
 </ion-view>

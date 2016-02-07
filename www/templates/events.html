@@ -1,13 +1,13 @@
 <ion-view view-title="Eventos">
   <ion-nav-buttons side="secondary">
-    <a class="button button-clear button-positive"  href="/#/app/event/new">
+    <a class="button button-clear button-positive"  href="#/app/event/new">
       <i class="icon ion-ios-plus-outline"></i>
-      Novo Evento
+      <!--Novo Evento-->
     </a>
   </ion-nav-buttons>
   <ion-content>
     <ion-list class="list">
-      <ion-item class="item item-avatar item-icon-right positive" href="/#/app/event/{{event.id}}" ng-repeat="event in events">
+      <ion-item class="item item-avatar item-icon-right positive" href="#/app/event/{{event.id}}" ng-repeat="event in events">
         <img ng-src="{{event.image}}">
         <h2 class="positive">{{event.name}}</h2>
         <p>Por {{event.owner.name}}</p>

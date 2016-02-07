@@ -1,12 +1,12 @@
-<ion-view view-title="Perfil Utilizador">
+<ion-view view-title="">
   <ion-content id="pnlContent">
     <div class="row responsive-sm">
       <form name="form" novalidate class="col-offset-25 col col-50" ng-submit="saveUser(form)">
         <div class="list">
           <div class="col">
             <div class="row">
-              <img id="profileImageImg" class="avatar" ng-src="{{user.profileImage || '//:0' }}"
-                   style="width:200px; height:200px;margin: auto;">
+              <img id="profileImageImg" class="avatar" ng-src="{{user.profileImage}}" src="img/ionic.png"
+                   style="-webkit-user-select: none;width:200px; height:200px;margin: auto;">
             </div>
             <br/>
             <input type="file" ng-model="user.profileImage"
@@ -18,7 +18,6 @@
             <label class="item item-input">
               <span class="positive input-label">Primeiro Nome</span>
               <span style="color: #c8c8c8"></span>
-              <label>
                 {{user.firstName}}
               </label>
           </div>

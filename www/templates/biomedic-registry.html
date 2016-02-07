@@ -3,24 +3,36 @@
     <div class="row responsive-sm">
       <form name="form" novalidate class="col-offset-25 col col-50" ng-submit="saveBiomedic(form)">
         <div class="list">
-          <div class="button-bar">
-            <a class="button button-light" ng-class="{'button-positive': isActive('hemoglobin')}"
-               ng-click="setType('hemoglobin')">Hemoglobina
-              Glicada</a>
-            <a class="button button-light" ng-class="{'button-positive': isActive('blood-pressure')}"
-               ng-click="setType('blood-pressure')">Tensão arterial</a>
-            <a class="button button-light" ng-class="{'button-positive': isActive('cholesterol')}"
-               ng-click="setType('cholesterol')">Colesterol
-              LDL</a>
-          </div>
-          <div ng-if="isActive('hemoglobin')">
-            <div ng-include="'templates/biomedic-hemoglobin-tpl.html'"></div>
-          </div>
-          <div ng-if="isActive('blood-pressure')">
-            <div ng-include="'templates/biomedic-blood-pressure-tpl.html'"></div>
-          </div>
-          <div ng-if="isActive('cholesterol')">
-            <div ng-include="'templates/biomedic-cholesterol-tpl.html'"></div>
+          <div class="list">
+            <div class="item item-divider item-positive">
+              Tipo do Registo
+            </div>
+            <div class="item">
+              <a class="button button-light button-block" ng-class="{'button-positive': isActive('hemoglobin')}"
+                 ng-click="setType('hemoglobin')">
+                Hemoglobina</a>
+              <a class="button button-light button-block"
+                 ng-class="{'button-positive': isActive('blood-pressure')}"
+                 ng-click="setType('blood-pressure')">Tensão arterial</a>
+              <a class="button button-light button-block" ng-class="{'button-positive': isActive('cholesterol')}"
+                 ng-click="setType('cholesterol')">Colesterol
+                LDL</a>
+            </div>
+
+            <div class="item item-divider item-positive">
+              Dados
+            </div>
+            <div class="item">
+              <div ng-if="isActive('hemoglobin')">
+                <div ng-include="'templates/biomedic-hemoglobin-tpl.html'"></div>
+              </div>
+              <div ng-if="isActive('blood-pressure')">
+                <div ng-include="'templates/biomedic-blood-pressure-tpl.html'"></div>
+              </div>
+              <div ng-if="isActive('cholesterol')">
+                <div ng-include="'templates/biomedic-cholesterol-tpl.html'"></div>
+              </div>
+            </div>
           </div>
         </div>
       </form>

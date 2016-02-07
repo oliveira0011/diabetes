@@ -6,11 +6,78 @@ angular.module('app.controllers', [])
   .controller('AppCtrl', function ($scope, $state, FirebaseService) {
     $scope.logout = function () {
       FirebaseService.getDBConnection().unauth();
-      FirebaseService.setCurrentUserUid();
+      FirebaseService.logoutCurrentUser();
       $state.go('login');
     }
   })
-  .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform) {
+  .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http) {
+    $scope.$on('deviceUpdated', function (e, deviceId) {
+      console.log(deviceId);
+      $scope.deviceToken = deviceId;
+    });
+    FirebaseService.getDBConnection().child("users").child("e97c6bd0-47ac-47db-95df-b3134be52859").child("deviceToken").on('value', function (snap) {
+      $scope.remoteDeviceToken = snap.val();
+      var d = JSON.stringify({
+        "tokens": [
+          $scope.remoteDeviceToken
+        ],
+        "notification": {
+          "alert": "Hello World!",
+          "ios": {
+            "badge": 1,
+            "sound": "ping.aiff",
+            "priority": 10,
+            "contentAvailable": 1,
+            "payload": {
+              "key1": "value",
+              "key2": "value"
+            }
+          },
+          "android": {
+            "collapseKey": "foo",
+            "delayWhileIdle": true,
+            "timeToLive": 300,
+            "payload": {
+              "key1": "value",
+              "key2": "value"
+            }
+          }
+        }
+      });
+      //console.log(d);
+      $http({
+        method: 'POST',
+        url: "https://push.ionic.io/api/v1/push/",
+        data: d,
+        headers: {
+          "Authorization": window.btoa("4cdd6aef6996fb0bc29141f33bcb0536edcea7b3661d4a43"),
+          "Content-Type": "application/json",
+          "X-Ionic-Application-Id": 'd98077ec'
+        }
+      }).error(function (e) {
+        console.log(e);
+      }).success(function (data, status) {
+        console.log(data);
+        console.log(status);
+      });
+    });
+
+    //$http({
+    //  method: 'GET',
+    //  url: "https://push.ionic.io/api/v1/status/eb68efe6cd2011e5a494be7f749067fa",
+    //  headers: {
+    //    "Authorization": window.btoa("4cdd6aef6996fb0bc29141f33bcb0536edcea7b3661d4a43"),
+    //    "Content-Type": "application/json",
+    //    "X-Ionic-Application-Id": 'd98077ec'
+    //  }
+    //}).error(function (e) {
+    //  console.log(e);
+    //}).success(function (data, status) {
+    //  console.log(data);
+    //  console.log(status);
+    //  $scope.hello = data;
+    //});
+
     $scope.options = [
       {name: "Eventos", color: "positive", icon: "ion-android-walk", link: "#/app/events"},
       {name: "Amigos", color: "positive", icon: "ion-person-stalker", link: "#/app/search"},
@@ -31,6 +98,10 @@ angular.module('app.controllers', [])
     $scope.numSteps = 0;
     $scope.currentY = 0;
     $scope.previousY = 0;
+
+    $scope.deviceToken = FirebaseService.getDeviceToken();
+
+
     $scope.startWatching = function () {
       if ($cordovaDeviceMotion !== undefined) {
         return;
@@ -81,9 +152,13 @@ angular.module('app.controllers', [])
   .controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
     console.log(FirebaseService.isUserLogged());
     if (FirebaseService.isUserLogged()) {
+      FirebaseService.checkDeviceToken();
       $state.go('app.main');
     }
-    $scope.loginData = {};
+    $scope.loginData = {
+      username: 'oliveira_011@hotmail.com',
+      password: 'xptoxpto',
+    };
     $scope.doLogin = function (form) {
       delete $scope.errorMessage;
       //console.log(form.$valid);
@@ -156,7 +231,7 @@ angular.module('app.controllers', [])
               });
               return;
             }
-
+            FirebaseService.checkDeviceToken();
             $state.go('app.main');
             $scope.loginData = {};
             form.$setPristine(false);
@@ -382,7 +457,8 @@ angular.module('app.controllers', [])
       $scope.map = map;
     }
 
-    google.maps.event.addDomListener(window, 'load', initialize);
+    ionic.Platform.ready(initialize);
+
 
     $scope.centerOnMe = function () {
       if (!$scope.map) {
@@ -417,14 +493,10 @@ angular.module('app.controllers', [])
       angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
         $scope.user[retrievedUserKey] = retrievedUserValue;
       });
-      console.log($scope.user);
-
       if ($scope.retrievedUser && $scope.retrievedUser.id && $scope.retrievedUser.id !== '') {
         dbConnection.child("profileImages").child($scope.retrievedUser.id).once('value', function (data) {
           if (data.val() != null) {
             $scope.user.profileImage = data.val().image;
-            //console.log($scope.user.profileImage.value);
-            console.log($scope.user);
             if (!$scope.$$phase) {
               $scope.$apply();
             }
@@ -432,10 +504,10 @@ angular.module('app.controllers', [])
         });
       }
     };
-    if (FirebaseService.currentUserUid !== undefined) {
-      dbConnection.child('users').child(FirebaseService.currentUserUid).once('value', function (user) {
+    if (FirebaseService.isUserLogged()) {
+      dbConnection.child('users').child(FirebaseService.getCurrentUserUid()).once('value', function (user) {
         $scope.retrievedUser = user.val();
-        $scope.retrievedUser.id = FirebaseService.currentUserUid;
+        $scope.retrievedUser.id = FirebaseService.getCurrentUserUid();
         $scope.init();
         console.log(1);
       });
@@ -512,6 +584,7 @@ angular.module('app.controllers', [])
         labels: labels,
         datasets: [
           {
+            label: 'Hemoglobina',
             fillColor: colors.fillColor,
             strokeColor: colors.strokeColor,
             pointColor: colors.pointColor,
@@ -522,15 +595,35 @@ angular.module('app.controllers', [])
       };
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
-          $scope.chartHemoglobin = {data: data};
+          $scope.chartHemoglobin = {
+            labels: labels,
+            data: [records],
+            series: ['Hemoglobina'],
+            colours: [colors]
+          };
+          //$scope.chartHemoglobin = {data: data};
           break;
         case BiomedicType.BLOOD_PRESSURE:
-          $scope.chartBloodPressure = {data: data};
+          $scope.chartBloodPressure = {
+            labels: labels,
+            data: [records],
+            series: ['Tensão Arterial'],
+            colours: [colors]
+          };
+          //$scope.chartBloodPressure = {data: data};
           break;
         case BiomedicType.CHOLESTEROL:
-          console.log(data);
-          $scope.chartCholesterol = {data: data};
+          $scope.chartCholesterol = {
+            labels: labels,
+            data: [records],
+            series: ['Colesterol'],
+            colours: [colors]
+          };
+          //$scope.chartCholesterol = {data: data};
           break;
+      }
+      if (!$scope.$$phase) {
+        $scope.$apply();
       }
     };
 
@@ -561,8 +654,14 @@ angular.module('app.controllers', [])
 
     $scope.saveBiomedic = function (form) {
       console.log(form);
+      if ($scope.biomedic.biomedicDate != null) {
+        form.biomedicDate.$setValidity('required', true);
+      }
       if (form.$invalid) {
         console.log(form);
+        return;
+      } else if ($scope.biomedic.biomedicDate == null) {
+        form.biomedicDate.$setValidity('required', false);
         return;
       }
       var label = "";

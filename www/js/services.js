@@ -69,17 +69,72 @@ angular.module('app.services', [])
 
     return EventsService;
   })
-  .service('FirebaseService', function ($cookieStore) {
+  .service('FirebaseService', function () {
     var firebaseService = {};
+    var deviceToken;
+    var push;
+    firebaseService.logoutCurrentUser = function () {
+      window.localStorage.removeItem('currentUserUid');
+      if (deviceToken) {
+        push.unregister();
+      }
+    };
     firebaseService.setCurrentUserUid = function (currentUserUid) {
-      $cookieStore.put('currentUserUid', currentUserUid);
+      window.localStorage.setItem('currentUserUid', currentUserUid);
     };
     firebaseService.getCurrentUserUid = function () {
-      return $cookieStore.get('currentUserUid');
+      return window.localStorage.getItem('currentUserUid');
+    };
+    firebaseService.isUserLogged = function () {
+      return window.localStorage.getItem('currentUserUid') && window.localStorage.getItem('currentUserUid') !== null;
     };
 
-    firebaseService.isUserLogged = function () {
-      return $cookieStore.get('currentUserUid') !== undefined;
+    firebaseService.getDeviceToken = function () {
+      console.log("GET: " + deviceToken);
+      return deviceToken;
+    };
+    firebaseService.registerDevice = function () {
+      console.log("registering device");
+      var callback = function (token) {
+        console.log("Device token:", token.token);
+        //push.addTokenToUser(user);
+        //user.save();
+        deviceToken = token.token;
+      };
+      Ionic.io();
+      push = new Ionic.Push({
+        "onNotification": function (notification) {
+          alert('Received push notification!');
+        },
+        "debug": true,
+        "pluginConfig": {
+          "android": {
+            "iconColor": "#0000FF"
+          }
+        }
+      });
+      push.register(callback);
+      console.log("registering started for device");
+    };
+    firebaseService.checkDeviceToken = function () {
+      if (!deviceToken) {
+        firebaseService.registerDevice();
+        console.log("Device token undefined");
+        return;
+      }
+      var ref = this.getDBConnection().child('users').child(this.getCurrentUserUid()).child("deviceToken");
+      ref.once('value', function (snap) {
+        var storedDeviceId = snap.val();
+        console.log(storedDeviceId);
+        if ((!storedDeviceId || storedDeviceId == null || storedDeviceId != deviceToken)) {
+          ref.set(deviceToken, function () {
+            console.log("Device Token updated.");
+          });
+        } else {
+          deviceToken = storedDeviceId;
+        }
+        $rootScope.$broadcast('deviceUpdated', deviceToken);
+      });
     };
     firebaseService.getDBConnection = function () {
       return new Firebase("https://diabetes.firebaseio.com");
