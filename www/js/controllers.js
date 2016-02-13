@@ -531,6 +531,7 @@ angular.module('app.controllers', [])
     $scope.hemoglobinRecords = [];
     $scope.bloodPressureRecords = [];
     $scope.cholesterolRecords = [];
+    $scope.weightRecords = [];
     function getFormattedDate(timestamp) {
       var date = new Date(timestamp);
       var month = date.getMonth() + 1;
@@ -540,8 +541,6 @@ angular.module('app.controllers', [])
     }
 
     var handler = function (type, retrievedRecords) {
-      console.log(JSON.stringify(retrievedRecords));
-      console.log("-----");
       if (!retrievedRecords) {
         return;
       }
@@ -553,8 +552,10 @@ angular.module('app.controllers', [])
       }
       var records = [];
       var colors = {};
+      var labels = [];
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
+          console.log($scope.hemoglobinRecords);
           colors = {
             fillColor: "#F15854",
             strokeColor: "#B22222",
@@ -564,7 +565,80 @@ angular.module('app.controllers', [])
           records = $scope.hemoglobinRecords;
           break;
         case BiomedicType.BLOOD_PRESSURE:
-          records = $scope.bloodPressureRecords;
+          console.log('qweqweqweqwe');
+          console.log(retrievedRecords);
+          records = [[], []];
+          labels = [];
+          var minRecords = Object.keys(retrievedRecords[0]).map(function (k) {
+            return retrievedRecords[0][k]
+          });
+          var maxRecords = Object.keys(retrievedRecords[1]).map(function (k) {
+            return retrievedRecords[1][k]
+          });
+
+          var rec = minRecords.concat(maxRecords);
+          rec.sort(function (a, b) {
+            return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
+          });
+          console.log(rec);
+
+          var cMax = 0;
+          var cMin = 0;
+          for (var i = 0; i < rec.length; i++) {
+            var record = rec[i];
+            var isNew = true;
+            var date = getFormattedDate(record.biomedicDate);
+            var nextRecord;
+            var nextDate;
+            if (labels.indexOf(date) == -1) {
+              if (record.type == BiomedicType.MIN_BLOOD_PRESSURE) {
+                nextRecord = rec[cMin + 1];
+              } else if (record.type == BiomedicType.MAX_BLOOD_PRESSURE) {
+                nextRecord = rec[cMax + 1];
+              }
+              labels.push(date);
+              if (nextRecord) {
+                nextDate = getFormattedDate(nextRecord.biomedicDate);
+                if (nextDate == date) {
+                  isNew = false;
+                  if (nextRecord.type == BiomedicType.MIN_BLOOD_PRESSURE) {
+                    console.log(1);
+                    records[1].push(nextRecord.value);
+                    i++;
+                  } else if (nextRecord.type == BiomedicType.MAX_BLOOD_PRESSURE) {
+                    console.log(2);
+                    records[0].push(nextRecord.value);
+                    i++;
+                  }
+                  cMin++;
+                  cMax++;
+                } else {
+                  nextRecord = undefined;
+                  if (record.type == BiomedicType.MIN_BLOOD_PRESSURE) {
+                    console.log(3);
+                    records[0].push(0);
+                    cMin++;
+                  } else if (record.type == BiomedicType.MAX_BLOOD_PRESSURE) {
+                    console.log(4);
+                    records[1].push(0);
+                    cMax++;
+                  }
+                }
+              }
+            }
+            cMin++;
+            cMax++;
+
+
+            if (record.type == BiomedicType.MIN_BLOOD_PRESSURE) {
+              records[1].push(record.value);
+            } else if (record.type == BiomedicType.MAX_BLOOD_PRESSURE) {
+              records[0].push(record.value);
+            }
+            console.log("[NOW]:" + date + " -> " + record.value + " -> " + record.type);
+            console.log("[NEXT]:" + nextDate + " -> " + (!nextRecord ? '' : nextRecord.value) + " -> " + (!nextRecord ? '' : nextRecord.type));
+          }
+          console.log(records);
           colors = {
             fillColor: "#FAA43A",
             strokeColor: "#FF8C00",
@@ -581,15 +655,28 @@ angular.module('app.controllers', [])
           };
           records = $scope.cholesterolRecords;
           break;
+        case BiomedicType.WEIGHT:
+          colors = {
+            fillColor: "#F17CB0",
+            strokeColor: "#F08080",
+            pointColor: "#CD5C5C",
+            pointStrokeColor: "#CD5C5C"
+          };
+          records = $scope.weightRecords;
+          break;
       }
-      var labels = [];
-      arr.sort(function (a, b) {
-        return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
-      });
-      angular.forEach(arr, function (record) {
-        records.push(record.value);
-        labels.push(getFormattedDate(record.biomedicDate));
-      });
+      if (records.length == 0) {
+
+
+        arr.sort(function (a, b) {
+          return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
+        });
+        angular.forEach(arr, function (record) {
+          records.push(record.value);
+          labels.push(getFormattedDate(record.biomedicDate));
+        });
+
+      }
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
           $scope.chartHemoglobin = {
@@ -602,8 +689,8 @@ angular.module('app.controllers', [])
         case BiomedicType.BLOOD_PRESSURE:
           $scope.chartBloodPressure = {
             labels: labels,
-            data: [records],
-            series: ['Tensão Arterial'],
+            data: records,
+            series: ['Tensão Arterial Máxima', 'Tensão Arterial Mínima'],
             colours: [colors]
           };
           break;
@@ -612,6 +699,18 @@ angular.module('app.controllers', [])
             labels: labels,
             data: [records],
             series: ['Colesterol'],
+            colours: [colors]
+          };
+          break;
+        case BiomedicType.WEIGHT:
+          var imc = [];
+          for (var i = 0; i < records.length; i++) {//IMC calculation
+            imc[i] = (records[i] / (1.71 * 1.71)).toFixed(2);
+          }
+          $scope.chartWeight = {
+            labels: labels,
+            data: [records, imc],
+            series: ['Peso', 'IMC'],
             colours: [colors]
           };
           break;
@@ -626,11 +725,12 @@ angular.module('app.controllers', [])
       BiomedicService.getHemoglobinRecords(handler);
       BiomedicService.getBloodPressureRecords(handler);
       BiomedicService.getCholesterolRecords(handler);
+      BiomedicService.getWeightRecords(handler);
     };
 
     init();
   })
-  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, Hemoglobin, BloodPressure, Cholesterol, BiomedicType, $ionicLoading, $state) {
+  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, Hemoglobin, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state) {
     $scope.maxDate = new Date();
     $scope.maxDate.setDate($scope.maxDate.getDate() + 1);
     $scope.biomedic = {};
@@ -663,11 +763,17 @@ angular.module('app.controllers', [])
         case BiomedicType.HEMOGLOBIN:
           label = "Hemoglobina";
           break;
-        case BiomedicType.BLOOD_PRESSURE:
-          label = "Tensão Arterial";
+        case BiomedicType.MAX_BLOOD_PRESSURE:
+          label = "Tensão Arterial Mínima";
+          break;
+        case BiomedicType.MIN_BLOOD_PRESSURE:
+          label = "Tensão Arterial Máxima";
           break;
         case BiomedicType.CHOLESTEROL:
           label = "Colesterol";
+          break;
+        case BiomedicType.WEIGHT:
+          label = "Peso";
           break;
 
       }
@@ -682,11 +788,17 @@ angular.module('app.controllers', [])
         case BiomedicType.HEMOGLOBIN:
           BiomedicService.addHemoglobinRecord(new Hemoglobin($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
           break;
-        case BiomedicType.BLOOD_PRESSURE:
-          BiomedicService.addBloodPressureRecord(new BloodPressure($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
+        case BiomedicType.MIN_BLOOD_PRESSURE:
+          BiomedicService.addMinBloodPressureRecord(new MinBloodPressure($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
+          break;
+        case BiomedicType.MAX_BLOOD_PRESSURE:
+          BiomedicService.addMaxBloodPressureRecord(new MaxBloodPressure($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
           break;
         case BiomedicType.CHOLESTEROL:
           BiomedicService.addCholesterolRecord(new Cholesterol($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
+          break;
+        case BiomedicType.WEIGHT:
+          BiomedicService.addWeightRecord(new Weight($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
           break;
       }
     }

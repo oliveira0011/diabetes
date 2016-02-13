@@ -12,11 +12,16 @@
                  ng-click="setType('hemoglobin')">
                 Hemoglobina</a>
               <a class="button button-light button-block"
-                 ng-class="{'button-positive': isActive('blood-pressure')}"
-                 ng-click="setType('blood-pressure')">Tensão arterial</a>
+                 ng-class="{'button-positive': isActive('min-blood-pressure')}"
+                 ng-click="setType('min-blood-pressure')">Tensão arterial Mínima</a>
+              <a class="button button-light button-block"
+                 ng-class="{'button-positive': isActive('max-blood-pressure')}"
+                 ng-click="setType('max-blood-pressure')">Tensão arterial Máxima</a>
               <a class="button button-light button-block" ng-class="{'button-positive': isActive('cholesterol')}"
                  ng-click="setType('cholesterol')">Colesterol
                 LDL</a>
+              <a class="button button-light button-block" ng-class="{'button-positive': isActive('weight')}"
+                 ng-click="setType('weight')">Peso</a>
             </div>
 
             <div class="item item-divider item-positive">
@@ -26,11 +31,17 @@
               <div ng-if="isActive('hemoglobin')">
                 <div ng-include="'templates/biomedic-hemoglobin-tpl.html'"></div>
               </div>
-              <div ng-if="isActive('blood-pressure')">
-                <div ng-include="'templates/biomedic-blood-pressure-tpl.html'"></div>
+              <div ng-if="isActive('min-blood-pressure')">
+                <div ng-include="'templates/biomedic-min-blood-pressure-tpl.html'"></div>
+              </div>
+              <div ng-if="isActive('max-blood-pressure')">
+                <div ng-include="'templates/biomedic-max-blood-pressure-tpl.html'"></div>
               </div>
               <div ng-if="isActive('cholesterol')">
                 <div ng-include="'templates/biomedic-cholesterol-tpl.html'"></div>
+              </div>
+              <div ng-if="isActive('weight')">
+                <div ng-include="'templates/biomedic-weight-tpl.html'"></div>
               </div>
             </div>
           </div>

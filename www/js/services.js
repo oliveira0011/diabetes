@@ -149,76 +149,84 @@ angular.module('app.services', [])
     };
     return firebaseService;
   })
-  .service('BiomedicService', function (FirebaseService, Hemoglobin, BloodPressure, Cholesterol, BiomedicType) {
+  .service('BiomedicService', function (FirebaseService, Hemoglobin, BloodPressure, Cholesterol, BiomedicType, Weight) {
     function BiomedicService() {
     }
+
+    BiomedicService.addRecord = function (biomedic, handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
+        .push({
+          value: biomedic.value,
+          biomedicDate: biomedic.biomedicDate.getTime()
+        }, handler);
+    };
+
+    BiomedicService.getRecords = function (type, handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child(type).child(FirebaseService.getCurrentUserUid()).on('value', function (data) {
+        var results = data.val();
+        for (var result in results) {
+          if (results.hasOwnProperty(result)) {
+            results[result].type = type;
+          }
+        }
+        handler(type, results);
+      });
+    };
 
     BiomedicService.addHemoglobinRecord = function (biomedic, handler) {
       if (!biomedic instanceof Hemoglobin) {
         throw 'The data passed to persist must be a Hemoglobin class.';
       }
-      console.log(biomedic);
-      var dbConnection = FirebaseService.getDBConnection();
-      console.log(FirebaseService.getCurrentUserUid());
-      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
-        .push({
-          value: biomedic.value,
-          biomedicDate: biomedic.biomedicDate.getTime()
-        }, handler);
+      BiomedicService.addRecord(biomedic, handler);
     };
-
-    BiomedicService.getHemoglobinRecords = function (handler) {
-      var dbConnection = FirebaseService.getDBConnection();
-      dbConnection.child(BiomedicType.HEMOGLOBIN).child(FirebaseService.getCurrentUserUid()).on('value', function (data) {
-        var results = data.val();
-        handler(BiomedicType.HEMOGLOBIN, results);
-      });
-    };
-    BiomedicService.addBloodPressureRecord = function (biomedic, handler) {
+    BiomedicService.addMinBloodPressureRecord = function (biomedic, handler) {
       if (!biomedic instanceof BloodPressure) {
-        throw 'The data passed to persist must be a BloodPressure class.';
+        throw 'The data passed to persist must be a MinBloodPressure class.';
       }
-      console.log(biomedic);
-      var dbConnection = FirebaseService.getDBConnection();
-      console.log(FirebaseService.getCurrentUserUid());
-      console.log(biomedic.biomedicDate);
-      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
-        .push({
-          value: biomedic.value,
-          biomedicDate: biomedic.biomedicDate.getTime()
-        }, handler);
+      BiomedicService.addRecord(biomedic, handler);
     };
-
-    BiomedicService.getBloodPressureRecords = function (handler) {
-      var dbConnection = FirebaseService.getDBConnection();
-      dbConnection.child(BiomedicType.BLOOD_PRESSURE).child(FirebaseService.getCurrentUserUid()).on('value', function (data) {
-        var results = data.val();
-        console.log(results);
-        handler(BiomedicType.BLOOD_PRESSURE, results);
-      });
+    BiomedicService.addMaxBloodPressureRecord = function (biomedic, handler) {
+      if (!biomedic instanceof BloodPressure) {
+        throw 'The data passed to persist must be a MaxBloodPressure class.';
+      }
+      BiomedicService.addRecord(biomedic, handler);
     };
     BiomedicService.addCholesterolRecord = function (biomedic, handler) {
       if (!biomedic instanceof Cholesterol) {
         throw 'The data passed to persist must be a Cholesterol class.';
       }
-      console.log(biomedic);
-      var dbConnection = FirebaseService.getDBConnection();
-      console.log(FirebaseService.getCurrentUserUid());
-      console.log(biomedic.biomedicDate);
-      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
-        .push({
-          value: biomedic.value,
-          biomedicDate: biomedic.biomedicDate.getTime()
-        }, handler);
+      BiomedicService.addRecord(biomedic, handler);
+    };
+    BiomedicService.addWeightRecord = function (biomedic, handler) {
+      if (!biomedic instanceof Weight) {
+        throw 'The data passed to persist must be a Weight class.';
+      }
+      BiomedicService.addRecord(biomedic, handler);
     };
 
-    BiomedicService.getCholesterolRecords = function (handler) {
-      var dbConnection = FirebaseService.getDBConnection();
-      dbConnection.child(BiomedicType.CHOLESTEROL).child(FirebaseService.getCurrentUserUid()).on('value', function (data) {
-        var results = data.val();
-        console.log(results);
-        handler(BiomedicType.CHOLESTEROL, results);
+    BiomedicService.getHemoglobinRecords = function (handler) {
+      BiomedicService.getRecords(BiomedicType.HEMOGLOBIN, handler);
+    };
+    BiomedicService.getMinBloodPressureRecords = function (handler) {
+      BiomedicService.getRecords(BiomedicType.MIN_BLOOD_PRESSURE, handler);
+    };
+    BiomedicService.getBloodPressureRecords = function (handler) {
+      BiomedicService.getRecords(BiomedicType.MIN_BLOOD_PRESSURE, function (type, records) {
+        BiomedicService.getRecords(BiomedicType.MAX_BLOOD_PRESSURE, function (type, retrievedRecords) {
+          handler(BiomedicType.BLOOD_PRESSURE, [records, retrievedRecords]);
+        });
       });
+    };
+    BiomedicService.getMaxBloodPressureRecords = function (handler) {
+      BiomedicService.getRecords(BiomedicType.MAX_BLOOD_PRESSURE, handler);
+    };
+    BiomedicService.getCholesterolRecords = function (handler) {
+      BiomedicService.getRecords(BiomedicType.CHOLESTEROL, handler);
+    };
+    BiomedicService.getWeightRecords = function (handler) {
+      BiomedicService.getRecords(BiomedicType.WEIGHT, handler);
     };
     return BiomedicService;
   })

@@ -3,7 +3,10 @@ angular.module('app.factories', [])
     return {
       HEMOGLOBIN: 'hemoglobin',
       BLOOD_PRESSURE: 'blood-pressure',
-      CHOLESTEROL: 'cholesterol'
+      MIN_BLOOD_PRESSURE: 'min-blood-pressure',
+      MAX_BLOOD_PRESSURE: 'max-blood-pressure',
+      CHOLESTEROL: 'cholesterol',
+      WEIGHT: 'weight'
     }
   })
   .factory('Biomedic', function () {
@@ -31,14 +34,34 @@ angular.module('app.factories', [])
 
     return Hemoglobin;
   })
-  .factory('BloodPressure', function (Biomedic, BiomedicType) {
+  .factory('BloodPressure', function (Biomedic) {
     var BloodPressure = function () {
+      if (this.constructor === BloodPressure) {
+        throw new Error("Can't instantiate abstract class!");
+      }
       Biomedic.apply(this, arguments);
-      this.type = BiomedicType.BLOOD_PRESSURE;
     };
     BloodPressure.prototype = Object.create(Biomedic.prototype);
     BloodPressure.prototype.constructor = BloodPressure;
     return BloodPressure;
+  })
+  .factory('MinBloodPressure', function (BloodPressure, BiomedicType) {
+    var MinBloodPressure = function () {
+      BloodPressure.apply(this, arguments);
+      this.type = BiomedicType.MIN_BLOOD_PRESSURE;
+    };
+    MinBloodPressure.prototype = Object.create(BloodPressure.prototype);
+    MinBloodPressure.prototype.constructor = MinBloodPressure;
+    return MinBloodPressure;
+  })
+  .factory('MaxBloodPressure', function (BloodPressure, BiomedicType) {
+    var MaxBloodPressure = function () {
+      BloodPressure.apply(this, arguments);
+      this.type = BiomedicType.MAX_BLOOD_PRESSURE;
+    };
+    MaxBloodPressure.prototype = Object.create(BloodPressure.prototype);
+    MaxBloodPressure.prototype.constructor = MaxBloodPressure;
+    return MaxBloodPressure;
   })
   .factory('Cholesterol', function (Biomedic, BiomedicType) {
     var Cholesterol = function () {
@@ -48,6 +71,15 @@ angular.module('app.factories', [])
     Cholesterol.prototype = Object.create(Biomedic.prototype);
     Cholesterol.prototype.constructor = Cholesterol;
     return Cholesterol;
+  })
+  .factory('Weight', function (Biomedic, BiomedicType) {
+    var Weight = function () {
+      Biomedic.apply(this, arguments);
+      this.type = BiomedicType.WEIGHT;
+    };
+    Weight.prototype = Object.create(Biomedic.prototype);
+    Weight.prototype.constructor = Weight;
+    return Weight;
   })
   .factory('Friend', function () {
     function Friend(id, name, profileImage) {
