@@ -540,7 +540,8 @@ angular.module('app.controllers', [])
     }
 
     var handler = function (type, retrievedRecords) {
-      console.log(retrievedRecords);
+      console.log(JSON.stringify(retrievedRecords));
+      console.log("-----");
       if (!retrievedRecords) {
         return;
       }
@@ -585,26 +586,10 @@ angular.module('app.controllers', [])
       arr.sort(function (a, b) {
         return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
       });
-
       angular.forEach(arr, function (record) {
-        console.log(record);
         records.push(record.value);
         labels.push(getFormattedDate(record.biomedicDate));
       });
-      var data = {
-        //labels: ["January", "February", "March", "April", "May", "June", "July"],
-        labels: labels,
-        datasets: [
-          {
-            label: 'Hemoglobina',
-            fillColor: colors.fillColor,
-            strokeColor: colors.strokeColor,
-            pointColor: colors.pointColor,
-            pointStrokeColor: colors.pointStrokeColor,
-            data: records
-          }
-        ]
-      };
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
           $scope.chartHemoglobin = {
@@ -613,7 +598,6 @@ angular.module('app.controllers', [])
             series: ['Hemoglobina'],
             colours: [colors]
           };
-          //$scope.chartHemoglobin = {data: data};
           break;
         case BiomedicType.BLOOD_PRESSURE:
           $scope.chartBloodPressure = {
@@ -622,7 +606,6 @@ angular.module('app.controllers', [])
             series: ['Tensão Arterial'],
             colours: [colors]
           };
-          //$scope.chartBloodPressure = {data: data};
           break;
         case BiomedicType.CHOLESTEROL:
           $scope.chartCholesterol = {
@@ -631,7 +614,6 @@ angular.module('app.controllers', [])
             series: ['Colesterol'],
             colours: [colors]
           };
-          //$scope.chartCholesterol = {data: data};
           break;
       }
       if (!$scope.$$phase) {
