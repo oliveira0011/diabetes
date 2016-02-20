@@ -29,49 +29,49 @@ angular.module('app.controllers', [])
     });
     FirebaseService.getDBConnection().child("users").child("e97c6bd0-47ac-47db-95df-b3134be52859").child("deviceToken").on('value', function (snap) {
       $scope.remoteDeviceToken = snap.val();
-      var d = JSON.stringify({
-        "tokens": [
-          $scope.remoteDeviceToken
-        ],
-        "notification": {
-          "alert": "Hello World!",
-          "ios": {
-            "badge": 1,
-            "sound": "ping.aiff",
-            "priority": 10,
-            "contentAvailable": 1,
-            "payload": {
-              "key1": "value",
-              "key2": "value"
-            }
-          },
-          "android": {
-            "collapseKey": "foo",
-            "delayWhileIdle": true,
-            "timeToLive": 300,
-            "payload": {
-              "key1": "value",
-              "key2": "value"
-            }
-          }
-        }
-      });
-      //console.log(d);
-      $http({
-        method: 'POST',
-        url: "https://push.ionic.io/api/v1/push/",
-        data: d,
-        headers: {
-          "Authorization": window.btoa("4cdd6aef6996fb0bc29141f33bcb0536edcea7b3661d4a43"),
-          "Content-Type": "application/json",
-          "X-Ionic-Application-Id": 'd98077ec'
-        }
-      }).error(function (e) {
-        console.log(e);
-      }).success(function (data, status) {
-        console.log(data);
-        console.log(status);
-      });
+      //var d = JSON.stringify({
+      //  "tokens": [
+      //    $scope.remoteDeviceToken
+      //  ],
+      //  "notification": {
+      //    "alert": "Hello World!",
+      //    "ios": {
+      //      "badge": 1,
+      //      "sound": "ping.aiff",
+      //      "priority": 10,
+      //      "contentAvailable": 1,
+      //      "payload": {
+      //        "key1": "value",
+      //        "key2": "value"
+      //      }
+      //    },
+      //    "android": {
+      //      "collapseKey": "foo",
+      //      "delayWhileIdle": true,
+      //      "timeToLive": 300,
+      //      "payload": {
+      //        "key1": "value",
+      //        "key2": "value"
+      //      }
+      //    }
+      //  }
+      //});
+      ////console.log(d);
+      //$http({
+      //  method: 'POST',
+      //  url: "https://push.ionic.io/api/v1/push/",
+      //  data: d,
+      //  headers: {
+      //    "Authorization": window.btoa("4cdd6aef6996fb0bc29141f33bcb0536edcea7b3661d4a43"),
+      //    "Content-Type": "application/json",
+      //    "X-Ionic-Application-Id": 'd98077ec'
+      //  }
+      //}).error(function (e) {
+      //  console.log(e);
+      //}).success(function (data, status) {
+      //  console.log(data);
+      //  console.log(status);
+      //});
     });
 
     //$http({
