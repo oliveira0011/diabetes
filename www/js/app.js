@@ -111,12 +111,12 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
           }
         }
       })
-      .state('app.notifications', {
-        url: '/notification',
+      .state('app.messages', {
+        url: '/message',
         views: {
           'menuContent': {
-            templateUrl: 'templates/notifications.html',
-            controller: 'NotificationsCtrl'
+            templateUrl: 'templates/messages.html',
+            controller: 'MessagesCtrl'
           }
         }
       });

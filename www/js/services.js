@@ -69,7 +69,7 @@ angular.module('app.services', [])
 
     return EventsService;
   })
-  .service('FirebaseService', function () {
+  .service('FirebaseService', function ($rootScope) {
     var firebaseService = {};
     var deviceToken;
     var push;
@@ -108,7 +108,9 @@ angular.module('app.services', [])
       Ionic.io();
       push = new Ionic.Push({
         "onNotification": function (notification) {
-          alert('Received push notification!');
+          //alert('Received push notification!');
+          console.log(notification);
+          $rootScope.$broadcast('newNotification', notification);
         },
         "debug": true,
         "pluginConfig": {
@@ -230,44 +232,41 @@ angular.module('app.services', [])
     };
     return BiomedicService;
   })
-  .service('NotificationService', function ($rootScope, FirebaseService) {
+  .service('MessageService', function ($rootScope, FirebaseService) {
+    var messagesService = {};
+    var messages = [];
 
-    var notificationsService = {};
-    var notifications = [];
-    notificationsService.getNotifications = function (handler) {
+    messagesService.getMessages = function (handler) {
       if (!FirebaseService.isUserLogged()) {
         console.log('invalidUser');
         $rootScope.$broadcast('logoutUser');
       }
-      var ref = FirebaseService.getDBConnection().child('notifications').child(FirebaseService.getCurrentUserUid());
-      //ref.push({title:'Nova Recomendação do seu Médico', body:'Após rever a sua evolução dos seus dados biomédicos, decidi atualizar o seu nível de atividade física para níveis mais convenientes.'});
-      //ref.push({title:'Novo Evento: Caminhada pela cidade', body:'Foi convidado para o Evento \'Caminhada pela cidade\'.', link:'#app/event/1'});
-      //ref.push({title:'Novo Evento: Caminhada pela peneda', body:'Foi convidado para o Evento \'Caminhada pela peneda\'.', link:'#app/event/1'});
-      ref.once('value', function (snap) {
+      var ref = FirebaseService.getDBConnection().child('messages').child("in").child(FirebaseService.getCurrentUserUid()).orderByChild("date");
+      ref.on('value', function (snap) {
         var value = snap.val();
         var retrievedNotifications = [];
         if (handler) {
           angular.forEach(value, function (notification, key) {
             notification.id = key;
-            retrievedNotifications.push(notification);
+            retrievedNotifications.unshift(notification);
           });
-          notifications = retrievedNotifications;
-          handler(notifications.slice());
+          messages = retrievedNotifications;
+          handler(messages.slice());
         }
       });
     };
-    notificationsService.registerNewNotificationsListener = function () {
+    messagesService.registerNewNotificationsListener = function () {
       if (!FirebaseService.isUserLogged()) {
         console.log('invalidUser');
         $rootScope.$broadcast('logoutUser');
       }
-      var ref = FirebaseService.getDBConnection().child('notifications').child(FirebaseService.getCurrentUserUid());
+      var ref = FirebaseService.getDBConnection().child('messages').child("in").child(FirebaseService.getCurrentUserUid()).orderByChild("date");
       ref.on('child_added', function (snap) {
         var value = snap.val();
         value.id = snap.key();
-        notifications.push(value);
-        $rootScope.$broadcast('new_notification', value);
+        messages.unshift(value);
+        $rootScope.$broadcast('new_message', value);
       });
     };
-    return notificationsService;
+    return messagesService;
   });

@@ -3,7 +3,7 @@ angular.module('app.controllers', [])
    *
    * APPLICATION CONTROLLER
    */
-  .controller('AppCtrl', function ($scope, $state, FirebaseService, NotificationService) {
+  .controller('AppCtrl', function ($scope, $state, FirebaseService, MessageService) {
     $scope.logout = function () {
       FirebaseService.getDBConnection().unauth();
       FirebaseService.logoutCurrentUser();
@@ -12,15 +12,18 @@ angular.module('app.controllers', [])
     $scope.$on('logoutUser', function () {
       $scope.logout();
     });
+    $scope.$on('newNotification', function (e, value) {
+      $state.go('app.messages');
+    });
     $scope.newNotificationsNumber = 0;
     $scope.$on('new_notification', function (e, value) {
       $scope.newNotificationsNumber++;
     });
-    NotificationService.registerNewNotificationsListener();
-    //NotificationService.getNotifications(function (notifications) {
-    //  $scope.newNotificationsNumber = notifications.length;
-    //  NotificationService.registerNewNotificationsListener();
-    //});
+    MessageService.registerNewNotificationsListener();
+    MessageService.getMessages(function (messages) {
+      $scope.newNotificationsNumber = messages.length;
+      MessageService.registerNewNotificationsListener();
+    });
   })
   .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http) {
     $scope.$on('deviceUpdated', function (e, deviceId) {
@@ -165,7 +168,7 @@ angular.module('app.controllers', [])
     console.log(FirebaseService.isUserLogged());
     if (FirebaseService.isUserLogged()) {
       FirebaseService.checkDeviceToken();
-      $state.go('app.main');
+      $state.go('app.biomedic');
     }
     $scope.loginData = {
       username: 'oliveira_011@hotmail.com',
@@ -244,7 +247,7 @@ angular.module('app.controllers', [])
               return;
             }
             FirebaseService.checkDeviceToken();
-            $state.go('app.main');
+            $state.go('app.biomedic');
             $scope.loginData = {};
             form.$setPristine(false);
           }
@@ -803,7 +806,7 @@ angular.module('app.controllers', [])
       }
     }
   })
-  .controller('NotificationsCtrl', function ($scope, NotificationService) {
+  .controller('MessagesCtrl', function ($scope, MessageService) {
     $scope.notifications = [];
     $scope.$on('new_notification', function (e, value) {
       $scope.notifications.unshift(value);
@@ -811,11 +814,26 @@ angular.module('app.controllers', [])
         $scope.$apply();
       }
     });
-    //NotificationService.getNotifications(function (notifications) {
-    //  $scope.notifications = notifications;
-    //  console.log($scope.notifications);
-    //  if (!$scope.$$phase) {
-    //    $scope.$apply();
-    //  }
-    //});
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var hour = date.getHours();
+      var minute = date.getMinutes();
+      var second = date.getSeconds();
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      hour = hour < 10 ? '0' + hour : hour;
+      minute = minute < 10 ? '0' + minute : minute;
+      second = second < 10 ? '0' + second : second;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
+    };
+    MessageService.getMessages(function (messages) {
+      $scope.messages = messages;
+      console.log($scope.messages);
+      if (!$scope.$$phase) {
+        $scope.$apply();
+      }
+    });
   });
