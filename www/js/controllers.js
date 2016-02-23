@@ -683,6 +683,9 @@ angular.module('app.controllers', [])
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
           $scope.chartHemoglobin = {
+            options: {
+              bezierCurve: false
+            },
             labels: labels,
             data: [records],
             series: ['Hemoglobina'],
@@ -691,6 +694,9 @@ angular.module('app.controllers', [])
           break;
         case BiomedicType.BLOOD_PRESSURE:
           $scope.chartBloodPressure = {
+            options: {
+              bezierCurve: false
+            },
             labels: labels,
             data: records,
             series: ['Tensão Arterial Máxima', 'Tensão Arterial Mínima'],
@@ -699,6 +705,9 @@ angular.module('app.controllers', [])
           break;
         case BiomedicType.CHOLESTEROL:
           $scope.chartCholesterol = {
+            options: {
+              bezierCurve: false
+            },
             labels: labels,
             data: [records],
             series: ['Colesterol'],
@@ -711,6 +720,9 @@ angular.module('app.controllers', [])
             imc[i] = (records[i] / (1.71 * 1.71)).toFixed(2);
           }
           $scope.chartWeight = {
+            options: {
+              bezierCurve: false
+            },
             labels: labels,
             data: [records, imc],
             series: ['Peso', 'IMC'],
