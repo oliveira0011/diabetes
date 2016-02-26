@@ -104,9 +104,14 @@ angular.module('app.controllers', [])
       $state.go('app.search');
     };
 
+
+    $scope.data = {
+      refreshRate: 100
+    };
+
     $scope.options = {
-      frequency: 500, // Measure every 100ms
-      deviation: 25  // We'll use deviation to determine the shake event, best values in the range between 25 and 30
+      frequency: $scope.data.refreshRate // Measure every 100ms
+      //deviation: 25  // We'll use deviation to determine the shake event, best values in the range between 25 and 30
     };
 
     $scope.threshold = 10;
@@ -117,13 +122,40 @@ angular.module('app.controllers', [])
     $scope.deviceToken = FirebaseService.getDeviceToken();
 
 
-    $scope.startWatching = function () {
-      if ($cordovaDeviceMotion !== undefined) {
-        return;
+
+    $scope.$watch('data.refreshRate', function (val) {
+      //console.log(1);
+      $scope.stopWatch();
+      $scope.startWatch();
+    });
+
+    $scope.meanSpeed = 0;
+    $scope.topSpeed = 0;
+    $scope.readsCount = 0;
+    $scope.clearData = function () {
+
+      $scope.meanSpeed = 0;
+      $scope.topSpeed = 0;
+      $scope.readsCount = 0;
+      $scope.numSteps = 0;
+    };
+    $scope.startWatch = function () {
+      if (!$scope.active) {
+        $scope.startWatching();
+        $scope.active = true;
       }
+    };
+    $scope.stopWatch = function () {
+      if ($scope.active) {
+        $scope.stopWatching();
+      }
+    };
+
+
+    $scope.startWatching = function () {
       // Device motion configuration
       $scope.watch = $cordovaDeviceMotion.watchAcceleration($scope.options);
-
+      $scope.active = true;
       // Device motion initilaization
       $scope.watch.then(null, function (error) {
         console.log('Error');
@@ -145,22 +177,32 @@ angular.module('app.controllers', [])
         $scope.previousY = $scope.currentY;
         $scope.timestamp = result.timestamp;
 
+        $scope.vx = $scope.x * $scope.options.frequency;
+        $scope.vy = $scope.y * $scope.options.frequency;
+        $scope.vz = $scope.z * $scope.options.frequency;
 
+        $scope.stoppedSpeed = Math.sqrt((9.81 * $scope.data.refreshRate) * (9.81 * $scope.data.refreshRate));
+
+        $scope.speed = Math.sqrt(($scope.vx * $scope.vx) + ($scope.vy * $scope.vy) + ($scope.vz * $scope.vz)) - $scope.stoppedSpeed;
+        $scope.meanSpeed = ($scope.meanSpeed + $scope.speed) / 2;
+
+        $scope.topSpeed = $scope.topSpeed < $scope.speed ? $scope.speed : $scope.topSpeed;
+        $scope.readsCount++;
       });
     };
     $scope.stopWatching = function () {
-      if ($scope.watch !== undefined) {
+      if ($scope.watch) {
         $scope.watch.clearWatch();
+        $scope.active = false;
       }
     };
     $ionicPlatform.ready(function () {
       $scope.startWatching();
     });
 
-
     $scope.$on('$ionicView.beforeLeave', function () {
       if ($scope.watch !== undefined) {
-        $scope.watch.clearWatch(); // Turn off motion detection watcher
+        $cordovaDeviceMotion.clearWatch($scope.watch); // Turn off motion detection watcher
       }
     });
   })
@@ -168,7 +210,7 @@ angular.module('app.controllers', [])
     console.log(FirebaseService.isUserLogged());
     if (FirebaseService.isUserLogged()) {
       FirebaseService.checkDeviceToken();
-      $state.go('app.biomedic');
+      $state.go('app.main');
     }
     $scope.loginData = {
       username: 'oliveira_011@hotmail.com',
@@ -247,7 +289,7 @@ angular.module('app.controllers', [])
               return;
             }
             FirebaseService.checkDeviceToken();
-            $state.go('app.biomedic');
+            $state.go('app.main');
             $scope.loginData = {};
             form.$setPristine(false);
           }

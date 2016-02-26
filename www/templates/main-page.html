@@ -1,17 +1,37 @@
 <ion-view>
   <ion-content id="pnlContent">
     <div class="list card">
-      <a href="{{option.link}}" class="item item-icon-left" ng-repeat="option in options">
-        <span class="icon {{option.icon}}"></span>
-        <h2>{{option.name}}</h2>
-      </a>
+      <div class="item item-text-wrap positive">
+        <!--Device token: {{deviceToken}}<br/>-->
+        <!--Remote Device token: {{remoteDeviceToken}}<br/>-->
+        Current x: {{x}}<br/>
+        Current y: {{y}}<br/>
+        Current z: {{z}}<br/>
+      </div>
+      <div class="item item-divider"></div>
+      <div class="item item-text-wrap assertive">
+        Current Speed: {{speed}}<br/>
+        Mean Speed: {{meanSpeed}}<br/>
+        Top Speed: {{topSpeed}}<br/>
+        Reads Count: {{readsCount}}<br/>
+      </div>
+      <div class="item item-divider"></div>
+      <div class="item item-text-wrap balanced">
+        Current Steps number: {{numSteps}}<br/>
+        Current timestamp: {{timestamp}}
+      </div>
     </div>
-    Device token: {{deviceToken}}<br/>
-    Remote Device token: {{remoteDeviceToken}}<br/>
-    Current x: {{x}}<br/>
-    Current y: {{y}}<br/>
-    Current z: {{z}}<br/>
-    Current Steps number: {{numSteps}}<br/>
-    Current timestamp: {{timestamp}}
+    <div class="item range">
+      0
+      <input min="0" max="1000" type="range" ng-model="data.refreshRate" name="refreshRate">
+      1000
+    </div>
+
+    <div class="item text-center">
+      <span>{{data.refreshRate}}</span>
+      <button class="button button-clear button-block button-balanced" ng-disabled="active" ng-click="startWatch()">Start</button>
+      <button class="button button-clear button-block button-assertive" ng-disabled="!active" ng-click="stopWatch()">Stop</button>
+      <button class="button button-clear button-block button-positive" ng-click="clearData()">Clear Saved Data</button>
+    </div>
   </ion-content>
 </ion-view>
