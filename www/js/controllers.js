@@ -105,8 +105,27 @@ angular.module('app.controllers', [])
     };
 
 
+    $scope.chartSpeed = {
+      options: {
+        responsive: true,
+        bezierCurve: false,
+        animation : false,
+        pointDot: false
+      },
+      labels: [],
+      //data: [records],
+      data: [[]],
+      series: ['Speed (Km/h)'],
+      colours: [{
+        fillColor: "#FAA43A",
+        strokeColor: "#FF8C00",
+        pointColor: "#FF4500",
+        pointStrokeColor: "#FF4500"
+      }]
+    };
+
     $scope.data = {
-      refreshRate: 100
+      refreshRate: 500
     };
 
     $scope.options = {
@@ -122,22 +141,30 @@ angular.module('app.controllers', [])
     $scope.deviceToken = FirebaseService.getDeviceToken();
 
 
-
     $scope.$watch('data.refreshRate', function (val) {
       //console.log(1);
-      $scope.stopWatch();
-      $scope.startWatch();
+      //$scope.stopWatch();
+      //$scope.startWatch();
     });
 
     $scope.meanSpeed = 0;
     $scope.topSpeed = 0;
     $scope.readsCount = 0;
+    $scope.vx = 0;
+    $scope.vy = 0;
+    $scope.vz = 0;
+    $scope.speed = 0;
     $scope.clearData = function () {
-
       $scope.meanSpeed = 0;
       $scope.topSpeed = 0;
       $scope.readsCount = 0;
       $scope.numSteps = 0;
+      $scope.vx = 0;
+      $scope.vy = 0;
+      $scope.vz = 0;
+      $scope.speed = 0;
+      $scope.chartSpeed.data[0] = [];
+      $scope.chartSpeed.labels = [];
     };
     $scope.startWatch = function () {
       if (!$scope.active) {
@@ -151,12 +178,14 @@ angular.module('app.controllers', [])
       }
     };
 
-
     $scope.startWatching = function () {
+      $scope.clearData();
       // Device motion configuration
       $scope.watch = $cordovaDeviceMotion.watchAcceleration($scope.options);
       $scope.active = true;
       // Device motion initilaization
+      //$scope.counter = 0;
+
       $scope.watch.then(null, function (error) {
         console.log('Error');
       }, function (result) {
@@ -177,16 +206,38 @@ angular.module('app.controllers', [])
         $scope.previousY = $scope.currentY;
         $scope.timestamp = result.timestamp;
 
-        $scope.vx = $scope.x * $scope.options.frequency;
-        $scope.vy = $scope.y * $scope.options.frequency;
-        $scope.vz = $scope.z * $scope.options.frequency;
+        $scope.vx += $scope.x * ($scope.options.frequency / 1000);
+        $scope.vy += $scope.y * ($scope.options.frequency / 1000);
+        $scope.vz += $scope.z * ($scope.options.frequency / 1000);
 
-        $scope.stoppedSpeed = Math.sqrt((9.81 * $scope.data.refreshRate) * (9.81 * $scope.data.refreshRate));
+        var stoppedSpeed = (Math.sqrt((9.81 * 9.81)) * ($scope.options.frequency / 1000));
+        var aux = (Math.sqrt(($scope.x * $scope.x) + ($scope.y * $scope.y) + ($scope.z * $scope.z)) * ($scope.options.frequency / 1000));
 
-        $scope.speed = Math.sqrt(($scope.vx * $scope.vx) + ($scope.vy * $scope.vy) + ($scope.vz * $scope.vz)) - $scope.stoppedSpeed;
-        $scope.meanSpeed = ($scope.meanSpeed + $scope.speed) / 2;
+        aux -= stoppedSpeed;
+        if (aux - 0.3 < 0) {
+          aux = 0;
+        }
+        //$scope.speed = $scope.speed + aux;
+        var kmPerHSpeed = 3.6 * aux;
 
-        $scope.topSpeed = $scope.topSpeed < $scope.speed ? $scope.speed : $scope.topSpeed;
+        $scope.speed = aux;
+        $scope.speedKm = kmPerHSpeed;
+
+        //sqrt((ax*ax)+(ay*ay)+(az*az)) * deltaT
+        $scope.counter++;
+
+
+        $scope.meanSpeed = ($scope.meanSpeed + $scope.speedKm) / 2;
+
+
+        //if($scope.counter == 5){
+        //  $scope.counter = 0;
+          $scope.chartSpeed.data[0].push($scope.meanSpeed);
+          $scope.chartSpeed.labels.push('');
+        //}
+
+        $scope.topSpeed = $scope.topSpeed < $scope.speedKm ? $scope.speedKm : $scope.topSpeed;
+
         $scope.readsCount++;
       });
     };

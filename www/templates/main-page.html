@@ -10,27 +10,42 @@
       </div>
       <div class="item item-divider"></div>
       <div class="item item-text-wrap assertive">
-        Current Speed: {{speed}}<br/>
-        Mean Speed: {{meanSpeed}}<br/>
-        Top Speed: {{topSpeed}}<br/>
+        Current Speed: {{speed}} m/s<br/>
+        Current Speed: {{speed}} Km/h<br/>
+        Mean Speed: {{meanSpeed}}Km/h<br/>
+        Top Speed: {{topSpeed}} Km/h<br/>
         Reads Count: {{readsCount}}<br/>
+        <!--Graph Entries: {{chartSpeed.data[0]}}<br/>-->
+        Graph Entries Number: {{chartSpeed.data[0].length}}<br/>
       </div>
       <div class="item item-divider"></div>
       <div class="item item-text-wrap balanced">
-        Current Steps number: {{numSteps}}<br/>
-        Current timestamp: {{timestamp}}
+
+        <div class="row responsive-lg">
+          <div class="col">
+            <canvas id="lineWeight" class="chart chart-line" chart-data="chartSpeed.data"
+                    chart-options="chartSpeed.options"
+                    chart-labels="chartSpeed.labels" chart-legend="true"
+                    chart-series="chartSpeed.series" chart-colours="chartSpeed.colours">
+            </canvas>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="item range">
-      0
-      <input min="0" max="1000" type="range" ng-model="data.refreshRate" name="refreshRate">
-      1000
-    </div>
+    <!--<div class="item range">-->
+    <!--0-->
+    <!--<input min="0" max="1000" type="range" ng-model="data.refreshRate" name="refreshRate">-->
+    <!--1000-->
+    <!--</div>-->
 
     <div class="item text-center">
       <span>{{data.refreshRate}}</span>
-      <button class="button button-clear button-block button-balanced" ng-disabled="active" ng-click="startWatch()">Start</button>
-      <button class="button button-clear button-block button-assertive" ng-disabled="!active" ng-click="stopWatch()">Stop</button>
+      <button class="button button-clear button-block button-balanced" ng-disabled="active" ng-click="startWatch()">
+        Start
+      </button>
+      <button class="button button-clear button-block button-assertive" ng-disabled="!active" ng-click="stopWatch()">
+        Stop
+      </button>
       <button class="button button-clear button-block button-positive" ng-click="clearData()">Clear Saved Data</button>
     </div>
   </ion-content>
