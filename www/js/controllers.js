@@ -25,74 +25,14 @@ angular.module('app.controllers', [])
       MessageService.registerNewNotificationsListener();
     });
   })
-  .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http) {
+  .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http, TimerService) {
     $scope.$on('deviceUpdated', function (e, deviceId) {
       console.log(deviceId);
       $scope.deviceToken = deviceId;
     });
     FirebaseService.getDBConnection().child("users").child("e97c6bd0-47ac-47db-95df-b3134be52859").child("deviceToken").on('value', function (snap) {
       $scope.remoteDeviceToken = snap.val();
-      //var d = JSON.stringify({
-      //  "tokens": [
-      //    $scope.remoteDeviceToken
-      //  ],
-      //  "notification": {
-      //    "alert": "Hello World!",
-      //    "ios": {
-      //      "badge": 1,
-      //      "sound": "ping.aiff",
-      //      "priority": 10,
-      //      "contentAvailable": 1,
-      //      "payload": {
-      //        "key1": "value",
-      //        "key2": "value"
-      //      }
-      //    },
-      //    "android": {
-      //      "collapseKey": "foo",
-      //      "delayWhileIdle": true,
-      //      "timeToLive": 300,
-      //      "payload": {
-      //        "key1": "value",
-      //        "key2": "value"
-      //      }
-      //    }
-      //  }
-      //});
-      ////console.log(d);
-      //$http({
-      //  method: 'POST',
-      //  url: "https://push.ionic.io/api/v1/push/",
-      //  data: d,
-      //  headers: {
-      //    "Authorization": window.btoa("4cdd6aef6996fb0bc29141f33bcb0536edcea7b3661d4a43"),
-      //    "Content-Type": "application/json",
-      //    "X-Ionic-Application-Id": 'd98077ec'
-      //  }
-      //}).error(function (e) {
-      //  console.log(e);
-      //}).success(function (data, status) {
-      //  console.log(data);
-      //  console.log(status);
-      //});
     });
-
-    //$http({
-    //  method: 'GET',
-    //  url: "https://push.ionic.io/api/v1/status/eb68efe6cd2011e5a494be7f749067fa",
-    //  headers: {
-    //    "Authorization": window.btoa("4cdd6aef6996fb0bc29141f33bcb0536edcea7b3661d4a43"),
-    //    "Content-Type": "application/json",
-    //    "X-Ionic-Application-Id": 'd98077ec'
-    //  }
-    //}).error(function (e) {
-    //  console.log(e);
-    //}).success(function (data, status) {
-    //  console.log(data);
-    //  console.log(status);
-    //  $scope.hello = data;
-    //});
-
     $scope.options = [
       {name: "Eventos", color: "positive", icon: "ion-android-walk", link: "#/app/events"},
       {name: "Amigos", color: "positive", icon: "ion-person-stalker", link: "#/app/search"},
@@ -109,7 +49,7 @@ angular.module('app.controllers', [])
       options: {
         responsive: true,
         bezierCurve: false,
-        animation : false,
+        animation: false,
         pointDot: false
       },
       labels: [],
@@ -123,6 +63,28 @@ angular.module('app.controllers', [])
         pointStrokeColor: "#FF4500"
       }]
     };
+
+    $scope.attrs = {
+      bgcolor: "FFFFFF",
+      animation: "0",
+      showalternatehgridcolor: "0",
+      divlinecolor: "CCCCCC",
+      showvalues: "0",
+      showcanvasborder: "0",
+      legendshadow: "0",
+      legendborderalpha: "0",
+      showborder: "0",
+      anchorAlpha: '0'
+    };
+
+    $scope.categories = [{
+      category: []
+    }];
+
+    $scope.dataset = [{
+      "seriesname": "",
+      "data": []
+    }];
 
     $scope.data = {
       refreshRate: 500
@@ -154,6 +116,8 @@ angular.module('app.controllers', [])
     $scope.vy = 0;
     $scope.vz = 0;
     $scope.speed = 0;
+    $scope.timeElapsed = 0;
+    $scope.startTimestamp = 0;
     $scope.clearData = function () {
       $scope.meanSpeed = 0;
       $scope.topSpeed = 0;
@@ -163,8 +127,12 @@ angular.module('app.controllers', [])
       $scope.vy = 0;
       $scope.vz = 0;
       $scope.speed = 0;
-      $scope.chartSpeed.data[0] = [];
-      $scope.chartSpeed.labels = [];
+      //$scope.chartSpeed.data[0] = [];
+      //$scope.chartSpeed.labels = [];
+      $scope.categories[0].category = [];
+      $scope.dataset[0].data = [];
+      $scope.timeElapsed = 0;
+      $scope.startTimestamp = 0;
     };
     $scope.startWatch = function () {
       if (!$scope.active) {
@@ -177,6 +145,63 @@ angular.module('app.controllers', [])
         $scope.stopWatching();
       }
     };
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year;
+    };
+    $scope.getFormattedTimerDate = function () {
+      var millis = $scope.timeElapsed;
+      var minutes = Math.floor(millis / 60000);
+      var seconds = ((millis % 60000) / 1000).toFixed(0);
+      return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+    };
+
+    $scope.cancelListeners = function () {
+      FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime()))
+        .orderByChild('timestamp').startAt($scope.startTimestamp).off('child_added', function () {
+        console.log("off");
+      });
+      //$scope.chartSpeed.data[0] = [];
+      //$scope.chartSpeed.labels = [];
+      $scope.categories[0].category = [];
+      $scope.dataset[0].data = [];
+    };
+    $scope.registerListeners = function () {
+      FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime()))
+        .orderByChild('timestamp').startAt($scope.startTimestamp).once('value', function (snap) {
+        var items = snap.val();
+        if (!items || items == null) {
+          items = [];
+        }
+        for (var i = 0; i < items.length; i++) {
+          var obj = items[i];
+          //$scope.chartSpeed.data[0].push(obj.speed);
+          //$scope.chartSpeed.labels.push('');
+          $scope.dataset[0].data.push({value: obj.speed});
+          $scope.categories[0].category.push({'label': $scope.getFormattedTimerDate()});
+        }
+      });
+      FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime()))
+        .orderByChild('timestamp').startAt($scope.startTimestamp).on('child_added', function (snap) {
+        var item = snap.val();
+        //$scope.chartSpeed.data[0].push(item.speed);
+        //$scope.chartSpeed.labels.push('');
+        $scope.dataset[0].data.push({value: item.speed});
+        $scope.categories[0].category.push({'label': $scope.getFormattedTimerDate()});
+      });
+      $scope.stopWatching = function () {
+        if ($scope.watch) {
+          $scope.watch.clearWatch();
+          $scope.active = false;
+        }
+      };
+    };
+
 
     $scope.startWatching = function () {
       $scope.clearData();
@@ -186,9 +211,18 @@ angular.module('app.controllers', [])
       // Device motion initilaization
       //$scope.counter = 0;
 
+      $scope.currentIterationTimestamp = new Date().getTime();
+      $scope.currentIterationSpeed = 0;
+      $scope.timeElapsed = 0;
+      $scope.startTimestamp = new Date().getTime();
+
+      $scope.iteration = 0;
+
       $scope.watch.then(null, function (error) {
         console.log('Error');
       }, function (result) {
+
+        $scope.timeElapsed = result.timestamp - $scope.startTimestamp;
 
         var x = result.x;
         var y = result.y;
@@ -214,14 +248,19 @@ angular.module('app.controllers', [])
         var aux = (Math.sqrt(($scope.x * $scope.x) + ($scope.y * $scope.y) + ($scope.z * $scope.z)) * ($scope.options.frequency / 1000));
 
         aux -= stoppedSpeed;
+
+        /*
+         * NORMALIZE DATA
+         */
         if (aux - 0.3 < 0) {
           aux = 0;
         }
-        //$scope.speed = $scope.speed + aux;
+        $scope.speed = $scope.speed + aux;
         var kmPerHSpeed = 3.6 * aux;
 
         $scope.speed = aux;
         $scope.speedKm = kmPerHSpeed;
+        //$scope.speedKm = aux;
 
         //sqrt((ax*ax)+(ay*ay)+(az*az)) * deltaT
         $scope.counter++;
@@ -232,20 +271,28 @@ angular.module('app.controllers', [])
 
         //if($scope.counter == 5){
         //  $scope.counter = 0;
-          $scope.chartSpeed.data[0].push($scope.meanSpeed);
-          $scope.chartSpeed.labels.push('');
+        //  $scope.chartSpeed.data[0].push($scope.meanSpeed);
+        //  $scope.chartSpeed.labels.push('');
         //}
 
-        $scope.topSpeed = $scope.topSpeed < $scope.speedKm ? $scope.speedKm : $scope.topSpeed;
+        $scope.currentIterationSpeed = ($scope.currentIterationSpeed + $scope.speedKm) / 2;
 
+        $scope.timestampAux = ($scope.timestamp - $scope.currentIterationTimestamp) / 1000;
+        if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 5) {
+          FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime())).push().set({
+            timestamp: $scope.timestamp,
+            x: $scope.x,
+            y: $scope.y,
+            z: $scope.z,
+            speed: $scope.currentIterationSpeed
+          });
+          $scope.currentIterationTimestamp = $scope.timestamp;
+          $scope.currentIterationSpeed = 0;
+        }
+        $scope.topSpeed = $scope.topSpeed < $scope.speedKm ? $scope.speedKm : $scope.topSpeed;
         $scope.readsCount++;
       });
-    };
-    $scope.stopWatching = function () {
-      if ($scope.watch) {
-        $scope.watch.clearWatch();
-        $scope.active = false;
-      }
+      $scope.registerListeners();
     };
     $ionicPlatform.ready(function () {
       $scope.startWatching();
@@ -257,7 +304,8 @@ angular.module('app.controllers', [])
       }
     });
   })
-  .controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
+  .
+  controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
     console.log(FirebaseService.isUserLogged());
     if (FirebaseService.isUserLogged()) {
       FirebaseService.checkDeviceToken();

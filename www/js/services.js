@@ -269,4 +269,32 @@ angular.module('app.services', [])
       });
     };
     return messagesService;
+  })
+  .service('TimerService', function ($rootScope, $timeout) {
+
+    var timer = {};
+    var timerTime = 60;
+    var mytimeout = null; // the current timeoutID
+    var started;
+    var xpto;
+
+    // actual timer method, counts down every second, stops on zero
+    timer.onTimeout = function () {
+      if (timerTime === 0) {
+        $rootScope.$broadcast('timer-stopped', xpto);
+        $timeout.cancel(mytimeout);
+        return;
+      }
+      timerTime--;
+      xpto++;
+      mytimeout = $timeout(timer.onTimeout, 1000);
+      $rootScope.$broadcast('timer-changed', timerTime);
+    };
+    timer.startTimer = function () {
+      mytimeout = $timeout(timer.onTimeout, 1000);
+      xpto = timerTime;
+      started = true;
+    };
+
+    return timer;
   });
