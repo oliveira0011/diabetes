@@ -473,6 +473,9 @@ angular.module('app.controllers', [])
         }
       }
     }, function () {
+      if (!$scope.events) {
+        return;
+      }
       for (var i = 0; i < $scope.events.length; i++) {
         var obj = $scope.events[i];
         $scope.events[i].friendsNumber = 0;
