@@ -7,45 +7,67 @@
     min-height: 300px;
   }
 </style>
-<ion-view view-title="">
+<ion-view view-title="{{event.name}}">
   <ion-content>
-    <div name="form" class="row responsive-sm">
-      <div class="col col-offset-10 col-34">
-        <h3 class="input input-label positive">Por {{event.owner.name}}</h3>
+    <div class="row responsive-sm">
+      <div class="col">
         <div id="map" data-tap-disabled="true"></div>
-        <div class="row">
-          <div class="col">
-            <ion-toggle ng-model="participate" toggle-class="toggle-positive">Participar</ion-toggle>
-          </div>
-        </div>
-        <h2 class="input input-label positive">Localização</h2>
-        <span class="input item-input">
-          {{event.location}}
-        </span>
       </div>
-      <div class="col col-34 list list-inset">
-        <div class="row">
-          <div class="col">
-            <h2 class="positive">{{event.name}}</h2>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <p>{{event.description}}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <h3 class="positive">Participantes Confirmados</h3>
-            <ion-list class="list list-inset">
-              <ion-item class="item item-avatar" ng-repeat="friend in event.friends">
-                <img ng-src="{{friend.profileImage}}">
-                <h2>{{friend.name}}</h2>
-              </ion-item>
-            </ion-list>
-          </div>
-        </div>
+    </div>
+
+    <div class="row" ng-if="canEditParticipation">
+      <div class="col">
+        <ion-toggle ng-model="participate" ng-click="editParticipation(!participate)" toggle-class="toggle-positive">Participar</ion-toggle>
+        {{$scope.participate}}
       </div>
-      </form>
+    </div>
+    <div class="row responsive-sm">
+      <div class="col">
+        <label class="item item-input item-icon-right">
+          <span class="positive input-label">Localização</span>
+            <span class="input item-input" style="margin-left: -15px;" ng-if="event.location">
+              {{event.location}}
+            </span>
+        </label>
+      </div>
+    </div>
+    <div class="row responsive-sm">
+      <div class="col">
+        <label class="item item-input">
+          <span class="positive input-label">Nome do Evento</span>
+          <p>{{event.name}}</p>
+        </label>
+      </div>
+    </div>
+    <div class="row responsive-sm">
+      <div class="col">
+        <label class="item item-input">
+          <span class="positive input-label">Descrição do Evento</span>
+          <p>{{event.description}}</p>
+        </label>
+      </div>
+    </div>
+    <div class="row responsive-sm">
+      <div class="col">
+        <label class="item item-input">
+          <span class="positive input-label">Data</span>
+          <span style="color: #c8c8c8"></span>
+          <p>{{getFormattedDate(event.date)}}</p>
+        </label>
+      </div>
+    </div>
+    <div class="row responsive-sm">
+      <div class="col">
+        <ion-list class="list list-inset">
+          <label class="item item-input">
+            <span class="positive input-label">Participantes: {{event.friends.length}}</span>
+          </label>
+          <ion-item class="item item-avatar" ng-repeat="friend in event.friends">
+            <img ng-src="{{friend.profileImage}}">
+            <h2>{{friend.firstName}} {{friend.lastName}}</h2>
+          </ion-item>
+        </ion-list>
+      </div>
+    </div>
   </ion-content>
 </ion-view>

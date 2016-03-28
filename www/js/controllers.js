@@ -204,6 +204,9 @@ angular.module('app.controllers', [])
 
 
     $scope.startWatching = function () {
+      if (!$cordovaDeviceMotion) {
+        return;
+      }
       $scope.clearData();
       // Device motion configuration
       $scope.watch = $cordovaDeviceMotion.watchAcceleration($scope.options);
@@ -458,26 +461,68 @@ angular.module('app.controllers', [])
   .controller('PlaylistCtrl', function ($scope, $stateParams) {
   })
   .controller('EventsCtrl', function (EventsService, $scope, $ionicLoading, $compile) {
-    $scope.events = EventsService.events;
+    EventsService.getAllEvents(function (events) {
+      $scope.events = events;
+      for (var i = 0; i < $scope.events.length; i++) {
+        var obj = $scope.events[i];
+        $scope.events[i].friendsNumber = 0;
+        for (var property in obj.friends) {
+          if (obj.friends.hasOwnProperty(property) && obj.friends[property].participate) {
+            $scope.events[i].friendsNumber++;
+          }
+        }
+      }
+    }, function () {
+      for (var i = 0; i < $scope.events.length; i++) {
+        var obj = $scope.events[i];
+        $scope.events[i].friendsNumber = 0;
+        for (var property in obj.friends) {
+          if (obj.friends.hasOwnProperty(property) && obj.friends[property].participate) {
+            $scope.events[i].friendsNumber++;
+          }
+        }
+      }
+      if (!$scope.$$phase) {
+        $scope.$apply();
+      }
+    });
+
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var hour = date.getHours();
+      var minute = date.getMinutes();
+      var second = date.getSeconds();
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      hour = hour < 10 ? '0' + hour : hour;
+      minute = minute < 10 ? '0' + minute : minute;
+      second = second < 10 ? '0' + second : second;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
+    };
+
   })
-  .controller('EventCtrl', function (Friend, Event, EventsService, $scope, $ionicLoading, $compile, $stateParams, $ionicModal, FriendsService) {
+  .controller('EventCtrl', function (Friend, Event, EventsService, $scope, $ionicLoading, $compile, $state, $stateParams, $ionicModal, FriendsService) {
     if ($stateParams.id) {
       $scope.event = EventsService.events[$stateParams.id];
       $scope.newEvent = false;
     } else {
       $scope.event = new Event();
+      $scope.event.date = new Date();
       $scope.newEvent = true;
     }
+    $scope.minDate = new Date();
 
     //<editor-fold desc="Modal Friends">
-    $scope.friends = FriendsService.friends;
-    $scope.selectedFriends = {};
-
-    angular.copy($scope.event.friends, $scope.selectedFriends);
-    angular.forEach($scope.selectedFriends, function (friend) {
-      friend.selected = true;
+    FriendsService.getFriends(function (friends) {
+      $scope.friends = friends;
+      $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
     });
-    $scope.selectAll = $scope.selectedFriends.length == $scope.friends.length;
+    $scope.friends = [];
+    $scope.selectedFriends = [];
+    $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
 
     $scope.toggleAll = function () {
       if (!$scope.selectAll) {
@@ -502,7 +547,12 @@ angular.module('app.controllers', [])
       }
     };
     $scope.closeModal = function () {
-      angular.copy($scope.selectedFriends, $scope.event.friends);
+      $scope.event.friends = [];
+      for (var selectedFriend in $scope.selectedFriends) {
+        if ($scope.selectedFriends.hasOwnProperty(selectedFriend)) {
+          $scope.event.friends.push($scope.selectedFriends[selectedFriend]);
+        }
+      }
       $scope.modal.hide();
     };
     $scope.openModalFriends = function () {
@@ -516,130 +566,184 @@ angular.module('app.controllers', [])
         $scope.modal.show();
       });
     };
+
+    $scope.saveEvent = function (form) {
+      if ($scope.event.date != null) {
+        form.date.$setValidity('required', true);
+      }
+      if ($scope.event.friends.length == 0) {
+        return;
+      }
+      if (form.$invalid) {
+        console.log(form);
+        return;
+      } else if ($scope.event.date == null) {
+        form.date.$setValidity('required', false);
+        return;
+      }
+      $ionicLoading.show({template: "A gravar Evento..."});
+
+      var handler = function () {
+        $ionicLoading.hide();
+        $state.go('app.events');
+      };
+      if ($scope.newEvent) {
+        EventsService.addEvent($scope.event, handler);
+      } else {
+        EventsService.editEvent($stateParams.id, $scope.event, handler);
+      }
+    };
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var hour = date.getHours();
+      var minute = date.getMinutes();
+      var second = date.getSeconds();
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      hour = hour < 10 ? '0' + hour : hour;
+      minute = minute < 10 ? '0' + minute : minute;
+      second = second < 10 ? '0' + second : second;
+      var year = date.getFullYear();
+      console.log(day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second);
+      return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
+    };
+
     //</editor-fold>
 
-
     function initialize() {
-      var myLatlng = new google.maps.LatLng(43.07493, -89.381388);
+      var myLatlng = new google.maps.LatLng(39.7375278, -8.813522, 17);
 
       var mapOptions = {
         center: myLatlng,
         zoom: 16,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeId: google.maps.MapTypeId.HYBRID
       };
-      var map = new google.maps.Map(document.getElementById("map"),
-        mapOptions);
-
-      //Marker + infowindow + angularjs compiled ng-click
-      var contentString = "<div><a ng-click='clickTest()'>Click me!</a></div>";
-      var compiled = $compile(contentString)($scope);
-
-      var infowindow = new google.maps.InfoWindow({
-        content: compiled[0]
-      });
+      var map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
       var marker = new google.maps.Marker({
         position: myLatlng,
-        map: map,
-        title: 'Uluru (Ayers Rock)'
+        map: map
       });
 
-      google.maps.event.addListener(marker, 'click', function () {
-        infowindow.open(map, marker);
-      });
-
-      $scope.map = map;
-    }
-
-    google.maps.event.addDomListener(window, 'load', initialize);
-
-    $scope.centerOnMe = function () {
-      if (!$scope.map) {
-        return;
+      function placeMarker(location) {
+        marker.setMap(null);
+        marker = new google.maps.Marker({
+          position: location,
+          map: map,
+          animation: google.maps.Animation.DROP
+        });
+        var geocoder = new google.maps.Geocoder;
+        geocoder.geocode({'location': location}, function (results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            console.log(results);
+            if (results[0]) {
+              $scope.event.location = results[0].formatted_address;
+            } else {
+              $scope.event.location = "Lat: " + event.latLng.lat() + "\nLng: " + event.latLng.lng();
+            }
+          } else {
+            console.log('Geocoder failed due to: ' + status);
+            $scope.event.location = "Lat: " + event.latLng.lat() + "\nLng: " + event.latLng.lng();
+          }
+          $scope.$apply();
+        });
       }
 
-      $scope.loading = $ionicLoading.show({
-        content: 'Getting current location...',
-        showBackdrop: false
+      google.maps.event.addListener(map, 'click', function (event) {
+        placeMarker(event.latLng);
+        $scope.event.geoLocation = event.latLng;
       });
 
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-        $scope.loading.hide();
-      }, function (error) {
-        alert('Unable to get location: ' + error.message);
-      });
-    };
-
-    $scope.clickTest = function () {
-      alert('Example of infowindow with ng-click')
-    };
-
-  })
-  .controller('EventFindCtrl', function ($scope, $ionicLoading, $compile, $stateParams, EventsService) {
-
-    $scope.event = EventsService.events[$stateParams.id];
-    $scope.participate = true;
-
-    function initialize() {
-      var myLatlng = new google.maps.LatLng(43.07493, -89.381388);
-
-      var mapOptions = {
-        center: myLatlng,
-        zoom: 16,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      };
-      var map = new google.maps.Map(document.getElementById("map"),
-        mapOptions);
-
-      //Marker + infowindow + angularjs compiled ng-click
-      var contentString = "<div><a ng-click='clickTest()'>Click me!</a></div>";
-      var compiled = $compile(contentString)($scope);
-
-      var infowindow = new google.maps.InfoWindow({
-        content: compiled[0]
-      });
-
-      var marker = new google.maps.Marker({
-        position: myLatlng,
-        map: map,
-        title: 'Uluru (Ayers Rock)'
-      });
-
-      google.maps.event.addListener(marker, 'click', function () {
-        infowindow.open(map, marker);
-      });
 
       $scope.map = map;
     }
 
+    $scope.marker = {};
     ionic.Platform.ready(initialize);
 
-
-    $scope.centerOnMe = function () {
-      if (!$scope.map) {
-        return;
-      }
-
-      $scope.loading = $ionicLoading.show({
-        content: 'Getting current location...',
-        showBackdrop: false
-      });
-
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-        $scope.loading.hide();
-      }, function (error) {
-        alert('Unable to get location: ' + error.message);
-      });
-    };
-
-    $scope.clickTest = function () {
-      alert('Example of infowindow with ng-click')
-    };
-
+    $scope.clearLocation = function () {
+      delete $scope.event.location;
+      delete $scope.event.geoLocation;
+    }
   })
-  .controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+  .controller('EventFindCtrl', function ($scope, $ionicLoading, $compile, $state, $stateParams, EventsService, FirebaseService) {
+    function initialize(lat, lng) {
+      var myLatlng = new google.maps.LatLng(lat, lng);
+      var mapOptions = {
+        center: myLatlng,
+        zoom: 16,
+        mapTypeId: google.maps.MapTypeId.HYBRID
+      };
+
+      if (!$scope.map) {
+        var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+        $scope.map = map;
+        $scope.marker = new google.maps.Marker({
+          position: myLatlng,
+          map: map
+        });
+      } else {
+        $scope.marker.setPosition(myLatlng);
+      }
+    }
+
+    $scope.participate = false;
+    EventsService.getEvent($stateParams.id, function (event) {
+      $scope.event = event;
+      $scope.canEditParticipation = (event.owner !== FirebaseService.getCurrentUserUid());
+
+      initialize(event.geoLocation.lat, event.geoLocation.lng);
+      $scope.participate = false;
+      for (var i = 0; i < $scope.event.friends.length; i++) {
+        var obj = $scope.event.friends[i];
+        if (obj.id == FirebaseService.getCurrentUserUid()) {
+          $scope.participate = true;
+        }
+      }
+    }, function () {
+      for (var i = 0; i < $scope.event.friends.length; i++) {
+        var obj = $scope.event.friends[i];
+        if (obj.id == FirebaseService.getCurrentUserUid()) {
+          $scope.participate = true;
+        }
+      }
+      if (!$scope.$$phase) {
+        $scope.$apply();
+      }
+    });
+
+    $scope.editParticipation = function () {
+      if ($scope.participate == false) {
+        $scope.participate = true;
+      } else {
+        $scope.participate = false;
+      }
+      //$scope.participate = participate;
+      EventsService.editParticipation($stateParams.id, $scope.participate, function () {
+        console.log("DONE");
+      })
+    };
+
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var hour = date.getHours();
+      var minute = date.getMinutes();
+      var second = date.getSeconds();
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      hour = hour < 10 ? '0' + hour : hour;
+      minute = minute < 10 ? '0' + minute : minute;
+      second = second < 10 ? '0' + second : second;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
+    };
+  })
+  .
+  controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
     //$scope.user = {firstName:1,lastName:1,address:1,oldPassword:1};
     $scope.user = {};
     var dbConnection = FirebaseService.getDBConnection();

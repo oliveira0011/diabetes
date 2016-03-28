@@ -1,71 +1,158 @@
 angular.module('app.services', [])
-  .service('FriendsService', function (Friend) {
+  .service('FriendsService', function (Friend, FirebaseService) {
     function FriendsService() {
       this.friends = {};
     }
 
-    FriendsService.prototype.addFriend = function (friend, friendAddedCallback) {
-      if (!friend instanceof Friend) {
-        console.log('Trying to add an non Event object!!');
-      } else {
-        if (!this.friends) {
-          this.friends = {};
+    FriendsService.getFriends = function (handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child("users").on('value', function (data) {
+        var friends = [];
+        var results = data.val();
+        for (var result in results) {
+          if (results.hasOwnProperty(result)) {
+            var friend = results[result];
+            if (friend.id !== FirebaseService.getCurrentUserUid()) {
+              console.log(friend.id);
+              const fr = friend;
+              dbConnection.child("profileImages").child(friend.id).once('value', function (data) {
+                if (data.val() != null) {
+                  var frind = new Friend(fr.id, fr.firstName + " " + fr.lastName, data.val().image);
+                  friends.push(frind);
+                }
+              });
+            }
+          }
         }
-        this.friends[friend.id] = friend;
-        if (this.friendAddedCallback) {
-          this.friendAddedCallback(friend);
-        }
-      }
+        handler(friends);
+      });
     };
-
-
-    FriendsService.prototype.getAllFriends = function () {
-      return this.friends;
-    };
-
-    FriendsService.prototype.getFriend = function (id) {
-      return this.friends[id];
-    };
-    FriendsService.friends = {};
-    FriendsService.friends["ID1"] = new Friend("ID1", "João Faria", "img/ionic.png");
-    FriendsService.friends[2] = new Friend(2, "Eduardo Silva", "img/ionic.png");
-    FriendsService.friends[3] = new Friend(3, "André Coelho", "img/ionic.png");
-    FriendsService.friends[4] = new Friend(4, "Cristiana Ramos", "img/ionic.png");
-    FriendsService.friends[5] = new Friend(5, "Tatiana Oliveira", "img/ionic.png");
-    FriendsService.friends[6] = new Friend(6, "Teresa Abreu", "img/ionic.png");
-
     return FriendsService;
   })
-  .service('EventsService', function (Event, FriendsService) {
+  .service('EventsService', function (Event, FirebaseService) {
     function EventsService() {
       this.events = {};
     }
 
-    EventsService.prototype.getAllEvents = function () {
-      return this.events;
+    EventsService.getEvent = function (id, handler, refreshHandler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child("events").child(id).on('value', function (snap) {
+        var data = snap.val();
+        const evt = data;
+        var friends = [];
+        angular.copy(evt.friends, friends);
+        evt.friends = [];
+        console.log(friends);
+        var ownerId = evt.owner;
+        handler(evt);
+        dbConnection.child("users").child(ownerId).on('value', function (snap) {
+          evt.owner = snap.val();
+          evt.owner.id = ownerId;
+          const own = evt.owner;
+          dbConnection.child("profileImages").child(ownerId).once('value', function (data) {
+            if (data.val() != null) {
+              own.profileImage = data.val().image;
+            }
+            for (var friend in friends) {
+              if (friends.hasOwnProperty(friend)) {
+                var obj = friends[friend];
+                console.log(obj);
+                if (obj.participate) {
+                  const f = friend;
+                  dbConnection.child("users").child(f).on('value', function (snap) {
+                    const fr = snap.val();
+                    dbConnection.child("profileImages").child(f).once('value', function (data) {
+                      if (data.val() != null) {
+                        fr.profileImage = data.val().image;
+                        evt.friends.push(fr);
+                        refreshHandler();
+                      }
+                    });
+                  });
+                }
+                refreshHandler();
+              }
+            }
+          });
+        });
+      });
     };
-
-    EventsService.prototype.getEvent = function (id) {
-      return this.events[id];
+    EventsService.getAllEvents = function (handler, refreshHandler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child("events").orderByChild("date").startAt(new Date().getTime()).on('value', function (snap) {
+        var data = snap.val();
+        var events = [];
+        for (var dt in data) {
+          if (data.hasOwnProperty(dt)) {
+            var event = data[dt];
+            event.id = dt;
+            const evt = event;
+            dbConnection.child("users").child(event.owner).once('value', function (snap) {
+              var owner = snap.val();
+              evt.owner = owner;
+              events.push(evt);
+              refreshHandler();
+            });
+          }
+        }
+        handler(events);
+      });
     };
-
-    EventsService.prototype.addEvent = function (event, eventAddedCallback) {
+    EventsService.editParticipation = function (eventId, participate, handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child("events").child(eventId).child("friends").child(FirebaseService.getCurrentUserUid()).set({participate: participate}, handler);
+    };
+    EventsService.addEvent = function (event, eventAddedCallback) {
       if (!event instanceof Event) {
         console.log('Trying to add an non Event object!!');
       } else {
-        if (!this.events) {
-          this.events = {};
+        var friendsIds = {};
+        console.log(event);
+        for (var i = 0; i < event.friends.length; i++) {
+          var obj = event.friends[i];
+          friendsIds[obj.id] = {};
+          friendsIds[obj.id].participate = false;
         }
-        this.events[event.id] = event;
-        if (this.eventAddedCallback) {
-          this.eventAddedCallback(event);
+        var dbConnection = FirebaseService.getDBConnection();
+        dbConnection.child("events")
+          .push({
+            name: event.name,
+            description: event.description,
+            location: event.location,
+            geoLocation: {lat: event.geoLocation.lat(), lng: event.geoLocation.lng()},
+            friends: friendsIds,
+            date: event.date.getTime(),
+            owner: FirebaseService.getCurrentUserUid()
+          }, eventAddedCallback);
+      }
+    };
+
+    EventsService.editEvent = function (id, event, eventAddedCallback) {
+      if (!event instanceof Event) {
+        console.log('Trying to add an non Event object!!');
+      } else {
+        var friendsIds = [];
+        for (var i = 0; i < event.friends.length; i++) {
+          var obj = event.friends[i];
+          friendsIds.push(obj.ud);
         }
+        var dbConnection = FirebaseService.getDBConnection();
+        dbConnection.child("events")
+          .child("id")
+          .set({
+            name: event.name,
+            description: event.description,
+            location: event.location,
+            geoLocation: {lat: event.geoLocation.lat(), lng: event.geoLocation.lng()},
+            friends: friendsIds,
+            date: event.date.getTime(),
+          }, eventAddedCallback);
       }
     };
     EventsService.events = {};
-    EventsService.events[1] = new Event(1, "Caminhada na Peneda", "R. Dr. João Soares,2400 Leiria", "Caminhada pela peneda. Importante para quem queira cumprir o seu objetivo de realizar exercício físico", FriendsService.friends, "img/ionic.png", FriendsService.friends[2]);
-    EventsService.events[2] = new Event(2, "Caminhada por Leiria", "R. Dr. João Soares,2400 Leiria", "Caminhada por Leiria", FriendsService.friends, "img/ionic.png", FriendsService.friends[3]);
-    EventsService.events[3] = new Event(3, "Sessão de exercício físico no parque do avião", "R. Dr. João Soares,2400 Leiria", "Em princípio não haverá caminhadas nem corridas, a menos que a maioria dos participantes assim o queira. A ideia é fazer exercícios como flexões e outros.", FriendsService.friends, "img/ionic.png", FriendsService.friends[4]);
+    //EventsService.events[1] = new Event(1, "Caminhada na Peneda", "R. Dr. João Soares,2400 Leiria", "Caminhada pela peneda. Importante para quem queira cumprir o seu objetivo de realizar exercício físico", FriendsService.friends, "img/ionic.png", FriendsService.friends[2]);
+    //EventsService.events[2] = new Event(2, "Caminhada por Leiria", "R. Dr. João Soares,2400 Leiria", "Caminhada por Leiria", FriendsService.friends, "img/ionic.png", FriendsService.friends[3]);
+    //EventsService.events[3] = new Event(3, "Sessão de exercício físico no parque do avião", "R. Dr. João Soares,2400 Leiria", "Em princípio não haverá caminhadas nem corridas, a menos que a maioria dos participantes assim o queira. A ideia é fazer exercícios como flexões e outros.", FriendsService.friends, "img/ionic.png", FriendsService.friends[4]);
 
     return EventsService;
   })

@@ -91,14 +91,15 @@ angular.module('app.factories', [])
     return Friend;
   })
   .factory('Event', function (Friend) {
-    function Event(id, name, location, description, friends, image, owner) {
+    function Event(id, name, description, date, location, geoLocation, friends, owner) {
       this.id = id;
       this.name = name;
-      this.location = location;
       this.description = description;
-      this.image = image;
+      this.date = date;
+      this.location = location;
+      this.geoLocation = geoLocation;
       this.owner = owner;
-      this.friends = {};
+      this.friends = [];
       if (friends) {
         var thisInstance = this;
         angular.forEach(friends, function (friend) {

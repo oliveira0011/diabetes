@@ -1,16 +1,34 @@
 <ion-view view-title="Eventos">
   <ion-nav-buttons side="secondary">
-    <a class="button button-clear button-positive"  href="#/app/event/new">
+    <a class="button button-clear button-positive" href="#/app/event/new">
       <i class="icon ion-ios-plus-outline"></i>
       <!--Novo Evento-->
     </a>
   </ion-nav-buttons>
   <ion-content>
     <ion-list class="list">
-      <ion-item class="item item-avatar item-icon-right positive" href="#/app/event/{{event.id}}" ng-repeat="event in events">
-        <img ng-src="{{event.image}}">
-        <h2 class="positive">{{event.name}}</h2>
-        <p>Por {{event.owner.name}}</p>
+      <ion-item class="item item-icon-right positive" href="#/app/event/{{event.id}}" ng-repeat="event in events">
+        <div class="row">
+          <div class="col">
+            <h2 class="positive">{{event.name}}</h2>
+          </div>
+          <div class="col">
+            <p class="">{{getFormattedDate(event.date)}}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <p class="">{{event.location}}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <span>Por {{event.owner.firstName}} {{event.owner.lastName}}</span>
+          </div>
+          <div class="col">
+            <p class="">{{event.friendsNumber}} Participante(s)</p>
+          </div>
+        </div>
         <i class="icon ion-chevron-right"></i>
       </ion-item>
     </ion-list>

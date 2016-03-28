@@ -5,64 +5,112 @@
     /*height: 100%;*/
     min-width: 300px;
     min-height: 300px;
-    z-index: 4;
-  }
-
-  .scroll {
-    height: 100%;
   }
 </style>
 <ion-view view-title="{{newEvent? 'Novo' : 'Editar'}} Evento">
   <ion-content>
-    <form name="form" class="row responsive-sm" novalidate ng-submit="saveEvent(form)">
-      <div class="col col-offset-10 col-34">
-        <div id="map" data-tap-disabled="true"></div>
-        <span class="input input-label">Localização</span>
-        <span class="input item-input">
-          {{event.location}}
-        </span>
+    <form name="form" class="" novalidate ng-submit="saveEvent(form)">
+
+      <div class="row responsive-sm">
+        <div class="col">
+          <div id="map" data-tap-disabled="true"></div>
+        </div>
       </div>
-      <div class="col col-34 list list-inset">
-        <div class="row">
-          <div class="col">
-            <label class="item item-input">
-              <input type="text" ng-required="true" ng-model="event.name" name="name" placeholder="Nome do Evento">
-            </label>
-            <div class="padding" ng-show="form.$submitted">
-              <p ng-show="form.$submitted && form.username.$error.required" class="invalid-input-label">Insira o nome do
-                evento</p>
+      <div class="row responsive-sm">
+        <div class="col">
+          <label class="item item-input item-icon-right">
+            <!--<span class="positive input-label">Localização</span>-->
+            <span class="input item-input" style="margin-left: -15px;color: #b2b2b2;" ng-if="!event.location">
+              Marque no mapa a Localização do Evento
+            </span>
+            <span class="input item-input" style="margin-left: -15px;" ng-if="event.location">
+              {{event.location}}
+            </span>
+          </label>
+        </div>
+        <button class="button button-assertive icon ion-ios-close-outline" ng-if="event.location"
+                ng-click="clearLocation()" type="button"></button>
+      </div>
+      <div class="row responsive-sm">
+        <div class="col">
+          <label class="item item-input">
+            <!--<span class="positive input-label">Nome do Evento</span>-->
+            <input type="text" ng-required="true" ng-model="event.name" name="name" placeholder="Nome do Evento">
+          </label>
+          <div class="padding" ng-show="form.$submitted">
+            <p ng-show="form.$submitted && form.name.$error.required" class="invalid-input-label">Insira o nome
+              do
+              evento</p>
+          </div>
+        </div>
+      </div>
+      <div class="row responsive-sm">
+        <div class="col">
+          <label class="item item-input">
+            <!--<span class="positive input-label">Descrição do Evento</span>-->
+            <textarea type="text" ng-required="true" rows="8" ng-model="event.description" name="description"
+                      placeholder="Descrição do Evento">></textarea>
+          </label>
+          <div class="padding" ng-show="form.$submitted">
+            <p ng-show="form.$submitted && form.description.$error.required" class="invalid-input-label">Insira a descrição
+              do
+              evento</p>
+          </div>
+        </div>
+      </div>
+      <div class="row responsive-sm">
+        <div class="col">
+          <label class="item item-input">
+            <span class="positive input-label">Data</span>
+            <span style="color: #c8c8c8"></span>
+            <input ng-model="event.date" name="date" type="datetime-local"
+                   min="{{minDate | date:'yyyy-MM-ddTHH:mm:ss'}}">
+          </label>
+        </div>
+      </div>
+      <div class="row responsive-sm">
+        <div class="col">
+          <div ng-messages="form.date.$error" ng-if="form.$invalid && form.$submitted" role="alert">
+            <div class="row assertive" ng-message="required">A data associada ao evento é obrigatória.</div>
+            <div class="row assertive" ng-message="min">A data associada ao evento não deve ser inferior ao dia atual.
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col">
-            <label class="item item-input">
-              <textarea type="text" ng-required="true" rows="8" ng-model="event.description" name="name"
-                        placeholder="Descrição do Evento"></textarea>
-            </label>
-            <div class="padding" ng-show="form.$submitted">
-              <p ng-show="form.$submitted && form.username.$error.required" class="invalid-input-label">Insira o nome do
-                evento</p>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <h3 class="positive">Participantes Convidados</h3>
+      </div>
+      <div class="row responsive-sm">
+        <div class="col">
+          <label class="item item-input">
+            <span class="positive input-label">Participantes Convidados</span>
             <button type="button" class="button button-small button-clear button-positive"
                     ng-click="openModalFriends()"><i
               class="icon ion-ios-plus-outline"></i>
               Convidar Amigos
             </button>
-            <ion-list class="list list-inset">
-              <ion-item class="item item-avatar" ng-repeat="friend in event.friends">
-                <img ng-src="{{friend.profileImage}}">
-                <h2>{{friend.name}}</h2>
-              </ion-item>
-            </ion-list>
+          </label>
+        </div>
+      </div>
+      <div class="row responsive-sm">
+        <div class="col">
+          <div ng-if="form.$invalid && form.$submitted && event.friends.length == 0" role="alert">
+            <div class="assertive">Convide pelo menos um amigo para participar no evento.
+            </div>
           </div>
         </div>
       </div>
+      <div class="row responsive-sm">
+        <div class="col">
+          <ion-list class="list list-inset">
+            <ion-item class="item item-avatar" ng-repeat="friend in event.friends">
+              <img ng-src="{{friend.profileImage}}">
+              <h2>{{friend.name}}</h2>
+            </ion-item>
+          </ion-list>
+        </div>
+      </div>
+      <div class="row responsive-sm">
+        <div class="col">
+          <button class="button button-block button-positive" type="submit">Submeter</button>
+        </div>
       </div>
     </form>
   </ion-content>
