@@ -8,65 +8,50 @@
   }
 </style>
 <ion-view view-title="{{event.name}}">
-  <ion-content>
-    <div class="row responsive-sm">
-      <div class="col">
-        <div id="map" data-tap-disabled="true"></div>
-      </div>
-    </div>
+  <ion-content padding="16">
 
-    <div class="row" ng-if="canEditParticipation">
+    <div class="row responsive-sm" style="max-height: 45px;">
       <div class="col">
-        <ion-toggle ng-model="participate" ng-click="editParticipation(!participate)" toggle-class="toggle-positive">Participar</ion-toggle>
-        {{$scope.participate}}
+        <h2 class="positive">{{event.name}}</h2>
+      </div>
+    </div>
+    <div class="col text-right" ng-if="canEditParticipation">
+      <ion-toggle ng-model="participate" ng-click="editParticipation(!participate)" toggle-class="toggle-positive" style="border-width:0px">
+        Participar
+      </ion-toggle>
+      {{$scope.participate}}
+    </div>
+    <div class="row responsive-sm">
+      <div class="col" style="border-bottom: 1px solid #ddd;">
+        <span style="color:#666">{{getFormattedDate(event.date)}}</span>
       </div>
     </div>
     <div class="row responsive-sm">
-      <div class="col">
-        <label class="item item-input item-icon-right">
-          <span class="positive input-label">Localização</span>
-            <span class="input item-input" style="margin-left: -15px;" ng-if="event.location">
-              {{event.location}}
-            </span>
-        </label>
+      <div class="col" style="border-bottom: 1px solid #ddd;">
+        <p>{{event.location}}</p>
       </div>
     </div>
     <div class="row responsive-sm">
-      <div class="col">
-        <label class="item item-input">
-          <span class="positive input-label">Nome do Evento</span>
-          <p>{{event.name}}</p>
-        </label>
-      </div>
-    </div>
-    <div class="row responsive-sm">
-      <div class="col">
-        <label class="item item-input">
-          <span class="positive input-label">Descrição do Evento</span>
+      <div class="col" style="border-bottom: 1px solid #ddd;">
+        <label class="">
+          <!--<span class="positive input-label">Descrição do Evento</span>-->
           <p>{{event.description}}</p>
         </label>
       </div>
     </div>
     <div class="row responsive-sm">
       <div class="col">
-        <label class="item item-input">
-          <span class="positive input-label">Data</span>
-          <span style="color: #c8c8c8"></span>
-          <p>{{getFormattedDate(event.date)}}</p>
-        </label>
-      </div>
-    </div>
-    <div class="row responsive-sm">
-      <div class="col">
         <ion-list class="list list-inset">
-          <label class="item item-input">
-            <span class="positive input-label">Participantes: {{event.friends.length}}</span>
-          </label>
           <ion-item class="item item-avatar" ng-repeat="friend in event.friends">
             <img ng-src="{{friend.profileImage}}">
             <h2>{{friend.firstName}} {{friend.lastName}}</h2>
           </ion-item>
         </ion-list>
+      </div>
+    </div>
+    <div class="row responsive-sm">
+      <div class="col">
+        <div id="map" data-tap-disabled="true"></div>
       </div>
     </div>
   </ion-content>

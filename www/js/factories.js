@@ -131,6 +131,26 @@ angular.module('app.factories', [])
     };
     return Event;
   })
+  .factory('MessageType', function () {
+    return {
+      CUSTOM: 'custom',
+      ACTIVITY_REEVALUATION: 'activity-reevaluation',
+      EVENT: 'event'
+    }
+  })
+  .factory('Message', function (MessageType) {
+    var Message = function (title, body, type) {
+      this.id = 0;
+      this.title = title;
+      this.body = body;
+      this.date = new Date().getTime();
+      if (!type instanceof MessageType.constructor) {
+        throw 'The type must be a MessageType';
+      }
+      this.type = type;
+    };
+    return Message;
+  })
   .factory('UserFormFactory', function () {
     ///returns the form structure needed for the creation of a user
     var factory = {};

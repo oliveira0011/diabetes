@@ -16,6 +16,10 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
       FirebaseService.registerDevice();
     });
   })
+  .config(function($ionicConfigProvider) {
+    // remove back button text completely
+    $ionicConfigProvider.backButton.previousTitleText(false).text(' ');
+  })
   .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
 
@@ -117,6 +121,15 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
           'menuContent': {
             templateUrl: 'templates/messages.html',
             controller: 'MessagesCtrl'
+          }
+        }
+      })
+      .state('app.message', {
+        url: '/message/:id',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/message.html',
+            controller: 'MessageCtrl'
           }
         }
       });

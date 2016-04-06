@@ -29,7 +29,7 @@ angular.module('app.services', [])
     };
     return FriendsService;
   })
-  .service('EventsService', function (Event, FirebaseService) {
+  .service('EventsService', function (Event, FirebaseService, MessageService, Message, MessageType) {
     function EventsService() {
       this.events = {};
     }
@@ -114,8 +114,8 @@ angular.module('app.services', [])
           friendsIds[obj.id].participate = false;
         }
         var dbConnection = FirebaseService.getDBConnection();
-        dbConnection.child("events")
-          .push({
+        var ref = dbConnection.child("events").push();
+        ref.set({
             name: event.name,
             description: event.description,
             location: event.location,
@@ -123,7 +123,18 @@ angular.module('app.services', [])
             friends: friendsIds,
             date: event.date.getTime(),
             owner: FirebaseService.getCurrentUserUid()
-          }, eventAddedCallback);
+          }, function () {
+            eventAddedCallback();
+          });
+        var eventId = ref.key();
+        dbConnection.child('users').child(FirebaseService.getCurrentUserUid()).once('value', function (user) {
+          var retrievedUser = user.val();
+          for (var j = 0; j < event.friends.length; j++) {
+            var fr = event.friends[j];
+            MessageService.addMessage(fr.id, eventId, new Message('Convite para Evento', retrievedUser.firstName + " " + retrievedUser.lastName + 'convidou-o para participar em ' + event.name + '.', MessageType.EVENT));
+          }
+        });
+
       }
     };
 
@@ -319,7 +330,7 @@ angular.module('app.services', [])
     };
     return BiomedicService;
   })
-  .service('MessageService', function ($rootScope, FirebaseService) {
+  .service('MessageService', function ($rootScope, FirebaseService, Message, MessageType, $http ) {
     var messagesService = {};
     var messages = [];
 
@@ -342,6 +353,21 @@ angular.module('app.services', [])
         }
       });
     };
+    messagesService.getMessage = function (id, handler) {
+      if (!FirebaseService.isUserLogged()) {
+        console.log('invalidUser');
+        $rootScope.$broadcast('logoutUser');
+      }
+      console.log("User: ");
+      console.log(FirebaseService.getCurrentUserUid());
+      var ref = FirebaseService.getDBConnection().child('messages').child("in").child(FirebaseService.getCurrentUserUid()).child(id);
+      ref.once('value', function (snap) {
+        var value = snap.val();
+        if (handler) {
+          handler(value);
+        }
+      });
+    };
     messagesService.registerNewNotificationsListener = function () {
       if (!FirebaseService.isUserLogged()) {
         console.log('invalidUser');
@@ -354,6 +380,83 @@ angular.module('app.services', [])
         messages.unshift(value);
         $rootScope.$broadcast('new_message', value);
       });
+    };
+    messagesService.addMessage = function (userId, eventId, message) {
+      if (!message instanceof Message) {
+        throw 'The data passed to persist must be a Message class.';
+      }
+      if (!FirebaseService.isUserLogged()) {
+        console.log('invalidUser');
+        $rootScope.$broadcast('logoutUser');
+      }
+      var ref = FirebaseService.getDBConnection().child('messages').child("in").child(userId)
+        .push();
+      ref.set({
+        title: message.title,
+        body: message.body,
+        date: message.date,
+        type: message.type,
+        eventId: eventId
+      });
+      FirebaseService.getDBConnection().child('messages').child("out").child(FirebaseService.getCurrentUserUid())
+        .child(ref.key())
+        .set({
+          title: message.title,
+          body: message.body,
+          date: message.date,
+          type: message.type,
+          eventId: eventId
+        }, function () {
+          FirebaseService.getDBConnection().child("users").child(userId).child("deviceToken").on('value', function (snap) {
+            var remoteDeviceToken = snap.val();
+            if (!remoteDeviceToken || remoteDeviceToken == null) {
+              return;
+            }
+            console.log(remoteDeviceToken);
+            var d = JSON.stringify({
+              "tokens": [
+                remoteDeviceToken
+              ],
+              "notification": {
+                "alert": message.title,
+                "ios": {
+                  "badge": 1,
+                  "sound": "ping.aiff",
+                  "priority": 10,
+                  "contentAvailable": 1,
+                  "title": "Nova Mensagem",
+                  "payload": {
+                    "body": message.body
+                  }
+                },
+                "android": {
+                  "collapseKey": message.title,
+                  "delayWhileIdle": true,
+                  "timeToLive": 300,
+                  "title": "Nova Mensagem",
+                  "payload": {
+                    "body": message.body
+                  }
+                }
+              }
+            });
+            $http({
+              method: 'POST',
+              url: "https://push.ionic.io/api/v1/push/",
+              data: d,
+              headers: {
+                "Authorization": 'Basic ' + window.btoa("9838b15f3334b5c7ab4e27ddd5a370b2dcb2b2805be53fce"),
+                "Content-Type": "application/json",
+                "X-Ionic-Application-Id": '6cfedcfa'
+              }
+            }).error(function (e) {
+              console.log(e);
+            }).success(function (data, status) {
+              console.log(data);
+              console.log(status);
+            });
+          });
+        });
     };
     return messagesService;
   })

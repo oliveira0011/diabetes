@@ -87,7 +87,7 @@ angular.module('app.controllers', [])
     }];
 
     $scope.data = {
-      refreshRate: 500
+      refreshRate: 200
     };
 
     $scope.options = {
@@ -103,11 +103,11 @@ angular.module('app.controllers', [])
     $scope.deviceToken = FirebaseService.getDeviceToken();
 
 
-    $scope.$watch('data.refreshRate', function (val) {
+    //$scope.$watch('data.refreshRate', function (val) {
       //console.log(1);
       //$scope.stopWatch();
       //$scope.startWatch();
-    });
+    //});
 
     $scope.meanSpeed = 0;
     $scope.topSpeed = 0;
@@ -281,7 +281,7 @@ angular.module('app.controllers', [])
         $scope.currentIterationSpeed = ($scope.currentIterationSpeed + $scope.speedKm) / 2;
 
         $scope.timestampAux = ($scope.timestamp - $scope.currentIterationTimestamp) / 1000;
-        if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 5) {
+        if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 10) {
           FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime())).push().set({
             timestamp: $scope.timestamp,
             x: $scope.x,
@@ -298,7 +298,7 @@ angular.module('app.controllers', [])
       $scope.registerListeners();
     };
     $ionicPlatform.ready(function () {
-      $scope.startWatching();
+      //$scope.startWatching();
     });
 
     $scope.$on('$ionicView.beforeLeave', function () {
@@ -696,8 +696,9 @@ angular.module('app.controllers', [])
     EventsService.getEvent($stateParams.id, function (event) {
       $scope.event = event;
       $scope.canEditParticipation = (event.owner !== FirebaseService.getCurrentUserUid());
-
-      initialize(event.geoLocation.lat, event.geoLocation.lng);
+      if (event.geoLocation) {
+        initialize(event.geoLocation.lat, event.geoLocation.lng);
+      }
       $scope.participate = false;
       for (var i = 0; i < $scope.event.friends.length; i++) {
         var obj = $scope.event.friends[i];
@@ -1065,6 +1066,31 @@ angular.module('app.controllers', [])
           break;
       }
     }
+  })
+  .controller('MessageCtrl', function ($scope, MessageService, $stateParams, $state) {
+    if ($stateParams.id) {
+      MessageService.getMessage($stateParams.id, function (message) {
+        $scope.message = message;
+      });
+    } else {
+      $state.go('app.messages');
+    }
+
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var hour = date.getHours();
+      var minute = date.getMinutes();
+      var second = date.getSeconds();
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      hour = hour < 10 ? '0' + hour : hour;
+      minute = minute < 10 ? '0' + minute : minute;
+      second = second < 10 ? '0' + second : second;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
+    };
   })
   .controller('MessagesCtrl', function ($scope, MessageService) {
     $scope.notifications = [];

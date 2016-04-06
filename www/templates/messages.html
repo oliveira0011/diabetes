@@ -1,8 +1,13 @@
 <ion-view title="Caixa de Mensagens">
   <ion-content>
     <ion-list class="list">
-      <ion-item class="item item-avatar item-icon-right positive"
-                ng-repeat="message in messages">
+      <ion-item ng-if="message.type !== 'event'" class="item item-avatar item-icon-right positive" href="#/app/message/{{message.id}}" ng-repeat="message in messages">
+        <h2 class="positive">{{message.title}}</h2>
+        <h3 class="dark">{{getFormattedDate(message.date)}}</h3>
+        <p>{{message.body}}</p>
+        <i class="icon ion-chevron-right"></i>
+      </ion-item>
+      <ion-item ng-if="message.type === 'event'" class="item item-avatar item-icon-right positive" href="#/app/event/{{message.eventId}}" ng-repeat="message in messages">
         <h2 class="positive">{{message.title}}</h2>
         <h3 class="dark">{{getFormattedDate(message.date)}}</h3>
         <p>{{message.body}}</p>

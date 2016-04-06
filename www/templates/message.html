@@ -1,0 +1,8 @@
+<ion-view title="">
+  <ion-content padding="10">
+    <h4 class="title text-center positive">{{message.title}}</h4>
+    <p class="text-right dark">{{getFormattedDate(message.date)}}</p>
+    <p>{{message.body}}</p>
+    <a class="button button-block button-outline button-positive" href="#/app/event/{{message.eventId}}" ng-if="message.type == 'event'">Ver Evento</a>
+  </ion-content>
+</ion-view>
