@@ -17,7 +17,6 @@
   box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0, 0, 0, .2);
 }
 
-
 .invalid-input {
   border: 1px solid red;
   color: #E00000;
@@ -50,20 +49,63 @@
   opacity: 1;
 }
 
-
-
 .item-checkbox-img {
   vertical-align: middle;
   position: absolute;
   top: 0px;
   left: 15px;
-  height:100%;
+  height: 100%;
 }
 
-.new-item-border{
+.new-item-border {
   border-left: 7px solid #33cd5f;
 }
 
-.new-message-border{
+.new-message-border {
   border-left: 7px solid #33cd5f !important;
+}
+
+/**
+CLOCK
+*/
+
+.circle {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  margin: auto;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 190px;
+  font-size: 50px;
+  /* width and height can be anything, as long as they're equal */
+}
+
+/* Create the animation blocks */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Spinning, gradient circle; CSS only! */
+#advanced {
+  /*!* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#e2e2e2+0,dbdbdb+50,d1d1d1+51,fefefe+100;Grey+Gloss+%231 *!*/
+  /*background: rgb(226,226,226); !* Old browsers *!*/
+  /*background: -moz-linear-gradient(top,  rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%); !* FF3.6-15 *!*/
+  /*background: -webkit-linear-gradient(top,  rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); !* Chrome10-25,Safari5.1-6 *!*/
+  /*background: linear-gradient(to bottom,  rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); !* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ *!*/
+  /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2e2e2', endColorstr='#fefefe',GradientType=0 ); !* IE6-9 *!*/
+
+  background-image: -moz-radial-gradient(45px 45px 45deg, circle cover, white 0%, #EEEEEE 10%, #33cd5f 90%);
+  background-image: -webkit-radial-gradient(100px 100px, circle cover, white 0%, #EEEEEE 65%, #33cd5f 0%);
+  background-image: radial-gradient(45px 45px 45deg, circle cover, white 100%, #EEEEEE 100%, #33cd5f 100%);
+
+  /*animation-name: spin;*/
+  /*animation-duration: 3s; !* 3 seconds *!*/
+  /*animation-iteration-count: infinite;*/
+  /*animation-timing-function: linear;*/
 }

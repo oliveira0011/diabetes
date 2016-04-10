@@ -80,25 +80,35 @@ angular.module('app.services', [])
         });
       });
     };
-    EventsService.getAllEvents = function (handler, refreshHandler) {
+    function clone(obj) {
+      if (null == obj || "object" != typeof obj) return obj;
+      var copy = obj.constructor();
+      for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+      }
+      return copy;
+    }
+
+    var processOwner = function (dbConnection, owner, id, evt1, refreshHandler, aux) {
+      dbConnection.child("users").child(owner).once('value', function (snap) {
+        var evt = aux[id];
+        evt.owner = snap.val();
+        refreshHandler(evt);
+      });
+    };
+    EventsService.getAllEvents = function (refreshHandler) {
       var dbConnection = FirebaseService.getDBConnection();
       dbConnection.child("events").orderByChild("date")/*.startAt(new Date().getTime())*/.on('value', function (snap) {
         var data = snap.val();
-        var events = [];
+        var aux = {};
         for (var dt in data) {
           if (data.hasOwnProperty(dt)) {
-            var event = data[dt];
+            var event = clone(data[dt]);
             event.id = dt;
-            const evt = event;
-            dbConnection.child("users").child(event.owner).once('value', function (snap) {
-              var owner = snap.val();
-              evt.owner = owner;
-              events.push(evt);
-              refreshHandler();
-            });
+            aux[event.id] = clone(event);
+            processOwner(dbConnection, event.owner, event.id, event, refreshHandler, aux);
           }
         }
-        handler(events);
       });
     };
     EventsService.markAsSeen = function (eventId, handler) {

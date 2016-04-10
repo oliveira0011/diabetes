@@ -19,6 +19,8 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
   .config(function($ionicConfigProvider) {
     // remove back button text completely
     $ionicConfigProvider.backButton.previousTitleText(false).text(' ');
+    $ionicConfigProvider.tabs.position("bottom"); //Places them at the bottom for all OS
+    $ionicConfigProvider.tabs.style("standard");
   })
   .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider

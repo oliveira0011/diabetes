@@ -427,85 +427,32 @@ angular.module('app.controllers', [])
   })
   .controller('PlaylistCtrl', function ($scope, $stateParams) {
   })
-  .controller('EventsCtrl', function (FirebaseService, EventsService, $scope, $ionicTabsDelegate) {
-    $scope.filter = 'new';
-    $scope.filteredEvents = [];
-    EventsService.getAllEvents(function (events) {
-      $scope.participate = false;
-      $scope.events = events;
-      for (var i = 0; i < $scope.events.length; i++) {
-        var obj = $scope.events[i];
-        if (obj.owner.id === FirebaseService.getCurrentUserUid()) {
-          $scope.events[i].seen = true;
-          $scope.events[i].participate = true;
-        }
-        $scope.events[i].outdated = $scope.events[i].date <= new Date().getTime();
-        $scope.events[i].friendsNumber = 0;
-        for (var property in obj.friends) {
-          if (obj.friends.hasOwnProperty(property) && obj.friends[property].participate) {
-            if (property === FirebaseService.getCurrentUserUid()) {
-              $scope.events[i].seen = obj.friends[property].seen;
-            }
-            if (obj.friends[property].participate) {
-              $scope.events[i].participate = true;
-              $scope.events[i].friendsNumber++;
-            }
-          }
-        }
+  .controller('EventsCtrl', function (FirebaseService, EventsService, $scope, $ionicTabsDelegate, $ionicPlatform) {
+    $scope.events = [];
+    function clone(obj) {
+      if (null == obj || "object" != typeof obj) return obj;
+      var copy = obj.constructor();
+      for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
       }
-      $scope.filterEvents($scope.filter);
-    }, function () {
-      if (!$scope.events) {
-        return;
-      }
-      for (var i = 0; i < $scope.events.length; i++) {
-        var obj = $scope.events[i];
-        if (obj.owner.id === FirebaseService.getCurrentUserUid()) {
-          $scope.events[i].seen = true;
-          $scope.events[i].participate = true;
-        }
-        $scope.events[i].outdated = $scope.events[i].date <= new Date().getTime();
-        $scope.events[i].friendsNumber = 0;
-        for (var property in obj.friends) {
-          if (obj.friends.hasOwnProperty(property)) {
-            if (property === FirebaseService.getCurrentUserUid()) {
-              $scope.events[i].seen = obj.friends[property].seen;
-            }
-            if (obj.friends[property].participate) {
-              $scope.events[i].participate = true;
-              $scope.events[i].friendsNumber++;
-            }
-          }
-        }
-      }
-      $scope.filterEvents($scope.filter);
-      if (!$scope.$$phase) {
-        $scope.$apply();
-      }
-    });
-
-    $scope.getFormattedDate = function (timestamp) {
-      var date = new Date(timestamp);
-      var day = date.getDate();
-      var month = date.getMonth() + 1;
-      var hour = date.getHours();
-      var minute = date.getMinutes();
-      var second = date.getSeconds();
-      month = month < 10 ? '0' + month : month;
-      day = day < 10 ? '0' + day : day;
-      hour = hour < 10 ? '0' + hour : hour;
-      minute = minute < 10 ? '0' + minute : minute;
-      second = second < 10 ? '0' + second : second;
-      var year = date.getFullYear();
-      return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
-    };
+      return copy;
+    }
 
     $scope.filterEvents = function (filter) {
       $scope.filter = filter;
       $scope.filteredEvents = [];
 
+
+      if(!$scope.events){
+        return;
+      }
+
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      for (var j = 0; j < $scope.events.length; j++) {
+        console.log($scope.events[j].id);
+      }
       for (var i = 0; i < $scope.events.length; i++) {
-        var obj = $scope.events[i];
+        var obj = clone($scope.events[i]);
         var add = false;
         switch (filter) {
           case 'new':
@@ -536,6 +483,59 @@ angular.module('app.controllers', [])
         }
       }
 
+    };
+
+
+    $scope.filter = 'new';
+    $scope.filteredEvents = [];
+    $ionicPlatform.ready(function () {
+      EventsService.getAllEvents(function (evt1) {
+        if (!$scope.filter) {
+          return;
+        }
+        var evt = clone(evt1);
+        if (evt.owner.id === FirebaseService.getCurrentUserUid()) {
+          evt.seen = true;
+          evt.participate = true;
+        }
+        evt.outdated = evt.date <= new Date().getTime();
+        evt.friendsNumber = 0;
+        for (var property in evt.friends) {
+          if (evt.friends.hasOwnProperty(property)) {
+            if (property === FirebaseService.getCurrentUserUid()) {
+              evt.seen = evt.friends[property].seen;
+            }
+            if (evt.friends[property].participate) {
+              evt.participate = true;
+              evt.friendsNumber++;
+            }
+          }
+        }
+        $scope.events.push(evt);
+        console.log("????????????????????????????????");
+        for (var j = 0; j < $scope.events.length; j++) {
+          console.log($scope.events[j].id);
+        }
+        $scope.filterEvents($scope.filter);
+        if (!$scope.$$phase) {
+          $scope.$apply();
+        }
+      });
+    });
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var hour = date.getHours();
+      var minute = date.getMinutes();
+      var second = date.getSeconds();
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      hour = hour < 10 ? '0' + hour : hour;
+      minute = minute < 10 ? '0' + minute : minute;
+      second = second < 10 ? '0' + second : second;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
     };
 
   })
@@ -846,17 +846,22 @@ angular.module('app.controllers', [])
     }
   })
   .controller('BiomedicCtrl', function ($scope, BiomedicService, BiomedicType) {
-    var initChart = function () {
+    var initChart = function (caption, subcaption, colors) {
       return {
         attrs: {
+          caption: caption,
+          subcaption: subcaption,
           bgcolor: "FFFFFF",
           animation: "0",
           showalternatehgridcolor: "0",
-          divlinecolor: "CCCCCC",
-          showvalues: "1",
+          divlinecolor: 'CCCCCC',
+          showvalues: "0",
           showcanvasborder: "0",
-          legendshadow: "1",
-          showborder: "0"
+          legendshadow: "0",
+          showborder: "0",
+          paletteColors: colors,
+          dynamicaxis: "1",
+          scrollheight: "10",
         },
         //labels: labels,
         dataset: [{
@@ -865,14 +870,14 @@ angular.module('app.controllers', [])
         }],
         categories: [{
           category: []
-        }]
-        //colours: [colors]
+        }],
+        colors: colors
       }
     };
-    $scope.chartCholesterol = initChart();
-    $scope.chartWeight = initChart();
-    $scope.chartHemoglobin = initChart();
-    $scope.chartBloodPressure = initChart();
+    $scope.chartCholesterol = initChart('Colesterol LDL', 'mg/dL', "#DECF3F");
+    $scope.chartWeight = initChart('Peso / IMC', 'Kg / Kg/m2', "#B276B2, #F17CB0");
+    $scope.chartHemoglobin = initChart('HbA1c', '%', "#F15854");
+    $scope.chartBloodPressure = initChart('T. Arterial Sistólica / Diastólica', 'mmHg', "#4D4D4D, #5DA5DA");
 
 
     $scope.hemoglobinRecords = [];
@@ -904,18 +909,14 @@ angular.module('app.controllers', [])
       }];
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
-          colors = {
-            fillColor: "#F15854",
-            strokeColor: "#B22222",
-            pointColor: "#800000",
-            pointStrokeColor: "#800000",
-          };
+          colors = $scope.chartHemoglobin.colors;
           records = [{
             "seriesname": "Hemoglobina",
             "data": $scope.hemoglobinRecords
           }];
           break;
         case BiomedicType.BLOOD_PRESSURE:
+          colors = $scope.chartBloodPressure.colors;
           records = [{
             "seriesname": "Tensão Arterial Máxima",
             "data": []
@@ -949,7 +950,6 @@ angular.module('app.controllers', [])
               } else if (record.type == BiomedicType.MAX_BLOOD_PRESSURE) {
                 nextRecord = rec[cMax + 1];
               }
-              console.log(labels);
               labels[0].category.push({label: date});
               if (nextRecord) {
                 nextDate = getFormattedDate(nextRecord.biomedicDate);
@@ -986,32 +986,16 @@ angular.module('app.controllers', [])
               records[0].data.push({value: record.value});
             }
           }
-          colors = {
-            fillColor: "#FAA43A",
-            strokeColor: "#FF8C00",
-            pointColor: "#FF4500",
-            pointStrokeColor: "#FF4500"
-          };
           break;
         case BiomedicType.CHOLESTEROL:
-          colors = {
-            fillColor: "#F17CB0",
-            strokeColor: "#F08080",
-            pointColor: "#CD5C5C",
-            pointStrokeColor: "#CD5C5C"
-          };
+          colors = $scope.chartCholesterol.colors;
           records = [{
             "seriesname": "Colesterol",
             "data": $scope.cholesterolRecords
           }];
           break;
         case BiomedicType.WEIGHT:
-          colors = {
-            fillColor: "#F17CB0",
-            strokeColor: "#F08080",
-            pointColor: "#CD5C5C",
-            pointStrokeColor: "#CD5C5C"
-          };
+          colors = $scope.chartWeight.colors;
           records = [{
             "seriesname": "Peso",
             "data": $scope.weightRecords
@@ -1023,7 +1007,7 @@ angular.module('app.controllers', [])
           return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
         });
         angular.forEach(arr, function (record) {
-          records[0].data.push({value: record.value});
+          records[0].data.push({color: colors[0], value: record.value});
           labels[0].category.push({label: getFormattedDate(record.biomedicDate)});
         });
       }
@@ -1031,7 +1015,6 @@ angular.module('app.controllers', [])
         case BiomedicType.HEMOGLOBIN:
           $scope.chartHemoglobin.dataset = records;
           $scope.chartHemoglobin.categories = labels;
-          console.log(JSON.stringify($scope.chartHemoglobin));
           break;
         case BiomedicType.BLOOD_PRESSURE:
           $scope.chartBloodPressure.dataset = records;

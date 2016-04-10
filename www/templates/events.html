@@ -9,7 +9,7 @@
     <ion-list class="list">
       <ion-item ng-class="{'item-stable': event.outdated, 'new-item-border': !event.seen}"
                 class="item item-icon-right positive" href="#/app/event/{{event.id}}"
-                ng-repeat="event in filteredEvents">
+                ng-repeat="event in filteredEvents track by $index">
         <div class="row">
           <div class="col">
             <h2 class="positive"><i class="balanced ion-ios-checkmark" ng-if="event.participate"></i> {{event.name}}

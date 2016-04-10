@@ -1,70 +1,52 @@
 <ion-view title="<i class='icon ion-ios-stopwatch positive'></i>">
-  <ion-content id="pnlContent">
-    <div class="list card">
-      <div class="item text-center row">
-        <button class="col button button-outline button-block button-balanced" ng-disabled="active"
+  <ion-content id="pnlContentMain" class="stable-bg">
+    <style>
+      #pnlContentMain .scroll {
+        min-height: 100%;
+        position: absolute;
+        margin: auto;
+        top: 40%;
+        transform: translateY(-40%);
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+
+    </style>
+
+    <div class="xpto">
+      <div id="advanced" class="col circle">
+        <span class="balanced">{{getFormattedTimerDate()}}</span>
+      </div>
+      <div class="row">
+        <button class="col button button-clear button-block button-balanced" ng-disabled="active"
                 ng-click="startWatch()">
-          <i class="icon ion-play"></i>
+          <i class="icon ion-play"></i> Iniciar Exercício
         </button>
-        <button class="col button button-outline button-block button-assertive" ng-disabled="!active"
+        </div>
+      <div class="row">
+        <button class="col button button-clear button-block button-assertive" ng-disabled="!active"
                 ng-click="stopWatch()">
-          <i class="icon ion-stop"></i>
-        </button>
-        <button class="col button button-outline button-block button-positive"
-                ng-click="clearData()">
-          <i class="icon ion-trash-b"></i>
+          <i class="icon ion-stop"></i> Terminar Exercício
         </button>
       </div>
-      <div class="item item-divider"></div>
-      <div class="item item-text-wrap">
-        <div class="text-center">
-          <h1 class="positive">
-            {{getFormattedTimerDate()}}
-          </h1>
-        </div>
-      </div>
-      <div class="item item-divider"></div>
-      <div class="item item-text-wrap balanced">
-        <div class="row responsive-lg">
-          <div class="col">
-            <!--<canvas id="lineWeight" class="chart chart-line" chart-data="chartSpeed.data"-->
-              <!--chart-options="chartSpeed.options"-->
-              <!--chart-labels="chartSpeed.labels" chart-legend="true"-->
-              <!--chart-series="chartSpeed.series" chart-colours="chartSpeed.colours">-->
-            <!--</canvas>-->
-            <div fusioncharts width="100%" height="200"
-                 type="msline"
-                 chart="{{attrs}}"
-                 categories="{{categories}}"
-                 dataset="{{dataset}}">
-          </div>
-        </div>
-      </div>
-      <div class="item item-divider"></div>
-      <div class="item item-text-wrap positive">
-        <!--Device token: {{deviceToken}}<br/>-->
-        <!--Remote Device token: {{remoteDeviceToken}}<br/>-->
-        Current x: {{x}}<br/>
-        Current y: {{y}}<br/>
-        Current z: {{z}}<br/>
-      </div>
-      <div class="item item-divider"></div>
-      <div class="item item-text-wrap assertive">
-        Current Speed: {{speed}} m/s<br/>
-        Current Speed: {{speed}} Km/h<br/>
-        Mean Speed: {{meanSpeed}}Km/h<br/>
-        Top Speed: {{topSpeed}} Km/h<br/>
-        Reads Count: {{readsCount}}<br/>
-        Seconds Elapsed: {{timestampAux}}<br/>
-        <!--Graph Entries: {{chartSpeed.data[0]}}<br/>-->
-        Graph Entries Number: {{chartSpeed.data[0].length}}<br/>
-        Refresh Rate: {{data.refreshRate}}<br/>
+        <!--<button class="col button button-outline button-block button-positive"-->
+        <!--ng-click="clearData()">-->
+        <!--<i class="icon ion-trash-b"></i>-->
+        <!--</button>-->
       </div>
     </div>
-    <!--<div class="item range">-->
-    <!--0-->
-    <!--<input min="0" max="1000" type="range" ng-model="data.refreshRate" name="refreshRate">-->
-    <!--1000-->
+    <!--<div class="item item-text-wrap balanced">-->
+    <!--<div class="row responsive-lg">-->
+    <!--<div class="col">-->
+    <!--<div fusioncharts width="100%" height="200"-->
+    <!--type="msline"-->
+    <!--chart="{{attrs}}"-->
+    <!--categories="{{categories}}"-->
+    <!--dataset="{{dataset}}">-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
     <!--</div>-->
   </ion-content>
 </ion-view>
