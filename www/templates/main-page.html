@@ -5,8 +5,7 @@
         min-height: 100%;
         position: absolute;
         margin: auto;
-        top: 40%;
-        transform: translateY(-40%);
+        top: 5%;
         right: 0;
         bottom: 0;
         left: 0;
@@ -23,30 +22,35 @@
                 ng-click="startWatch()">
           <i class="icon ion-play"></i> Iniciar Exercício
         </button>
-        </div>
+      </div>
       <div class="row">
         <button class="col button button-clear button-block button-assertive" ng-disabled="!active"
                 ng-click="stopWatch()">
           <i class="icon ion-stop"></i> Terminar Exercício
         </button>
       </div>
-        <!--<button class="col button button-outline button-block button-positive"-->
-        <!--ng-click="clearData()">-->
-        <!--<i class="icon ion-trash-b"></i>-->
-        <!--</button>-->
+      <div class="row">
+        <button class="col button button-clear button-block"
+                ng-click="showGraph = !showGraph">
+          <i class="icon ion-ios-pulse"></i>
+        </button>
+      </div>
+      <!--<button class="col button button-outline button-block button-positive"-->
+      <!--ng-click="clearData()">-->
+      <!--<i class="icon ion-trash-b"></i>-->
+      <!--</button>-->
+    </div>
+    <div ng-if="showGraph" class="item item-text-wrap balanced">
+      <div class="row responsive-lg">
+        <div class="col">
+          <div fusioncharts width="100%" height="200"
+               type="msline"
+               chart="{{attrs}}"
+               categories="{{categories}}"
+               dataset="{{dataset}}">
+          </div>
+        </div>
       </div>
     </div>
-    <!--<div class="item item-text-wrap balanced">-->
-    <!--<div class="row responsive-lg">-->
-    <!--<div class="col">-->
-    <!--<div fusioncharts width="100%" height="200"-->
-    <!--type="msline"-->
-    <!--chart="{{attrs}}"-->
-    <!--categories="{{categories}}"-->
-    <!--dataset="{{dataset}}">-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
   </ion-content>
 </ion-view>
