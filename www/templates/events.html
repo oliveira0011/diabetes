@@ -5,7 +5,7 @@
       <!--Novo Evento-->
     </a>
   </ion-nav-buttons>
-  <ion-content>
+  <ion-content class="stable-bg">
     <ion-list class="list">
       <ion-item ng-class="{'item-stable': event.outdated, 'new-item-border': !event.seen}"
                 class="item item-icon-right positive" href="#/app/event/{{event.id}}"
@@ -36,7 +36,7 @@
       </ion-item>
     </ion-list>
   </ion-content>
-  <ion-tabs class="tabs-positive">
+  <ion-tabs class="tabs-light">
     <ion-tab title="Em vigor" ng-click="filterEvents('new')"></ion-tab>
     <ion-tab title="Por ver" ng-click="filterEvents('unseen')"></ion-tab>
     <ion-tab title="Participados" ng-click="filterEvents('participated')"></ion-tab>
