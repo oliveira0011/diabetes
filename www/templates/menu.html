@@ -15,20 +15,12 @@
   <ion-side-menu side="left">
     <ion-content>
       <ion-list>
-        <ion-item menu-close href="#/app/profile">
-          Perfil
-        </ion-item>
-        <ion-item menu-close href="#/app/event">
-          Eventos
-        </ion-item>
-        <ion-item menu-close href="#/app/biomedic">
-          Dados Biomédicos
-        </ion-item>
-        <ion-item menu-close href="#/app/message">
-          Notificações
-          <i ng-if="newNotificationsNumber > 0" class="badge badge-assertive">{{newNotificationsNumber}}</i>
-        </ion-item>
-        <ion-item menu-close class="ion ion-log-out" ng-click="logout()"></ion-item>
+        <ion-item menu-close href="#/app/main" class="positive"><i class="ion ion-ios-stopwatch"></i></ion-item>
+        <ion-item menu-close href="#/app/biomedic" class="positive"><i class="ion ion-ios-pulse positive"></i> Dados Biomédicos</ion-item>
+        <ion-item menu-close href="#/app/event" class="positive"><i class="ion ion-ios-location positive"></i> Eventos</ion-item>
+        <ion-item menu-close href="#/app/message" class="positive"><i class="ion ion-email"></i> Notificações<i ng-if="newNotificationsNumber > 0" class="badge badge-assertive">{{newNotificationsNumber}}</i></ion-item>
+        <ion-item menu-close href="#/app/profile" class="positive"><i class="ion-ios-person"></i> Perfil</ion-item>
+        <ion-item menu-close class="ion ion-log-out positive" ng-click="logout()"></ion-item>
       </ion-list>
     </ion-content>
   </ion-side-menu>

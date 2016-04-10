@@ -9,22 +9,25 @@ angular.module('app.services', [])
       dbConnection.child("users").on('value', function (data) {
         var friends = [];
         var results = data.val();
-        for (var result in results) {
+        for (var i = 0; i < Object.keys(results).length; i++) {
+          var result = Object.keys(results)[i];
           if (results.hasOwnProperty(result)) {
             var friend = results[result];
             if (friend.id !== FirebaseService.getCurrentUserUid()) {
-              console.log(friend.id);
               const fr = friend;
+              const counter = i + 1;
               dbConnection.child("profileImages").child(friend.id).once('value', function (data) {
                 if (data.val() != null) {
                   var frind = new Friend(fr.id, fr.firstName + " " + fr.lastName, data.val().image);
                   friends.push(frind);
+                  if (counter === Object.keys(results).length - 1) {
+                    handler(friends);
+                  }
                 }
               });
             }
           }
         }
-        handler(friends);
       });
     };
     return FriendsService;
@@ -79,7 +82,7 @@ angular.module('app.services', [])
     };
     EventsService.getAllEvents = function (handler, refreshHandler) {
       var dbConnection = FirebaseService.getDBConnection();
-      dbConnection.child("events").orderByChild("date").startAt(new Date().getTime()).on('value', function (snap) {
+      dbConnection.child("events").orderByChild("date")/*.startAt(new Date().getTime())*/.on('value', function (snap) {
         var data = snap.val();
         var events = [];
         for (var dt in data) {
@@ -98,9 +101,16 @@ angular.module('app.services', [])
         handler(events);
       });
     };
+    EventsService.markAsSeen = function (eventId, handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child("events").child(eventId).child("friends").child(FirebaseService.getCurrentUserUid()).update({seen: true}, handler);
+    };
     EventsService.editParticipation = function (eventId, participate, handler) {
       var dbConnection = FirebaseService.getDBConnection();
-      dbConnection.child("events").child(eventId).child("friends").child(FirebaseService.getCurrentUserUid()).set({participate: participate}, handler);
+      dbConnection.child("events").child(eventId).child("friends").child(FirebaseService.getCurrentUserUid()).update({
+        participate: participate,
+        seen: true
+      }, handler);
     };
     EventsService.addEvent = function (event, eventAddedCallback) {
       if (!event instanceof Event) {
@@ -112,20 +122,21 @@ angular.module('app.services', [])
           var obj = event.friends[i];
           friendsIds[obj.id] = {};
           friendsIds[obj.id].participate = false;
+          friendsIds[obj.id].seen = false;
         }
         var dbConnection = FirebaseService.getDBConnection();
         var ref = dbConnection.child("events").push();
         ref.set({
-            name: event.name,
-            description: event.description,
-            location: event.location,
-            geoLocation: {lat: event.geoLocation.lat(), lng: event.geoLocation.lng()},
-            friends: friendsIds,
-            date: event.date.getTime(),
-            owner: FirebaseService.getCurrentUserUid()
-          }, function () {
-            eventAddedCallback();
-          });
+          name: event.name,
+          description: event.description,
+          location: event.location,
+          geoLocation: {lat: event.geoLocation.lat(), lng: event.geoLocation.lng()},
+          friends: friendsIds,
+          date: event.date.getTime(),
+          owner: FirebaseService.getCurrentUserUid()
+        }, function () {
+          eventAddedCallback();
+        });
         var eventId = ref.key();
         dbConnection.child('users').child(FirebaseService.getCurrentUserUid()).once('value', function (user) {
           var retrievedUser = user.val();
@@ -330,7 +341,7 @@ angular.module('app.services', [])
     };
     return BiomedicService;
   })
-  .service('MessageService', function ($rootScope, FirebaseService, Message, MessageType, $http ) {
+  .service('MessageService', function ($rootScope, FirebaseService, Message, MessageType, $http) {
     var messagesService = {};
     var messages = [];
 
@@ -353,6 +364,10 @@ angular.module('app.services', [])
         }
       });
     };
+    messagesService.markAsSeen = function (id, handler) {
+      var ref = FirebaseService.getDBConnection().child('messages').child("in").child(FirebaseService.getCurrentUserUid()).child(id);
+      ref.update({seen: true}, handler);
+    };
     messagesService.getMessage = function (id, handler) {
       if (!FirebaseService.isUserLogged()) {
         console.log('invalidUser');
@@ -364,6 +379,7 @@ angular.module('app.services', [])
       ref.once('value', function (snap) {
         var value = snap.val();
         if (handler) {
+          value.id = id;
           handler(value);
         }
       });
@@ -396,7 +412,8 @@ angular.module('app.services', [])
         body: message.body,
         date: message.date,
         type: message.type,
-        eventId: eventId
+        eventId: eventId,
+        seen: false
       });
       FirebaseService.getDBConnection().child('messages').child("out").child(FirebaseService.getCurrentUserUid())
         .child(ref.key())
@@ -405,7 +422,8 @@ angular.module('app.services', [])
           body: message.body,
           date: message.date,
           type: message.type,
-          eventId: eventId
+          eventId: eventId,
+          seen: false
         }, function () {
           FirebaseService.getDBConnection().child("users").child(userId).child("deviceToken").on('value', function (snap) {
             var remoteDeviceToken = snap.val();

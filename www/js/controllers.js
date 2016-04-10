@@ -17,11 +17,20 @@ angular.module('app.controllers', [])
     });
     $scope.newNotificationsNumber = 0;
     $scope.$on('new_notification', function (e, value) {
-      $scope.newNotificationsNumber++;
+      if (!value.seen) {
+        $scope.newNotificationsNumber++;
+      }
+
     });
     MessageService.registerNewNotificationsListener();
     MessageService.getMessages(function (messages) {
-      $scope.newNotificationsNumber = messages.length;
+      $scope.newNotificationsNumber = 0;
+      for (var i = 0; i < messages.length; i++) {
+        var obj = messages[i];
+        if (!obj.seen) {
+          $scope.newNotificationsNumber++;
+        }
+      }
       MessageService.registerNewNotificationsListener();
     });
   })
@@ -42,26 +51,6 @@ angular.module('app.controllers', [])
 
     $scope.redirect = function () {
       $state.go('app.search');
-    };
-
-
-    $scope.chartSpeed = {
-      options: {
-        responsive: true,
-        bezierCurve: false,
-        animation: false,
-        pointDot: false
-      },
-      labels: [],
-      //data: [records],
-      data: [[]],
-      series: ['Speed (Km/h)'],
-      colours: [{
-        fillColor: "#FAA43A",
-        strokeColor: "#FF8C00",
-        pointColor: "#FF4500",
-        pointStrokeColor: "#FF4500"
-      }]
     };
 
     $scope.attrs = {
@@ -102,13 +91,6 @@ angular.module('app.controllers', [])
 
     $scope.deviceToken = FirebaseService.getDeviceToken();
 
-
-    //$scope.$watch('data.refreshRate', function (val) {
-      //console.log(1);
-      //$scope.stopWatch();
-      //$scope.startWatch();
-    //});
-
     $scope.meanSpeed = 0;
     $scope.topSpeed = 0;
     $scope.readsCount = 0;
@@ -127,8 +109,6 @@ angular.module('app.controllers', [])
       $scope.vy = 0;
       $scope.vz = 0;
       $scope.speed = 0;
-      //$scope.chartSpeed.data[0] = [];
-      //$scope.chartSpeed.labels = [];
       $scope.categories[0].category = [];
       $scope.dataset[0].data = [];
       $scope.timeElapsed = 0;
@@ -166,8 +146,6 @@ angular.module('app.controllers', [])
         .orderByChild('timestamp').startAt($scope.startTimestamp).off('child_added', function () {
         console.log("off");
       });
-      //$scope.chartSpeed.data[0] = [];
-      //$scope.chartSpeed.labels = [];
       $scope.categories[0].category = [];
       $scope.dataset[0].data = [];
     };
@@ -180,8 +158,6 @@ angular.module('app.controllers', [])
         }
         for (var i = 0; i < items.length; i++) {
           var obj = items[i];
-          //$scope.chartSpeed.data[0].push(obj.speed);
-          //$scope.chartSpeed.labels.push('');
           $scope.dataset[0].data.push({value: obj.speed});
           $scope.categories[0].category.push({'label': $scope.getFormattedTimerDate()});
         }
@@ -189,8 +165,6 @@ angular.module('app.controllers', [])
       FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime()))
         .orderByChild('timestamp').startAt($scope.startTimestamp).on('child_added', function (snap) {
         var item = snap.val();
-        //$scope.chartSpeed.data[0].push(item.speed);
-        //$scope.chartSpeed.labels.push('');
         $scope.dataset[0].data.push({value: item.speed});
         $scope.categories[0].category.push({'label': $scope.getFormattedTimerDate()});
       });
@@ -309,7 +283,6 @@ angular.module('app.controllers', [])
   })
   .
   controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
-    console.log(FirebaseService.isUserLogged());
     if (FirebaseService.isUserLogged()) {
       FirebaseService.checkDeviceToken();
       $state.go('app.main');
@@ -320,10 +293,8 @@ angular.module('app.controllers', [])
     };
     $scope.doLogin = function (form) {
       delete $scope.errorMessage;
-      //console.log(form.$valid);
       if (form.$valid) {
         $ionicLoading.show({template: 'A autenticar...'});
-        console.log($scope.loginData);
         var dbConnection = FirebaseService.getDBConnection();
 
         function authHandler(error, authData) {
@@ -347,7 +318,6 @@ angular.module('app.controllers', [])
                     text: '<b>Gravar</b>',
                     type: 'button-positive',
                     onTap: function (e) {
-                      console.log(!$scope.data.newPassword);
                       if (!$scope.data.newPassword) {
                         e.preventDefault();
                       } else {
@@ -359,7 +329,6 @@ angular.module('app.controllers', [])
               });
 
               myPopup.then(function (res) {
-                console.log(res);
                 delete $scope.data;
                 dbConnection.changePassword({
                   email: $scope.loginData.username,
@@ -423,7 +392,6 @@ angular.module('app.controllers', [])
             text: '<b>Gravar</b>',
             type: 'button-positive',
             onTap: function (e) {
-              console.log(!$scope.data.email);
               if (!$scope.data.email) {
                 e.preventDefault();
               } else {
@@ -438,7 +406,6 @@ angular.module('app.controllers', [])
         $ionicLoading.show({
           template: "A enviar email de reposição de palavra-passe..."
         });
-        console.log(res);
         FirebaseService.getDBConnection().resetPassword({
           email: res
         }, function (error) {
@@ -460,31 +427,58 @@ angular.module('app.controllers', [])
   })
   .controller('PlaylistCtrl', function ($scope, $stateParams) {
   })
-  .controller('EventsCtrl', function (EventsService, $scope, $ionicLoading, $compile) {
+  .controller('EventsCtrl', function (FirebaseService, EventsService, $scope, $ionicTabsDelegate) {
+    $scope.filter = 'new';
+    $scope.filteredEvents = [];
     EventsService.getAllEvents(function (events) {
+      $scope.participate = false;
       $scope.events = events;
       for (var i = 0; i < $scope.events.length; i++) {
         var obj = $scope.events[i];
+        if (obj.owner.id === FirebaseService.getCurrentUserUid()) {
+          $scope.events[i].seen = true;
+          $scope.events[i].participate = true;
+        }
+        $scope.events[i].outdated = $scope.events[i].date <= new Date().getTime();
         $scope.events[i].friendsNumber = 0;
         for (var property in obj.friends) {
           if (obj.friends.hasOwnProperty(property) && obj.friends[property].participate) {
-            $scope.events[i].friendsNumber++;
+            if (property === FirebaseService.getCurrentUserUid()) {
+              $scope.events[i].seen = obj.friends[property].seen;
+            }
+            if (obj.friends[property].participate) {
+              $scope.events[i].participate = true;
+              $scope.events[i].friendsNumber++;
+            }
           }
         }
       }
+      $scope.filterEvents($scope.filter);
     }, function () {
       if (!$scope.events) {
         return;
       }
       for (var i = 0; i < $scope.events.length; i++) {
         var obj = $scope.events[i];
+        if (obj.owner.id === FirebaseService.getCurrentUserUid()) {
+          $scope.events[i].seen = true;
+          $scope.events[i].participate = true;
+        }
+        $scope.events[i].outdated = $scope.events[i].date <= new Date().getTime();
         $scope.events[i].friendsNumber = 0;
         for (var property in obj.friends) {
-          if (obj.friends.hasOwnProperty(property) && obj.friends[property].participate) {
-            $scope.events[i].friendsNumber++;
+          if (obj.friends.hasOwnProperty(property)) {
+            if (property === FirebaseService.getCurrentUserUid()) {
+              $scope.events[i].seen = obj.friends[property].seen;
+            }
+            if (obj.friends[property].participate) {
+              $scope.events[i].participate = true;
+              $scope.events[i].friendsNumber++;
+            }
           }
         }
       }
+      $scope.filterEvents($scope.filter);
       if (!$scope.$$phase) {
         $scope.$apply();
       }
@@ -506,6 +500,44 @@ angular.module('app.controllers', [])
       return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
     };
 
+    $scope.filterEvents = function (filter) {
+      $scope.filter = filter;
+      $scope.filteredEvents = [];
+
+      for (var i = 0; i < $scope.events.length; i++) {
+        var obj = $scope.events[i];
+        var add = false;
+        switch (filter) {
+          case 'new':
+            if (!obj.outdated) {
+              add = true;
+            }
+            $ionicTabsDelegate.select(0);
+            break;
+          case 'unseen':
+            if (!obj.seen) {
+              add = true;
+            }
+            $ionicTabsDelegate.select(1);
+            break;
+          case 'participated':
+            if (obj.outdated && obj.participate) {
+              add = true;
+            }
+            $ionicTabsDelegate.select(2);
+            break;
+          case 'all':
+            add = true;
+            $ionicTabsDelegate.select(3);
+            break;
+        }
+        if (add) {
+          $scope.filteredEvents.push(obj);
+        }
+      }
+
+    };
+
   })
   .controller('EventCtrl', function (Friend, Event, EventsService, $scope, $ionicLoading, $compile, $state, $stateParams, $ionicModal, FriendsService) {
     if ($stateParams.id) {
@@ -519,13 +551,6 @@ angular.module('app.controllers', [])
     $scope.minDate = new Date();
 
     //<editor-fold desc="Modal Friends">
-    FriendsService.getFriends(function (friends) {
-      $scope.friends = friends;
-      $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
-    });
-    $scope.friends = [];
-    $scope.selectedFriends = [];
-    $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
 
     $scope.toggleAll = function () {
       if (!$scope.selectAll) {
@@ -541,22 +566,38 @@ angular.module('app.controllers', [])
           }
         });
       }
+      $scope.selectAll = !$scope.selectAll;
     };
+
+    FriendsService.getFriends(function (friends) {
+      $scope.friends = friends;
+      $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
+      if ($scope.selectAll) {
+        $scope.toggleAll();
+      }
+    });
+
+    $scope.friends = [];
+    $scope.selectedFriends = [];
+    $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
+
     $scope.toggleFriend = function (friend) {
       if (friend.selected) {
         $scope.selectedFriends[friend.id] = friend;
+        $scope.selectAll = false;
       } else {
         delete $scope.selectedFriends[friend.id];
+        $scope.selectAll = true;
       }
     };
     $scope.closeModal = function () {
-      $scope.event.friends = [];
-      for (var selectedFriend in $scope.selectedFriends) {
-        if ($scope.selectedFriends.hasOwnProperty(selectedFriend)) {
-          $scope.event.friends.push($scope.selectedFriends[selectedFriend]);
-        }
-      }
-      $scope.modal.hide();
+      //$scope.event.friends = [];
+      //for (var selectedFriend in $scope.selectedFriends) {
+      //  if ($scope.selectedFriends.hasOwnProperty(selectedFriend)) {
+      //    $scope.event.friends.push($scope.selectedFriends[selectedFriend]);
+      //  }
+      //}
+      $scope.modal.remove();
     };
     $scope.openModalFriends = function () {
       $ionicModal.fromTemplateUrl('/templates/friends-modal.html', {
@@ -564,9 +605,27 @@ angular.module('app.controllers', [])
         animation: 'slide-in-up'
       }).then(function (modal) {
         $scope.modal = modal;
-        console.log("modal:")
-        console.log($scope.modal)
         $scope.modal.show();
+      });
+    };
+
+    $scope.closeModalLocation = function () {
+      $scope.modal.remove();
+    };
+    $scope.openModalLocation = function () {
+      $ionicModal.fromTemplateUrl('/templates/event-location-modal.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+      }).then(function (modal) {
+        $scope.modal = modal;
+        $scope.modal.show();
+        if ($scope.event.geoLocation) {
+          $scope.location = $scope.event.location;
+          $scope.geoLocation = $scope.event.geoLocation;
+          initialize($scope.event.geoLocation);
+        } else {
+          initialize();
+        }
       });
     };
 
@@ -578,7 +637,6 @@ angular.module('app.controllers', [])
         return;
       }
       if (form.$invalid) {
-        console.log(form);
         return;
       } else if ($scope.event.date == null) {
         form.date.$setValidity('required', false);
@@ -609,13 +667,12 @@ angular.module('app.controllers', [])
       minute = minute < 10 ? '0' + minute : minute;
       second = second < 10 ? '0' + second : second;
       var year = date.getFullYear();
-      console.log(day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second);
       return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
     };
 
     //</editor-fold>
 
-    function initialize() {
+    function initialize(geoLocation) {
       var myLatlng = new google.maps.LatLng(39.7375278, -8.813522, 17);
 
       var mapOptions = {
@@ -626,7 +683,7 @@ angular.module('app.controllers', [])
       var map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
       var marker = new google.maps.Marker({
-        position: myLatlng,
+        position: geoLocation ? geoLocation : myLatlng,
         map: map
       });
 
@@ -640,15 +697,13 @@ angular.module('app.controllers', [])
         var geocoder = new google.maps.Geocoder;
         geocoder.geocode({'location': location}, function (results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
-            console.log(results);
             if (results[0]) {
-              $scope.event.location = results[0].formatted_address;
+              $scope.location = results[0].formatted_address;
             } else {
-              $scope.event.location = "Lat: " + event.latLng.lat() + "\nLng: " + event.latLng.lng();
+              $scope.location = "Lat: " + event.latLng.lat() + "\nLng: " + event.latLng.lng();
             }
           } else {
-            console.log('Geocoder failed due to: ' + status);
-            $scope.event.location = "Lat: " + event.latLng.lat() + "\nLng: " + event.latLng.lng();
+            $scope.location = "Lat: " + event.latLng.lat() + "\nLng: " + event.latLng.lng();
           }
           $scope.$apply();
         });
@@ -656,7 +711,7 @@ angular.module('app.controllers', [])
 
       google.maps.event.addListener(map, 'click', function (event) {
         placeMarker(event.latLng);
-        $scope.event.geoLocation = event.latLng;
+        $scope.geoLocation = event.latLng;
       });
 
 
@@ -664,11 +719,22 @@ angular.module('app.controllers', [])
     }
 
     $scope.marker = {};
-    ionic.Platform.ready(initialize);
 
     $scope.clearLocation = function () {
-      delete $scope.event.location;
+      delete $scope.location;
+      delete $scope.geoLocation;
+    };
+
+    $scope.removeGeoLocation = function () {
       delete $scope.event.geoLocation;
+    };
+
+    $scope.saveLocation = function () {
+      $scope.event.location = $scope.location;
+      $scope.event.geoLocation = $scope.geoLocation;
+      delete $scope.location;
+      delete $scope.geoLocation;
+      $scope.closeModalLocation();
     }
   })
   .controller('EventFindCtrl', function ($scope, $ionicLoading, $compile, $state, $stateParams, EventsService, FirebaseService) {
@@ -695,7 +761,9 @@ angular.module('app.controllers', [])
     $scope.participate = false;
     EventsService.getEvent($stateParams.id, function (event) {
       $scope.event = event;
-      $scope.canEditParticipation = (event.owner !== FirebaseService.getCurrentUserUid());
+      EventsService.markAsSeen($stateParams.id, function () {
+      });
+      $scope.canEditParticipation = (event.date > new Date().getTime()) && (event.owner !== FirebaseService.getCurrentUserUid());
       if (event.geoLocation) {
         initialize(event.geoLocation.lat, event.geoLocation.lng);
       }
@@ -726,8 +794,7 @@ angular.module('app.controllers', [])
       }
       //$scope.participate = participate;
       EventsService.editParticipation($stateParams.id, $scope.participate, function () {
-        console.log("DONE");
-      })
+      });
     };
 
     $scope.getFormattedDate = function (timestamp) {
@@ -773,13 +840,41 @@ angular.module('app.controllers', [])
         $scope.retrievedUser = user.val();
         $scope.retrievedUser.id = FirebaseService.getCurrentUserUid();
         $scope.init();
-        console.log(1);
       });
     } else {
       $state.go('login');
     }
   })
   .controller('BiomedicCtrl', function ($scope, BiomedicService, BiomedicType) {
+    var initChart = function () {
+      return {
+        attrs: {
+          bgcolor: "FFFFFF",
+          animation: "0",
+          showalternatehgridcolor: "0",
+          divlinecolor: "CCCCCC",
+          showvalues: "1",
+          showcanvasborder: "0",
+          legendshadow: "1",
+          showborder: "0"
+        },
+        //labels: labels,
+        dataset: [{
+          "seriesname": "",
+          "data": []
+        }],
+        categories: [{
+          category: []
+        }]
+        //colours: [colors]
+      }
+    };
+    $scope.chartCholesterol = initChart();
+    $scope.chartWeight = initChart();
+    $scope.chartHemoglobin = initChart();
+    $scope.chartBloodPressure = initChart();
+
+
     $scope.hemoglobinRecords = [];
     $scope.bloodPressureRecords = [];
     $scope.cholesterolRecords = [];
@@ -804,23 +899,30 @@ angular.module('app.controllers', [])
       }
       var records = [];
       var colors = {};
-      var labels = [];
+      var labels = [{
+        category: []
+      }];
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
-          console.log($scope.hemoglobinRecords);
           colors = {
             fillColor: "#F15854",
             strokeColor: "#B22222",
             pointColor: "#800000",
             pointStrokeColor: "#800000",
           };
-          records = $scope.hemoglobinRecords;
+          records = [{
+            "seriesname": "Hemoglobina",
+            "data": $scope.hemoglobinRecords
+          }];
           break;
         case BiomedicType.BLOOD_PRESSURE:
-          console.log('qweqweqweqwe');
-          console.log(retrievedRecords);
-          records = [[], []];
-          labels = [];
+          records = [{
+            "seriesname": "Tensão Arterial Máxima",
+            "data": []
+          }, {
+            "seriesname": "Tensão Arterial Mínima",
+            "data": []
+          }];
           var minRecords = Object.keys(retrievedRecords[0]).map(function (k) {
             return retrievedRecords[0][k]
           });
@@ -832,7 +934,6 @@ angular.module('app.controllers', [])
           rec.sort(function (a, b) {
             return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
           });
-          console.log(rec);
 
           var cMax = 0;
           var cMin = 0;
@@ -842,24 +943,23 @@ angular.module('app.controllers', [])
             var date = getFormattedDate(record.biomedicDate);
             var nextRecord;
             var nextDate;
-            if (labels.indexOf(date) == -1) {
+            if (labels[0].category.indexOf(date) == -1) {
               if (record.type == BiomedicType.MIN_BLOOD_PRESSURE) {
                 nextRecord = rec[cMin + 1];
               } else if (record.type == BiomedicType.MAX_BLOOD_PRESSURE) {
                 nextRecord = rec[cMax + 1];
               }
-              labels.push(date);
+              console.log(labels);
+              labels[0].category.push({label: date});
               if (nextRecord) {
                 nextDate = getFormattedDate(nextRecord.biomedicDate);
                 if (nextDate == date) {
                   isNew = false;
                   if (nextRecord.type == BiomedicType.MIN_BLOOD_PRESSURE) {
-                    console.log(1);
-                    records[1].push(nextRecord.value);
+                    records[1].data.push({value: nextRecord.value});
                     i++;
                   } else if (nextRecord.type == BiomedicType.MAX_BLOOD_PRESSURE) {
-                    console.log(2);
-                    records[0].push(nextRecord.value);
+                    records[0].data.push({value: nextRecord.value});
                     i++;
                   }
                   cMin++;
@@ -867,12 +967,10 @@ angular.module('app.controllers', [])
                 } else {
                   nextRecord = undefined;
                   if (record.type == BiomedicType.MIN_BLOOD_PRESSURE) {
-                    console.log(3);
-                    records[0].push(0);
+                    records[0].data.push({value: 0});
                     cMin++;
                   } else if (record.type == BiomedicType.MAX_BLOOD_PRESSURE) {
-                    console.log(4);
-                    records[1].push(0);
+                    records[1].data.push({value: 0});
                     cMax++;
                   }
                 }
@@ -883,14 +981,11 @@ angular.module('app.controllers', [])
 
 
             if (record.type == BiomedicType.MIN_BLOOD_PRESSURE) {
-              records[1].push(record.value);
+              records[1].data.push({value: record.value});
             } else if (record.type == BiomedicType.MAX_BLOOD_PRESSURE) {
-              records[0].push(record.value);
+              records[0].data.push({value: record.value});
             }
-            console.log("[NOW]:" + date + " -> " + record.value + " -> " + record.type);
-            console.log("[NEXT]:" + nextDate + " -> " + (!nextRecord ? '' : nextRecord.value) + " -> " + (!nextRecord ? '' : nextRecord.type));
           }
-          console.log(records);
           colors = {
             fillColor: "#FAA43A",
             strokeColor: "#FF8C00",
@@ -905,7 +1000,10 @@ angular.module('app.controllers', [])
             pointColor: "#CD5C5C",
             pointStrokeColor: "#CD5C5C"
           };
-          records = $scope.cholesterolRecords;
+          records = [{
+            "seriesname": "Colesterol",
+            "data": $scope.cholesterolRecords
+          }];
           break;
         case BiomedicType.WEIGHT:
           colors = {
@@ -914,69 +1012,47 @@ angular.module('app.controllers', [])
             pointColor: "#CD5C5C",
             pointStrokeColor: "#CD5C5C"
           };
-          records = $scope.weightRecords;
+          records = [{
+            "seriesname": "Peso",
+            "data": $scope.weightRecords
+          }];
           break;
       }
-      if (records.length == 0) {
-
-
+      if (records[0].data.length == 0) {
         arr.sort(function (a, b) {
           return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
         });
         angular.forEach(arr, function (record) {
-          records.push(record.value);
-          labels.push(getFormattedDate(record.biomedicDate));
+          records[0].data.push({value: record.value});
+          labels[0].category.push({label: getFormattedDate(record.biomedicDate)});
         });
-
       }
       switch (type) {
         case BiomedicType.HEMOGLOBIN:
-          $scope.chartHemoglobin = {
-            options: {
-              bezierCurve: false
-            },
-            labels: labels,
-            data: [records],
-            series: ['Hemoglobina'],
-            colours: [colors]
-          };
+          $scope.chartHemoglobin.dataset = records;
+          $scope.chartHemoglobin.categories = labels;
+          console.log(JSON.stringify($scope.chartHemoglobin));
           break;
         case BiomedicType.BLOOD_PRESSURE:
-          $scope.chartBloodPressure = {
-            options: {
-              bezierCurve: false
-            },
-            labels: labels,
-            data: records,
-            series: ['Tensão Arterial Máxima', 'Tensão Arterial Mínima'],
-            colours: [colors]
-          };
+          $scope.chartBloodPressure.dataset = records;
+          $scope.chartBloodPressure.categories = labels;
           break;
         case BiomedicType.CHOLESTEROL:
-          $scope.chartCholesterol = {
-            options: {
-              bezierCurve: false
-            },
-            labels: labels,
-            data: [records],
-            series: ['Colesterol'],
-            colours: [colors]
-          };
+          $scope.chartCholesterol.dataset = records;
+          $scope.chartCholesterol.categories = labels;
           break;
         case BiomedicType.WEIGHT:
           var imc = [];
-          for (var i = 0; i < records.length; i++) {//IMC calculation
-            imc[i] = (records[i] / (1.71 * 1.71)).toFixed(2);
+          for (var j = 0; j < records[0].data.length; j++) {//IMC calculation
+            var obj = records[0].data[j].value;
+            imc[j] = {value: (obj / (1.71 * 1.71)).toFixed(2)};
           }
-          $scope.chartWeight = {
-            options: {
-              bezierCurve: false
-            },
-            labels: labels,
-            data: [records, imc],
-            series: ['Peso', 'IMC'],
-            colours: [colors]
-          };
+          records.push({
+            "seriesname": "IMC",
+            "data": imc
+          });
+          $scope.chartWeight.dataset = records;
+          $scope.chartWeight.categories = labels;
           break;
       }
       if (!$scope.$$phase) {
@@ -1011,12 +1087,10 @@ angular.module('app.controllers', [])
     };
 
     $scope.saveBiomedic = function (form) {
-      console.log(form);
       if ($scope.biomedic.biomedicDate != null) {
         form.biomedicDate.$setValidity('required', true);
       }
       if (form.$invalid) {
-        console.log(form);
         return;
       } else if ($scope.biomedic.biomedicDate == null) {
         form.biomedicDate.$setValidity('required', false);
@@ -1117,9 +1191,12 @@ angular.module('app.controllers', [])
     };
     MessageService.getMessages(function (messages) {
       $scope.messages = messages;
-      console.log($scope.messages);
       if (!$scope.$$phase) {
         $scope.$apply();
       }
     });
+    $scope.markAsSeen = function (message) {
+      MessageService.markAsSeen(message.id, function (x) {
+      });
+    }
   });

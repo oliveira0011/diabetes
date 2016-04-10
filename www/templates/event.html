@@ -14,7 +14,7 @@
         <div class="col">
           <label class="item item-input">
             <!--<span class="positive input-label">Nome do Evento</span>-->
-            <input type="text" ng-required="true" ng-model="event.name" name="name" placeholder="Nome do Evento">
+            <input type="text" ng-required="true" ng-model="event.name" name="name" placeholder="Nome">
           </label>
           <div class="padding" ng-show="form.$submitted">
             <p ng-show="form.$submitted && form.name.$error.required" class="invalid-input-label">Insira o nome
@@ -44,22 +44,14 @@
       </div>
       <div class="row responsive-sm">
         <div class="col">
-          <label class="item item-input item-icon-right">
-            <!--<span class="positive input-label">Localização</span>-->
-            <span class="input item-input" style="margin-left: -15px;color: #b2b2b2;" ng-if="!event.location">
-              Marque no mapa a Localização do Evento
-            </span>
-            <span class="input item-input" style="margin-left: -15px;" ng-if="event.location">
-              {{event.location}}
-            </span>
-          </label>
-        </div>
-        <button class="button button-assertive icon ion-ios-close-outline" ng-if="event.location"
-                ng-click="clearLocation()" type="button"></button>
-      </div>
-      <div class="row responsive-sm">
-        <div class="col">
-          <div id="map" data-tap-disabled="true"></div>
+          <div class="item item-input" >
+            <!--<span class="positive input-label">Nome do Evento</span>-->
+            <input ng-change="removeGeoLocation()" type="text" ng-required="true" ng-model="event.location" name="location" placeholder="Localização">
+            <button class="button icon ion-earth button-clear"  type="button" ng-click="openModalLocation()"></button>
+          </div>
+          <div class="padding" ng-show="form.$submitted">
+            <p ng-show="form.$submitted && form.location.$error.required" class="invalid-input-label">Insira a localização do evento</p>
+          </div>
         </div>
       </div>
       <div class="row responsive-sm">
@@ -67,21 +59,18 @@
           <label class="item item-input">
             <!--<span class="positive input-label">Descrição do Evento</span>-->
             <textarea type="text" ng-required="true" rows="8" ng-model="event.description" name="description"
-                      placeholder="Descrição do Evento">></textarea>
+                      placeholder="Descrição">></textarea>
           </label>
           <div class="padding" ng-show="form.$submitted">
-            <p ng-show="form.$submitted && form.description.$error.required" class="invalid-input-label">Insira a
-              descrição
-              do
-              evento</p>
+            <p ng-show="form.$submitted && form.description.$error.required" class="invalid-input-label">Insira a descrição do evento</p>
           </div>
         </div>
       </div>
       <div class="row responsive-sm">
         <div class="col">
-          <label class="item item-input">
-            <span class="positive input-label">Participantes Convidados</span>
-            <button type="button" class="button button-small button-clear button-positive"
+          <label class="">
+            <!--<span class="positive input-label">Participantes Convidados</span>-->
+            <button type="button" class="button button-clear button-positive"
                     ng-click="openModalFriends()"><i
               class="icon ion-ios-plus-outline"></i>
               Convidar Amigos
@@ -89,7 +78,7 @@
           </label>
         </div>
       </div>
-      <div class="row responsive-sm" ng-if="event.friends.length > 0">
+      <div class="row responsive-sm">
         <div class="col"  style="margin-bottom: 0px">
           <div ng-if="form.$invalid && form.$submitted && event.friends.length == 0" role="alert">
             <div class="assertive">Convide pelo menos um amigo para participar no evento.

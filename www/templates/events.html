@@ -7,10 +7,13 @@
   </ion-nav-buttons>
   <ion-content>
     <ion-list class="list">
-      <ion-item class="item item-icon-right positive" href="#/app/event/{{event.id}}" ng-repeat="event in events">
+      <ion-item ng-class="{'item-stable': event.outdated, 'new-item-border': !event.seen}"
+                class="item item-icon-right positive" href="#/app/event/{{event.id}}"
+                ng-repeat="event in filteredEvents">
         <div class="row">
           <div class="col">
-            <h2 class="positive">{{event.name}}</h2>
+            <h2 class="positive"><i class="balanced ion-ios-checkmark" ng-if="event.participate"></i> {{event.name}}
+            </h2>
           </div>
           <div class="col">
             <p class="">{{getFormattedDate(event.date)}}</p>
@@ -33,4 +36,11 @@
       </ion-item>
     </ion-list>
   </ion-content>
+  <ion-tabs class="tabs-positive">
+    <ion-tab title="Em vigor" ng-click="filterEvents('new')"></ion-tab>
+    <ion-tab title="Por ver" ng-click="filterEvents('unseen')"></ion-tab>
+    <ion-tab title="Participados" ng-click="filterEvents('participated')"></ion-tab>
+    <ion-tab title="Todos" ng-click="filterEvents('all')"></ion-tab>
+
+  </ion-tabs>
 </ion-view>

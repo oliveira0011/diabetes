@@ -12,14 +12,13 @@
 
     <div class="row responsive-sm" style="max-height: 45px;">
       <div class="col">
-        <h2 class="positive">{{event.name}}</h2>
+        <h2 class="positive"><i ng-if="participate" class="balanced ion-ios-checkmark"></i> {{event.name}}</h2>
       </div>
     </div>
-    <div class="col text-right" ng-if="canEditParticipation">
-      <ion-toggle ng-model="participate" ng-click="editParticipation(!participate)" toggle-class="toggle-positive" style="border-width:0px">
+    <div class="col text-right">
+      <ion-toggle ng-if="canEditParticipation" ng-model="participate" ng-click="editParticipation(!participate)" toggle-class="toggle-positive" style="border-width:0px">
         Participar
       </ion-toggle>
-      {{$scope.participate}}
     </div>
     <div class="row responsive-sm">
       <div class="col" style="border-bottom: 1px solid #ddd;">

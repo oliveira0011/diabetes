@@ -59,3 +59,11 @@
   left: 15px;
   height:100%;
 }
+
+.new-item-border{
+  border-left: 7px solid #33cd5f;
+}
+
+.new-message-border{
+  border-left: 7px solid #33cd5f !important;
+}
