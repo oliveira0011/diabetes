@@ -1007,7 +1007,7 @@ angular.module('app.controllers', [])
           return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
         });
         angular.forEach(arr, function (record) {
-          records[0].data.push({color: colors[0], value: record.value});
+          records[0].data.push({value: record.value});
           labels[0].category.push({label: getFormattedDate(record.biomedicDate)});
         });
       }
