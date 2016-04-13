@@ -40,12 +40,13 @@
       <!--<i class="icon ion-trash-b"></i>-->
       <!--</button>-->
     </div>
-    <div ng-if="showGraph" class="item item-text-wrap balanced">
+    <div ng-if="!showGraph" class="item item-text-wrap balanced">
       <div class="row responsive-lg">
         <div class="col">
           <div fusioncharts width="100%" height="200"
-               type="msline"
+               type="mscolumn2d"
                chart="{{attrs}}"
+               trendlines="{{trendlines}}"
                categories="{{categories}}"
                dataset="{{dataset}}">
           </div>

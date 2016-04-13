@@ -35,25 +35,21 @@ angular.module('app.controllers', [])
     });
   })
   .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http, TimerService) {
-    $scope.$on('deviceUpdated', function (e, deviceId) {
-      console.log(deviceId);
-      $scope.deviceToken = deviceId;
-    });
-    FirebaseService.getDBConnection().child("users").child("e97c6bd0-47ac-47db-95df-b3134be52859").child("deviceToken").on('value', function (snap) {
-      $scope.remoteDeviceToken = snap.val();
-    });
-    $scope.options = [
-      {name: "Eventos", color: "positive", icon: "ion-android-walk", link: "#/app/events"},
-      {name: "Amigos", color: "positive", icon: "ion-person-stalker", link: "#/app/search"},
-      {name: "Atividade Física", color: "positive", icon: "ion-ios-pulse", link: "#/app/search"},
-      {name: "Definições", color: "positive", icon: "ion-gear-a", link: "#/app/search"}
-    ];
 
-    $scope.redirect = function () {
-      $state.go('app.search');
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year;
     };
 
     $scope.attrs = {
+      caption: "Minutos / Categoria de Exercício",
+      yaxisname: "Segundos",
+      xaxisname: "Categoria de exercício",
       bgcolor: "FFFFFF",
       animation: "0",
       showalternatehgridcolor: "0",
@@ -66,14 +62,147 @@ angular.module('app.controllers', [])
       anchorAlpha: '0'
     };
 
+
     $scope.categories = [{
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }, {
       category: []
     }];
 
     $scope.dataset = [{
-      "seriesname": "",
-      "data": []
+      "seriesName": "Idle",
+      "data": [{}, {}, {}, {}, {}, {}, {}]
+    }, {
+      "seriesName": "Andar",
+      "data": [{}, {}, {}, {}, {}, {}, {}]
+    }, {
+      "seriesName": "Correr",
+      "data": [{}, {}, {}, {}, {}, {}, {}]
     }];
+
+
+    var roundedMinutesWalk = Math.round(200/60);
+    var roundedSecondsWalk = (200%60);
+
+    var roundedMinutesRun = Math.round(200/60);
+    var roundedSecondsRun = (200%60);
+    $scope.trendlines= [
+      {
+        "line": [
+          {
+            "startvalue": "600",
+            "color": "#0075c2",
+            "displayvalue": "Caminhada",
+            "valueOnRight" : "1",
+            "thickness" : "1",
+            "showBelow" : "1",
+            "tooltext" : "Andar: " + roundedMinutesWalk + ":" + roundedSecondsWalk + "m"
+          },
+          {
+            "startvalue": "200",
+            "color": "#1aaf5d",
+            "displayvalue": "Corrida",
+            "valueOnRight" : "1",
+            "thickness" : "1",
+            "showBelow" : "1",
+            "tooltext" : "Corrida: " + roundedMinutesRun + ":" + roundedSecondsRun + "m"
+          }
+        ]
+      }
+    ];
+
+    var fillSerie = function (serieNumber) {
+      serieNumber = 6 - serieNumber;
+      var formattedDate = $scope.getFormattedDate(new Date().getTime() - (86400000 * serieNumber));
+      $scope.categories[0].category[serieNumber] = {label: formattedDate};
+      if (serieNumber == 0) {
+        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
+          .on('value', function (snap) {
+            $scope.dataset[0].data[serieNumber] = {};
+            $scope.dataset[1].data[serieNumber] = {};
+            $scope.dataset[2].data[serieNumber] = {};
+            var items = snap.val();
+            console.log(formattedDate, items);
+            if (items == null) {
+              items = {
+                idle: 0,
+                walk: 0,
+                run: 0
+              }
+            }
+            $scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
+            $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
+            $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
+          });
+      } else {
+        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
+          .once('value', function (snap) {
+            $scope.dataset[0].data[serieNumber] = {};
+            $scope.dataset[1].data[serieNumber] = {};
+            $scope.dataset[2].data[serieNumber] = {};
+            var items = snap.val();
+            console.log(formattedDate, items);
+            if (items == null) {
+              items = {
+                idle: 0,
+                walk: 0,
+                run: 0
+              }
+            }
+            if (items == null) {
+              items = {
+                idle: 0,
+                walk: 0,
+                run: 0
+              }
+            }
+            console.log(serieNumber);
+            $scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
+            $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
+            $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
+          });
+      }
+    };
+
+    for (var i = 0; i < 7; i++) {
+      fillSerie(i);
+    }
+
+    $scope.stopWatching = function () {
+      if ($scope.watch) {
+        $scope.watch.clearWatch();
+        $scope.active = false;
+      }
+    };
+
+
+    $scope.$on('deviceUpdated', function (e, deviceId) {
+      console.log(deviceId);
+      $scope.deviceToken = deviceId;
+    });
+    FirebaseService.getDBConnection().child("users").child(FirebaseService.getCurrentUserUid()).child("deviceToken").on('value', function (snap) {
+      $scope.remoteDeviceToken = snap.val();
+    });
+    $scope.options = [
+      {name: "Eventos", color: "positive", icon: "ion-android-walk", link: "#/app/events"},
+      {name: "Amigos", color: "positive", icon: "ion-person-stalker", link: "#/app/search"},
+      {name: "Atividade Física", color: "positive", icon: "ion-ios-pulse", link: "#/app/search"},
+      {name: "Definições", color: "positive", icon: "ion-gear-a", link: "#/app/search"}
+    ];
+
+    $scope.redirect = function () {
+      $state.go('app.search');
+    };
 
     $scope.data = {
       refreshRate: 200
@@ -125,15 +254,6 @@ angular.module('app.controllers', [])
         $scope.stopWatching();
       }
     };
-    $scope.getFormattedDate = function (timestamp) {
-      var date = new Date(timestamp);
-      var day = date.getDate();
-      var month = date.getMonth() + 1;
-      month = month < 10 ? '0' + month : month;
-      day = day < 10 ? '0' + day : day;
-      var year = date.getFullYear();
-      return day + "-" + month + '-' + year;
-    };
     $scope.getFormattedTimerDate = function () {
       var millis = $scope.timeElapsed;
       var minutes = Math.floor(millis / 60000);
@@ -143,7 +263,7 @@ angular.module('app.controllers', [])
 
     $scope.cancelListeners = function () {
       FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime()))
-        .orderByChild('timestamp').startAt($scope.startTimestamp).off('child_added', function () {
+        .orderByChild('timestamp').startAt($scope.startTimestamp).off('value', function () {
         console.log("off");
       });
       $scope.categories[0].category = [];
@@ -151,23 +271,13 @@ angular.module('app.controllers', [])
     };
     $scope.registerListeners = function () {
       FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime()))
-        .orderByChild('timestamp').startAt($scope.startTimestamp).once('value', function (snap) {
-        var items = snap.val();
-        if (!items || items == null) {
-          items = [];
-        }
-        for (var i = 0; i < items.length; i++) {
-          var obj = items[i];
-          $scope.dataset[0].data.push({value: obj.speed});
-          $scope.categories[0].category.push({'label': $scope.getFormattedTimerDate()});
-        }
-      });
-      FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime()))
-        .orderByChild('timestamp').startAt($scope.startTimestamp).on('child_added', function (snap) {
-        var item = snap.val();
-        $scope.dataset[0].data.push({value: item.speed});
-        $scope.categories[0].category.push({'label': $scope.getFormattedTimerDate()});
-      });
+        .on('value', function (snap) {
+          $scope.dataset[0].data = [];
+          var items = snap.val();
+          $scope.dataset[0].data.push({label: 'Idle', value: items.idle});
+          $scope.dataset[0].data.push({label: 'Andar', value: items.walk});
+          $scope.dataset[0].data.push({label: 'Correr', value: items.run});
+        });
       $scope.stopWatching = function () {
         if ($scope.watch) {
           $scope.watch.clearWatch();
@@ -256,18 +366,85 @@ angular.module('app.controllers', [])
 
         $scope.timestampAux = ($scope.timestamp - $scope.currentIterationTimestamp) / 1000;
         if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 10) {
-          FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime())).push().set({
-            timestamp: $scope.timestamp,
-            x: $scope.x,
-            y: $scope.y,
-            z: $scope.z,
-            speed: $scope.currentIterationSpeed
-          });
+          if ($scope.currentIterationSpeed > 8) {
+            var runRef = FirebaseService.getDBConnection().child('physical_activity')
+              .child(FirebaseService.getCurrentUserUid())
+              .child($scope.getFormattedDate(new Date().getTime()))
+              .child("run");
+            runRef.transaction(function (current_value) {
+              return (current_value || 0) + 10;
+            });
+
+            var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+              .child(FirebaseService.getCurrentUserUid())
+              .child($scope.getFormattedDate(new Date().getTime()))
+              .child("runSpeed");
+            runSpeedRef.transaction(function (current_value) {
+              return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
+            });
+            //  .push().set({
+            //  timestamp: $scope.timestamp,
+            //  x: $scope.x,
+            //  y: $scope.y,
+            //  z: $scope.z,
+            //  speed: $scope.currentIterationSpeed
+            //});
+          } else if ($scope.currentIterationSpeed > 3) {
+            var walkRef = FirebaseService.getDBConnection().child('physical_activity')
+              .child(FirebaseService.getCurrentUserUid())
+              .child($scope.getFormattedDate(new Date().getTime()))
+              .child("walk");
+
+            walkRef.transaction(function (current_value) {
+              return (current_value || 0) + 10;
+            });
+
+
+            var walkSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+              .child(FirebaseService.getCurrentUserUid())
+              .child($scope.getFormattedDate(new Date().getTime()))
+              .child("walkSpeed");
+            walkSpeedRef.transaction(function (current_value) {
+              return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
+            });
+            //.push().set({
+            //    timestamp: $scope.timestamp,
+            //    x: $scope.x,
+            //    y: $scope.y,
+            //    z: $scope.z,
+            //    speed: $scope.currentIterationSpeed
+            //  });
+            $scope.currentIterationTimestamp = $scope.timestamp;
+            $scope.currentIterationSpeed = 0;
+          } else {
+            var idleRef = FirebaseService.getDBConnection().child('physical_activity')
+              .child(FirebaseService.getCurrentUserUid())
+              .child($scope.getFormattedDate(new Date().getTime()))
+              .child("idle");
+
+            idleRef.transaction(function (current_value) {
+              return (current_value || 0) + 10;
+            });
+
+
+            var idleSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+              .child(FirebaseService.getCurrentUserUid())
+              .child($scope.getFormattedDate(new Date().getTime()))
+              .child("idleSpeed");
+            idleSpeedRef.transaction(function (current_value) {
+              return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
+            });
+            //.push().set({
+            //    timestamp: $scope.timestamp,
+            //    x: $scope.x,
+            //    y: $scope.y,
+            //    z: $scope.z,
+            //    speed: $scope.currentIterationSpeed
+            //  });
+          }
           $scope.currentIterationTimestamp = $scope.timestamp;
           $scope.currentIterationSpeed = 0;
         }
-        $scope.topSpeed = $scope.topSpeed < $scope.speedKm ? $scope.speedKm : $scope.topSpeed;
-        $scope.readsCount++;
       });
       $scope.registerListeners();
     };
@@ -443,7 +620,7 @@ angular.module('app.controllers', [])
       $scope.filteredEvents = [];
 
 
-      if(!$scope.events){
+      if (!$scope.events) {
         return;
       }
 
