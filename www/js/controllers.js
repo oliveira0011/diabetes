@@ -91,31 +91,31 @@ angular.module('app.controllers', [])
     }];
 
 
-    var roundedMinutesWalk = Math.round(200/60);
-    var roundedSecondsWalk = (200%60);
+    var roundedMinutesWalk = 0;
+    var roundedSecondsWalk = 0;
 
-    var roundedMinutesRun = Math.round(200/60);
-    var roundedSecondsRun = (200%60);
-    $scope.trendlines= [
+    var roundedMinutesRun = 0;
+    var roundedSecondsRun = 0;
+    $scope.trendlines = [
       {
         "line": [
           {
             "startvalue": "600",
             "color": "#0075c2",
             "displayvalue": "Caminhada",
-            "valueOnRight" : "1",
-            "thickness" : "1",
-            "showBelow" : "1",
-            "tooltext" : "Andar: " + roundedMinutesWalk + ":" + roundedSecondsWalk + "m"
+            "valueOnRight": "1",
+            "thickness": "1",
+            "showBelow": "1",
+            "tooltext": "Andar: " + roundedMinutesWalk + ":" + roundedSecondsWalk + "m"
           },
           {
             "startvalue": "200",
             "color": "#1aaf5d",
             "displayvalue": "Corrida",
-            "valueOnRight" : "1",
-            "thickness" : "1",
-            "showBelow" : "1",
-            "tooltext" : "Corrida: " + roundedMinutesRun + ":" + roundedSecondsRun + "m"
+            "valueOnRight": "1",
+            "thickness": "1",
+            "showBelow": "1",
+            "tooltext": "Corrida: " + roundedMinutesRun + ":" + roundedSecondsRun + "m"
           }
         ]
       }
@@ -476,7 +476,10 @@ angular.module('app.controllers', [])
 
         function authHandler(error, authData) {
           if (error) {
-            console.log("Login Failed!", error);
+            //console.log("Login Failed!", error);
+            $scope.errorMessages =
+              ["A autenticação falhou, por favor verifique as suas credenciais."];
+
           } else {
             console.log("Authenticated successfully with payload:", authData);
             FirebaseService.setCurrentUserUid(authData.uid);
