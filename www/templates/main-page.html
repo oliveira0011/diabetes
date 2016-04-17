@@ -14,8 +14,8 @@
     </style>
 
     <div class="xpto">
-      <div id="advanced" class="col circle">
-        <span class="balanced">{{getFormattedTimerDate()}}</span>
+      <div ng-class="active ? 'circle-active' : 'circle-inactive'" class="col circle">
+        <span>{{getFormattedTimerDate()}}</span>
       </div>
       <div class="row">
         <button class="col button button-clear button-block button-balanced" ng-disabled="active"
@@ -28,29 +28,6 @@
                 ng-click="stopWatch()">
           <i class="icon ion-stop"></i> Terminar Exercício
         </button>
-      </div>
-      <div class="row">
-        <button class="col button button-clear button-block"
-                ng-click="showGraph = !showGraph">
-          <i class="icon ion-ios-pulse"></i>
-        </button>
-      </div>
-      <!--<button class="col button button-outline button-block button-positive"-->
-      <!--ng-click="clearData()">-->
-      <!--<i class="icon ion-trash-b"></i>-->
-      <!--</button>-->
-    </div>
-    <div ng-if="!showGraph" class="item item-text-wrap balanced">
-      <div class="row responsive-lg">
-        <div class="col">
-          <div fusioncharts width="100%" height="200"
-               type="mscolumn2d"
-               chart="{{attrs}}"
-               trendlines="{{trendlines}}"
-               categories="{{categories}}"
-               dataset="{{dataset}}">
-          </div>
-        </div>
       </div>
     </div>
   </ion-content>

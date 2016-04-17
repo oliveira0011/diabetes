@@ -35,149 +35,6 @@ angular.module('app.controllers', [])
     });
   })
   .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http, TimerService) {
-
-    $scope.getFormattedDate = function (timestamp) {
-      var date = new Date(timestamp);
-      var day = date.getDate();
-      var month = date.getMonth() + 1;
-      month = month < 10 ? '0' + month : month;
-      day = day < 10 ? '0' + day : day;
-      var year = date.getFullYear();
-      return day + "-" + month + '-' + year;
-    };
-
-    $scope.attrs = {
-      caption: "Minutos / Categoria de Exercício",
-      yaxisname: "Segundos",
-      xaxisname: "Categoria de exercício",
-      bgcolor: "FFFFFF",
-      animation: "0",
-      showalternatehgridcolor: "0",
-      divlinecolor: "CCCCCC",
-      showvalues: "0",
-      showcanvasborder: "0",
-      legendshadow: "0",
-      legendborderalpha: "0",
-      showborder: "0",
-      anchorAlpha: '0'
-    };
-
-
-    $scope.categories = [{
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }];
-
-    $scope.dataset = [{
-      "seriesName": "Idle",
-      "data": [{}, {}, {}, {}, {}, {}, {}]
-    }, {
-      "seriesName": "Andar",
-      "data": [{}, {}, {}, {}, {}, {}, {}]
-    }, {
-      "seriesName": "Correr",
-      "data": [{}, {}, {}, {}, {}, {}, {}]
-    }];
-
-
-    var roundedMinutesWalk = 0;
-    var roundedSecondsWalk = 0;
-
-    var roundedMinutesRun = 0;
-    var roundedSecondsRun = 0;
-    $scope.trendlines = [
-      {
-        "line": [
-          {
-            "startvalue": "600",
-            "color": "#0075c2",
-            "displayvalue": "Caminhada",
-            "valueOnRight": "1",
-            "thickness": "1",
-            "showBelow": "1",
-            "tooltext": "Andar: " + roundedMinutesWalk + ":" + roundedSecondsWalk + "m"
-          },
-          {
-            "startvalue": "200",
-            "color": "#1aaf5d",
-            "displayvalue": "Corrida",
-            "valueOnRight": "1",
-            "thickness": "1",
-            "showBelow": "1",
-            "tooltext": "Corrida: " + roundedMinutesRun + ":" + roundedSecondsRun + "m"
-          }
-        ]
-      }
-    ];
-
-    var fillSerie = function (serieNumber) {
-      serieNumber = 6 - serieNumber;
-      var formattedDate = $scope.getFormattedDate(new Date().getTime() - (86400000 * serieNumber));
-      $scope.categories[0].category[serieNumber] = {label: formattedDate};
-      if (serieNumber == 0) {
-        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
-          .on('value', function (snap) {
-            $scope.dataset[0].data[serieNumber] = {};
-            $scope.dataset[1].data[serieNumber] = {};
-            $scope.dataset[2].data[serieNumber] = {};
-            var items = snap.val();
-            console.log(formattedDate, items);
-            if (items == null) {
-              items = {
-                idle: 0,
-                walk: 0,
-                run: 0
-              }
-            }
-            $scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
-            $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
-            $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
-          });
-      } else {
-        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
-          .once('value', function (snap) {
-            $scope.dataset[0].data[serieNumber] = {};
-            $scope.dataset[1].data[serieNumber] = {};
-            $scope.dataset[2].data[serieNumber] = {};
-            var items = snap.val();
-            console.log(formattedDate, items);
-            if (items == null) {
-              items = {
-                idle: 0,
-                walk: 0,
-                run: 0
-              }
-            }
-            if (items == null) {
-              items = {
-                idle: 0,
-                walk: 0,
-                run: 0
-              }
-            }
-            console.log(serieNumber);
-            $scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
-            $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
-            $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
-          });
-      }
-    };
-
-    for (var i = 0; i < 7; i++) {
-      fillSerie(i);
-    }
-
     $scope.stopWatching = function () {
       if ($scope.watch) {
         $scope.watch.clearWatch();
@@ -238,8 +95,12 @@ angular.module('app.controllers', [])
       $scope.vy = 0;
       $scope.vz = 0;
       $scope.speed = 0;
-      $scope.categories[0].category = [];
-      $scope.dataset[0].data = [];
+      if ($scope.categories && $scope.categories[0]) {
+        $scope.categories[0].category = [];
+      }
+      if ($scope.dataset && $scope.dataset[0]) {
+        $scope.dataset[0].data = [];
+      }
       $scope.timeElapsed = 0;
       $scope.startTimestamp = 0;
     };
@@ -288,7 +149,8 @@ angular.module('app.controllers', [])
 
 
     $scope.startWatching = function () {
-      if (!$cordovaDeviceMotion) {
+      console.log(typeof $cordovaDeviceMotion.watchAcceleration);
+      if (!$cordovaDeviceMotion || (typeof $cordovaDeviceMotion.watchAcceleration) == undefined) {
         return;
       }
       $scope.clearData();
@@ -458,8 +320,151 @@ angular.module('app.controllers', [])
       }
     });
   })
-  .
-  controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
+  .controller('PhysicalActivityCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http, TimerService) {
+
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year;
+    };
+
+    $scope.attrs = {
+      caption: "Minutos / Categoria de Exercício",
+      yaxisname: "Segundos",
+      xaxisname: "Categoria de exercício",
+      bgcolor: "FFFFFF",
+      animation: "0",
+      showalternatehgridcolor: "0",
+      divlinecolor: "CCCCCC",
+      showvalues: "0",
+      showcanvasborder: "0",
+      legendshadow: "0",
+      legendborderalpha: "0",
+      showborder: "0",
+      anchorAlpha: '0'
+    };
+
+
+    $scope.categories = [{
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }, {
+      category: []
+    }];
+
+    $scope.dataset = [{
+      "seriesName": "Idle",
+      "data": [{}, {}, {}, {}, {}, {}, {}]
+    }, {
+      "seriesName": "Andar",
+      "data": [{}, {}, {}, {}, {}, {}, {}]
+    }, {
+      "seriesName": "Correr",
+      "data": [{}, {}, {}, {}, {}, {}, {}]
+    }];
+
+
+    var roundedMinutesWalk = 0;
+    var roundedSecondsWalk = 0;
+
+    var roundedMinutesRun = 0;
+    var roundedSecondsRun = 0;
+    $scope.trendlines = [
+      {
+        "line": [
+          {
+            "startvalue": "600",
+            "color": "#0075c2",
+            "displayvalue": "Caminhada",
+            "valueOnRight": "1",
+            "thickness": "1",
+            "showBelow": "1",
+            "tooltext": "Andar: " + roundedMinutesWalk + ":" + roundedSecondsWalk + "m"
+          },
+          {
+            "startvalue": "200",
+            "color": "#1aaf5d",
+            "displayvalue": "Corrida",
+            "valueOnRight": "1",
+            "thickness": "1",
+            "showBelow": "1",
+            "tooltext": "Corrida: " + roundedMinutesRun + ":" + roundedSecondsRun + "m"
+          }
+        ]
+      }
+    ];
+
+    var fillSerie = function (serieNumber) {
+      serieNumber = 6 - serieNumber;
+      var formattedDate = $scope.getFormattedDate(new Date().getTime() - (86400000 * serieNumber));
+      $scope.categories[0].category[serieNumber] = {label: formattedDate};
+      if (serieNumber == 0) {
+        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
+          .on('value', function (snap) {
+            $scope.dataset[0].data[serieNumber] = {};
+            $scope.dataset[1].data[serieNumber] = {};
+            $scope.dataset[2].data[serieNumber] = {};
+            var items = snap.val();
+            console.log(formattedDate, items);
+            if (items == null) {
+              items = {
+                idle: 0,
+                walk: 0,
+                run: 0
+              }
+            }
+            $scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
+            $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
+            $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
+          });
+      } else {
+        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
+          .once('value', function (snap) {
+            $scope.dataset[0].data[serieNumber] = {};
+            $scope.dataset[1].data[serieNumber] = {};
+            $scope.dataset[2].data[serieNumber] = {};
+            var items = snap.val();
+            console.log(formattedDate, items);
+            if (items == null) {
+              items = {
+                idle: 0,
+                walk: 0,
+                run: 0
+              }
+            }
+            if (items == null) {
+              items = {
+                idle: 0,
+                walk: 0,
+                run: 0
+              }
+            }
+            console.log(serieNumber);
+            $scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
+            $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
+            $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
+          });
+      }
+    };
+
+    for (var i = 0; i < 7; i++) {
+      fillSerie(i);
+    }
+  })
+  .controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
     if (FirebaseService.isUserLogged()) {
       FirebaseService.checkDeviceToken();
       $state.go('app.main');
@@ -1073,7 +1078,7 @@ angular.module('app.controllers', [])
     }
 
     var handler = function (type, retrievedRecords) {
-      if (!retrievedRecords) {
+      if (!retrievedRecords || retrievedRecords == null) {
         return;
       }
       var arr = Object.keys(retrievedRecords).map(function (k) {
@@ -1104,10 +1109,10 @@ angular.module('app.controllers', [])
             "seriesname": "Tensão Arterial Mínima",
             "data": []
           }];
-          var minRecords = Object.keys(retrievedRecords[0]).map(function (k) {
+          var minRecords = !retrievedRecords[0] || retrievedRecords == null ? [] : Object.keys(retrievedRecords[0]).map(function (k) {
             return retrievedRecords[0][k]
           });
-          var maxRecords = Object.keys(retrievedRecords[1]).map(function (k) {
+          var maxRecords = !retrievedRecords[0] || retrievedRecords == null ? [] : Object.keys(retrievedRecords[1]).map(function (k) {
             return retrievedRecords[1][k]
           });
 
@@ -1184,11 +1189,13 @@ angular.module('app.controllers', [])
       }
       if (records[0].data.length == 0) {
         arr.sort(function (a, b) {
-          return parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate);
+          return (!a || a == null) && (!b || b == null) ? 0 : (a && (!b || b == null) ? parseFloat(a.biomedicDate) : ((!a || a == null) && b ? parseFloat(b.biomedicDate) : parseFloat(a.biomedicDate) - parseFloat(b.biomedicDate)));
         });
         angular.forEach(arr, function (record) {
-          records[0].data.push({value: record.value});
-          labels[0].category.push({label: getFormattedDate(record.biomedicDate)});
+          if (record && record != null) {
+            records[0].data.push({value: record.value});
+            labels[0].category.push({label: getFormattedDate(record.biomedicDate)});
+          }
         });
       }
       switch (type) {

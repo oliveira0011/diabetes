@@ -117,6 +117,15 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
           }
         }
       })
+      .state('app.physical-activity', {
+        url: '/physical-activity',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/physical-activity.html',
+            controller: 'PhysicalActivityCtrl'
+          }
+        }
+      })
       .state('app.messages', {
         url: '/message',
         views: {
