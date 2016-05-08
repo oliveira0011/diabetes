@@ -135,7 +135,7 @@ angular.module('app.controllers', [])
         .on('value', function (snap) {
           $scope.dataset[0].data = [];
           var items = snap.val();
-          $scope.dataset[0].data.push({label: 'Idle', value: items.idle});
+          //$scope.dataset[0].data.push({label: 'Idle', value: items.idle});
           $scope.dataset[0].data.push({label: 'Andar', value: items.walk});
           $scope.dataset[0].data.push({label: 'Correr', value: items.run});
         });
@@ -426,7 +426,7 @@ angular.module('app.controllers', [])
                 run: 0
               }
             }
-            $scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
+            //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
             $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
             $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
           });
@@ -453,7 +453,7 @@ angular.module('app.controllers', [])
               }
             }
             console.log(serieNumber);
-            $scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
+            //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
             $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
             $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
           });
