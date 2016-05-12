@@ -110,9 +110,6 @@ angular.module('app.controllers', [])
       if ($scope.categories && $scope.categories[0]) {
         $scope.categories[0].category = [];
       }
-      if ($scope.dataset && $scope.dataset[0]) {
-        $scope.dataset[0].data = [];
-      }
       $scope.timeElapsed = 0;
       $scope.startTimestamp = 0;
     };
@@ -140,17 +137,8 @@ angular.module('app.controllers', [])
         console.log("off");
       });
       $scope.categories[0].category = [];
-      $scope.dataset[0].data = [];
     };
     $scope.registerListeners = function () {
-      FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child($scope.getFormattedDate(new Date().getTime()))
-        .on('value', function (snap) {
-          $scope.dataset[0].data = [];
-          var items = snap.val();
-          //$scope.dataset[0].data.push({label: 'Idle', value: items.idle});
-          $scope.dataset[0].data.push({label: 'Andar', value: items.walk});
-          $scope.dataset[0].data.push({label: 'Correr', value: items.run});
-        });
       $scope.stopWatching = function () {
         if ($scope.watch) {
           $scope.watch.clearWatch();
@@ -219,7 +207,7 @@ angular.module('app.controllers', [])
         $scope.speed = $scope.speed + aux;
         var kmPerHSpeed = 3.6 * aux;
 
-        $scope.speed = aux;
+        //$scope.speed = aux;
         $scope.speedKm = kmPerHSpeed;
         //$scope.speedKm = aux;
 
@@ -240,7 +228,7 @@ angular.module('app.controllers', [])
 
         $scope.timestampAux = ($scope.timestamp - $scope.currentIterationTimestamp) / 1000;
         if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 10) {
-          if ($scope.currentIterationSpeed > 8) {
+          if ($scope.currentIterationSpeed > 6) {//TODO: check, for now we reduced to -2
             var runRef = FirebaseService.getDBConnection().child('physical_activity')
               .child(FirebaseService.getCurrentUserUid())
               .child($scope.getFormattedDate(new Date().getTime()))
@@ -263,7 +251,7 @@ angular.module('app.controllers', [])
             //  z: $scope.z,
             //  speed: $scope.currentIterationSpeed
             //});
-          } else if ($scope.currentIterationSpeed > 3) {
+          } else if ($scope.currentIterationSpeed > 0.2) {//TODO: check, for now we reduced to -2
             var walkRef = FirebaseService.getDBConnection().child('physical_activity')
               .child(FirebaseService.getCurrentUserUid())
               .child($scope.getFormattedDate(new Date().getTime()))
@@ -378,9 +366,6 @@ angular.module('app.controllers', [])
     }];
 
     $scope.dataset = [{
-      "seriesName": "Idle",
-      "data": [{}, {}, {}, {}, {}, {}, {}]
-    }, {
       "seriesName": "Andar",
       "data": [{}, {}, {}, {}, {}, {}, {}]
     }, {
@@ -428,26 +413,23 @@ angular.module('app.controllers', [])
           .on('value', function (snap) {
             $scope.dataset[0].data[serieNumber] = {};
             $scope.dataset[1].data[serieNumber] = {};
-            $scope.dataset[2].data[serieNumber] = {};
             var items = snap.val();
             console.log(formattedDate, items);
             if (items == null) {
               items = {
-                idle: 0,
                 walk: 0,
                 run: 0
               }
             }
             //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
-            $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
-            $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
+            $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: items.walk});
+            $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: items.run});
           });
       } else {
         FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
           .once('value', function (snap) {
             $scope.dataset[0].data[serieNumber] = {};
             $scope.dataset[1].data[serieNumber] = {};
-            $scope.dataset[2].data[serieNumber] = {};
             var items = snap.val();
             console.log(formattedDate, items);
             if (items == null) {
@@ -466,8 +448,8 @@ angular.module('app.controllers', [])
             }
             console.log(serieNumber);
             //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
-            $scope.dataset[1].data[serieNumber] = ({label: 'Andar', value: items.walk});
-            $scope.dataset[2].data[serieNumber] = ({label: 'Correr', value: items.run});
+            $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: items.walk});
+            $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: items.run});
           });
       }
     };
