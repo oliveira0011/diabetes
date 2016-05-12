@@ -35,6 +35,18 @@ angular.module('app.controllers', [])
     });
   })
   .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http, TimerService) {
+
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year;
+    };
+
+
     $scope.stopWatching = function () {
       if ($scope.watch) {
         $scope.watch.clearWatch();
