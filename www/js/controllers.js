@@ -1053,13 +1053,13 @@ angular.module('app.controllers', [])
         colors: colors
       }
     };
-    $scope.chartCholesterol = initChart('Colesterol LDL', 'mg/dL', "#DECF3F");
+    $scope.chartCholesterol = initChart('Colesterol HDL', 'mg/dL', "#DECF3F");
     $scope.chartWeight = initChart('Peso / IMC', 'Kg / Kg/m2', "#B276B2, #F17CB0");
-    $scope.chartHemoglobin = initChart('HbA1c', '%', "#F15854");
+    $scope.chartCardiacFrequency = initChart('Frequência Cardíaca', 'bpm', "#F15854");
     $scope.chartBloodPressure = initChart('T. Arterial Sistólica / Diastólica', 'mmHg', "#4D4D4D, #5DA5DA");
 
 
-    $scope.hemoglobinRecords = [];
+    $scope.cardiacfrequencyRecords = [];
     $scope.bloodPressureRecords = [];
     $scope.cholesterolRecords = [];
     $scope.weightRecords = [];
@@ -1087,11 +1087,11 @@ angular.module('app.controllers', [])
         category: []
       }];
       switch (type) {
-        case BiomedicType.HEMOGLOBIN:
-          colors = $scope.chartHemoglobin.colors;
+        case BiomedicType.CARDIACFREQUENCY:
+          colors = $scope.chartCardiacFrequency.colors;
           records = [{
-            "seriesname": "Hemoglobina",
-            "data": $scope.hemoglobinRecords
+            "seriesname": "CardiacFrequencya",
+            "data": $scope.cardiacfrequencyRecords
           }];
           break;
         case BiomedicType.BLOOD_PRESSURE:
@@ -1193,9 +1193,9 @@ angular.module('app.controllers', [])
         });
       }
       switch (type) {
-        case BiomedicType.HEMOGLOBIN:
-          $scope.chartHemoglobin.dataset = records;
-          $scope.chartHemoglobin.categories = labels;
+        case BiomedicType.CARDIACFREQUENCY:
+          $scope.chartCardiacFrequency.dataset = records;
+          $scope.chartCardiacFrequency.categories = labels;
           break;
         case BiomedicType.BLOOD_PRESSURE:
           $scope.chartBloodPressure.dataset = records;
@@ -1226,7 +1226,7 @@ angular.module('app.controllers', [])
 
 
     var init = function () {
-      BiomedicService.getHemoglobinRecords(handler);
+      BiomedicService.getCardiacFrequencyRecords(handler);
       BiomedicService.getBloodPressureRecords(handler);
       BiomedicService.getCholesterolRecords(handler);
       BiomedicService.getWeightRecords(handler);
@@ -1234,7 +1234,7 @@ angular.module('app.controllers', [])
 
     init();
   })
-  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, Hemoglobin, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state) {
+  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, CardiacFrequency, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state) {
     $scope.maxDate = new Date();
     $scope.maxDate.setDate($scope.maxDate.getDate() + 1);
     $scope.biomedic = {};
@@ -1245,7 +1245,7 @@ angular.module('app.controllers', [])
         type: type
       };
     };
-    $scope.setType('hemoglobin');
+    $scope.setType('cardiacfrequency');
     $scope.isActive = function (type) {
       return type === $scope.biomedic.type;
     };
@@ -1262,8 +1262,8 @@ angular.module('app.controllers', [])
       }
       var label = "";
       switch ($scope.biomedic.type) {
-        case BiomedicType.HEMOGLOBIN:
-          label = "Hemoglobina";
+        case BiomedicType.CARDIACFREQUENCY:
+          label = "Frequência Cardíaca";
           break;
         case BiomedicType.MAX_BLOOD_PRESSURE:
           label = "Tensão Arterial Mínima";
@@ -1287,8 +1287,8 @@ angular.module('app.controllers', [])
         $state.go('app.biomedic');
       };
       switch ($scope.biomedic.type) {
-        case BiomedicType.HEMOGLOBIN:
-          BiomedicService.addHemoglobinRecord(new Hemoglobin($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
+        case BiomedicType.CARDIACFREQUENCY:
+          BiomedicService.addCardiacFrequencyRecord(new CardiacFrequency($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
           break;
         case BiomedicType.MIN_BLOOD_PRESSURE:
           BiomedicService.addMinBloodPressureRecord(new MinBloodPressure($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);

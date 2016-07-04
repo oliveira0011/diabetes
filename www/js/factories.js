@@ -1,7 +1,7 @@
 angular.module('app.factories', [])
   .factory('BiomedicType', function () {
     return {
-      HEMOGLOBIN: 'hemoglobin',
+      CARDIACFREQUENCY: 'cardiacfrequency',
       BLOOD_PRESSURE: 'blood-pressure',
       MIN_BLOOD_PRESSURE: 'min-blood-pressure',
       MAX_BLOOD_PRESSURE: 'max-blood-pressure',
@@ -24,15 +24,15 @@ angular.module('app.factories', [])
     };
     return Biomedic;
   })
-  .factory('Hemoglobin', function (Biomedic, BiomedicType) {
-    var Hemoglobin = function () {
+  .factory('CardiacFrequency', function (Biomedic, BiomedicType) {
+    var CardiacFrequency = function () {
       Biomedic.apply(this, arguments);
-      this.type = BiomedicType.HEMOGLOBIN;
+      this.type = BiomedicType.CARDIACFREQUENCY;
     };
-    Hemoglobin.prototype = Object.create(Biomedic.prototype);
-    Hemoglobin.prototype.constructor = Hemoglobin;
+    CardiacFrequency.prototype = Object.create(Biomedic.prototype);
+    CardiacFrequency.prototype.constructor = CardiacFrequency;
 
-    return Hemoglobin;
+    return CardiacFrequency;
   })
   .factory('BloodPressure', function (Biomedic) {
     var BloodPressure = function () {
