@@ -22,6 +22,8 @@
                 HDL</a>
               <a class="button button-light button-block" ng-class="{'button-positive': isActive('weight')}"
                  ng-click="setType('weight')">Peso</a>
+              <a class="button button-light button-block" ng-class="{'button-positive': isActive('abdominal_girth')}"
+                 ng-click="setType('abdominal_girth')">Perímetro Abdominal</a>
             </div>
 
             <div class="item item-divider item-positive">
@@ -42,6 +44,9 @@
               </div>
               <div ng-if="isActive('weight')">
                 <div ng-include="'templates/biomedic-weight-tpl.html'"></div>
+              </div>
+              <div ng-if="isActive('abdominal_girth')">
+                <div ng-include="'templates/biomedic-abdominal-girth-tpl.html'"></div>
               </div>
             </div>
           </div>

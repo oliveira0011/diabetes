@@ -6,7 +6,8 @@ angular.module('app.factories', [])
       MIN_BLOOD_PRESSURE: 'min-blood-pressure',
       MAX_BLOOD_PRESSURE: 'max-blood-pressure',
       CHOLESTEROL: 'cholesterol',
-      WEIGHT: 'weight'
+      WEIGHT: 'weight',
+      ABDOMINAL_GIRTH: 'abdominal_girth'
     }
   })
   .factory('Biomedic', function () {
@@ -23,6 +24,16 @@ angular.module('app.factories', [])
       throw new Error("Abstract method!");
     };
     return Biomedic;
+  })
+  .factory('AbdominalGirth', function (Biomedic, BiomedicType) {
+    var AbdominalGirth = function () {
+      Biomedic.apply(this, arguments);
+      this.type = BiomedicType.ABDOMINAL_GIRTH;
+    };
+    AbdominalGirth.prototype = Object.create(Biomedic.prototype);
+    AbdominalGirth.prototype.constructor = AbdominalGirth;
+
+    return AbdominalGirth;
   })
   .factory('CardiacFrequency', function (Biomedic, BiomedicType) {
     var CardiacFrequency = function () {

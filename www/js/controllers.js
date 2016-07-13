@@ -1057,12 +1057,14 @@ angular.module('app.controllers', [])
     $scope.chartWeight = initChart('Peso / IMC', 'Kg / Kg/m2', "#B276B2, #F17CB0");
     $scope.chartCardiacFrequency = initChart('Frequência Cardíaca', 'bpm', "#F15854");
     $scope.chartBloodPressure = initChart('T. Arterial Sistólica / Diastólica', 'mmHg', "#4D4D4D, #5DA5DA");
+    $scope.chartAbdominalGirth = initChart('Perímetro Abdominal', 'cm', "#DECF3F");
 
 
     $scope.cardiacfrequencyRecords = [];
     $scope.bloodPressureRecords = [];
     $scope.cholesterolRecords = [];
     $scope.weightRecords = [];
+    $scope.abdominalGirthRecords = [];
     function getFormattedDate(timestamp) {
       var date = new Date(timestamp);
       var month = date.getMonth() + 1;
@@ -1087,6 +1089,13 @@ angular.module('app.controllers', [])
         category: []
       }];
       switch (type) {
+        case BiomedicType.ABDOMINAL_GIRTH:
+          colors = $scope.chartAbdominalGirth.colors;
+          records = [{
+            "seriesname": "CardiacFrequencya",
+            "data": $scope.abdominalGirthRecords
+          }];
+          break;
         case BiomedicType.CARDIACFREQUENCY:
           colors = $scope.chartCardiacFrequency.colors;
           records = [{
@@ -1103,10 +1112,10 @@ angular.module('app.controllers', [])
             "seriesname": "Tensão Arterial Mínima",
             "data": []
           }];
-          var minRecords = !retrievedRecords[0] || retrievedRecords == null ? [] : Object.keys(retrievedRecords[0]).map(function (k) {
+          var minRecords = !retrievedRecords[0] || retrievedRecords[0] == null ? [] : Object.keys(retrievedRecords[0]).map(function (k) {
             return retrievedRecords[0][k]
           });
-          var maxRecords = !retrievedRecords[0] || retrievedRecords == null ? [] : Object.keys(retrievedRecords[1]).map(function (k) {
+          var maxRecords = !retrievedRecords[1] || retrievedRecords[1] == null ? [] : Object.keys(retrievedRecords[1]).map(function (k) {
             return retrievedRecords[1][k]
           });
 
@@ -1193,6 +1202,10 @@ angular.module('app.controllers', [])
         });
       }
       switch (type) {
+        case BiomedicType.ABDOMINAL_GIRTH:
+          $scope.chartAbdominalGirth.dataset = records;
+          $scope.chartAbdominalGirth.categories = labels;
+          break;
         case BiomedicType.CARDIACFREQUENCY:
           $scope.chartCardiacFrequency.dataset = records;
           $scope.chartCardiacFrequency.categories = labels;
@@ -1230,11 +1243,12 @@ angular.module('app.controllers', [])
       BiomedicService.getBloodPressureRecords(handler);
       BiomedicService.getCholesterolRecords(handler);
       BiomedicService.getWeightRecords(handler);
+      BiomedicService.getAbdominalGirthRecords(handler);
     };
 
     init();
   })
-  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, CardiacFrequency, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state) {
+  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, CardiacFrequency, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state, AbdominalGirth) {
     $scope.maxDate = new Date();
     $scope.maxDate.setDate($scope.maxDate.getDate() + 1);
     $scope.biomedic = {};
@@ -1277,6 +1291,9 @@ angular.module('app.controllers', [])
         case BiomedicType.WEIGHT:
           label = "Peso";
           break;
+        case BiomedicType.ABDOMINAL_GIRTH:
+          label = "Perímetro Abdominal";
+          break;
 
       }
       $ionicLoading.show({template: "A gravar " + label + "..."});
@@ -1301,6 +1318,9 @@ angular.module('app.controllers', [])
           break;
         case BiomedicType.WEIGHT:
           BiomedicService.addWeightRecord(new Weight($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
+          break;
+        case BiomedicType.ABDOMINAL_GIRTH:
+          BiomedicService.addAbdominalGirthRecord(new AbdominalGirth($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
           break;
       }
     }

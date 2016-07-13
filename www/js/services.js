@@ -270,7 +270,7 @@ angular.module('app.services', [])
     };
     return firebaseService;
   })
-  .service('BiomedicService', function (FirebaseService, CardiacFrequency, BloodPressure, Cholesterol, BiomedicType, Weight) {
+  .service('BiomedicService', function (FirebaseService, CardiacFrequency, BloodPressure, Cholesterol, BiomedicType, Weight, AbdominalGirth) {
     function BiomedicService() {
     }
 
@@ -296,6 +296,12 @@ angular.module('app.services', [])
       });
     };
 
+    BiomedicService.addAbdominalGirthRecord = function (biomedic, handler) {
+      if (!biomedic instanceof AbdominalGirth) {
+        throw 'The data passed to persist must be a AbdominalGirth class.';
+      }
+      BiomedicService.addRecord(biomedic, handler);
+    };
     BiomedicService.addCardiacFrequencyRecord = function (biomedic, handler) {
       if (!biomedic instanceof CardiacFrequency) {
         throw 'The data passed to persist must be a CardiacFrequency class.';
@@ -327,6 +333,9 @@ angular.module('app.services', [])
       BiomedicService.addRecord(biomedic, handler);
     };
 
+    BiomedicService.getAbdominalGirthRecords = function (handler) {
+      BiomedicService.getRecords(BiomedicType.ABDOMINAL_GIRTH, handler);
+    };
     BiomedicService.getCardiacFrequencyRecords = function (handler) {
       BiomedicService.getRecords(BiomedicType.CARDIACFREQUENCY, handler);
     };

@@ -135,6 +135,14 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
           }
         }
       })
+      .state('app.about', {
+        url: '/about',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/about.html'
+          }
+        }
+      })
       .state('app.message', {
         url: '/message/:id',
         views: {
