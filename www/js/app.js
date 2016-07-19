@@ -16,7 +16,7 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
       FirebaseService.registerDevice();
     });
   })
-  .config(function($ionicConfigProvider) {
+  .config(function ($ionicConfigProvider) {
     // remove back button text completely
     $ionicConfigProvider.backButton.previousTitleText(false).text(' ');
     $ionicConfigProvider.tabs.position("bottom"); //Places them at the bottom for all OS
@@ -123,6 +123,15 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
           'menuContent': {
             templateUrl: 'templates/physical-activity.html',
             controller: 'PhysicalActivityCtrl'
+          }
+        }
+      })
+      .state('app.recomendation', {
+        url: '/recomendation',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/recomendation.html',
+            controller: 'RecomendationCtrl'
           }
         }
       })

@@ -524,4 +524,47 @@ angular.module('app.services', [])
     };
 
     return timer;
+  })
+  .service('RecomendationService', function (FirebaseService, Recomendation, RecomendationLevel) {
+    var recomendationService = {};
+    recomendationService.getCurrentRecomendation = function (userId, handler) {
+      if (!FirebaseService.isUserLogged()) {
+        console.log('invalidUser');
+        $rootScope.$broadcast('logoutUser');
+      }
+      FirebaseService.getDBConnection().child('recomendations').child(userId).orderByChild("date").limitToLast(1).on('value', function (snap) {
+        var value = snap.val();
+        for (var first in value) {
+          if (value.hasOwnProperty(first)) {
+            var rec = new Recomendation(RecomendationLevel[value[first].level], value[first].medicationModified, value[first].exercises);
+            rec.id = first;
+            rec.date = value[first].date;
+            console.log(rec);
+            handler(rec);
+            return;
+          }
+        }
+        handler();
+      });
+    };
+    recomendationService.getRecomendations = function (userId, handler) {
+      if (!FirebaseService.isUserLogged()) {
+        console.log('invalidUser');
+        $rootScope.$broadcast('logoutUser');
+      }
+      FirebaseService.getDBConnection().child('recomendations').child(userId).orderByChild("date").on('value', function (snap) {
+        var value = snap.val();
+        var arrayToReturn = [];
+        for (var first in value) {
+          if (value.hasOwnProperty(first)) {
+            var rec = new Recomendation(RecomendationLevel[value[first].level], value[first].medicationModified, value[first].exercises);
+            rec.id = first;
+            rec.date = value[first].date;
+            arrayToReturn.push(rec);
+          }
+        }
+        handler(arrayToReturn);
+      });
+    };
+    return recomendationService;
   });

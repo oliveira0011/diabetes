@@ -1025,6 +1025,7 @@ angular.module('app.controllers', [])
     }
   })
   .controller('BiomedicCtrl', function ($scope, BiomedicService, BiomedicType) {
+
     var initChart = function (caption, subcaption, colors) {
       return {
         attrs: {
@@ -1053,18 +1054,7 @@ angular.module('app.controllers', [])
         colors: colors
       }
     };
-    $scope.chartCholesterol = initChart('Colesterol HDL', 'mg/dL', "#DECF3F");
-    $scope.chartWeight = initChart('Peso / IMC', 'Kg / Kg/m2', "#B276B2, #F17CB0");
-    $scope.chartCardiacFrequency = initChart('Frequência Cardíaca', 'bpm', "#F15854");
-    $scope.chartBloodPressure = initChart('T. Arterial Sistólica / Diastólica', 'mmHg', "#4D4D4D, #5DA5DA");
-    $scope.chartAbdominalGirth = initChart('Perímetro Abdominal', 'cm', "#DECF3F");
 
-
-    $scope.cardiacfrequencyRecords = [];
-    $scope.bloodPressureRecords = [];
-    $scope.cholesterolRecords = [];
-    $scope.weightRecords = [];
-    $scope.abdominalGirthRecords = [];
     function getFormattedDate(timestamp) {
       var date = new Date(timestamp);
       var month = date.getMonth() + 1;
@@ -1239,6 +1229,18 @@ angular.module('app.controllers', [])
 
 
     var init = function () {
+      $scope.chartCholesterol = initChart('Colesterol HDL', 'mg/dL', "#DECF3F");
+      $scope.chartWeight = initChart('Peso / IMC', 'Kg / Kg/m2', "#B276B2, #F17CB0");
+      $scope.chartCardiacFrequency = initChart('Frequência Cardíaca', 'bpm', "#F15854");
+      $scope.chartBloodPressure = initChart('T. Arterial Sistólica / Diastólica', 'mmHg', "#4D4D4D, #5DA5DA");
+      $scope.chartAbdominalGirth = initChart('Perímetro Abdominal', 'cm', "#DECF3F");
+
+
+      $scope.cardiacfrequencyRecords = [];
+      $scope.bloodPressureRecords = [];
+      $scope.cholesterolRecords = [];
+      $scope.weightRecords = [];
+      $scope.abdominalGirthRecords = [];
       BiomedicService.getCardiacFrequencyRecords(handler);
       BiomedicService.getBloodPressureRecords(handler);
       BiomedicService.getCholesterolRecords(handler);
@@ -1247,8 +1249,15 @@ angular.module('app.controllers', [])
     };
 
     init();
+
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams ){
+      console.log('stateChanged to: ', toState, toState.name === 'app.biomedic');
+      if(toState.name === 'app.biomedic'){
+        init();
+      }
+    });
   })
-  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, CardiacFrequency, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state, AbdominalGirth) {
+  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, CardiacFrequency, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state, AbdominalGirth, $rootScope) {
     $scope.maxDate = new Date();
     $scope.maxDate.setDate($scope.maxDate.getDate() + 1);
     $scope.biomedic = {};
@@ -1324,6 +1333,19 @@ angular.module('app.controllers', [])
           break;
       }
     }
+  })
+  .controller('RecomendationCtrl', function ($scope, FirebaseService, RecomendationService) {
+    RecomendationService.getCurrentRecomendation(FirebaseService.getCurrentUserUid(), function (recomendation) {
+      if (recomendation && recomendation !== null) {
+        var obj = recomendation;
+        var level = obj.level;
+        var aux = obj.toJson();
+        aux.level = level;
+        $scope.recomendation = aux;
+      } else {
+        $scope.recomendation = undefined;
+      }
+    });
   })
   .controller('MessageCtrl', function ($scope, MessageService, $stateParams, $state) {
     if ($stateParams.id) {

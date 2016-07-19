@@ -25,6 +25,65 @@ angular.module('app.factories', [])
     };
     return Biomedic;
   })
+  .factory('PhysicalActivityType', function () {
+    return {
+      WALK: {key: "WALK", value: "Andar"},
+      RUN: {key: "RUN", value: "Correr"}
+    }
+  })
+  .factory('PhysicalActivity', function (PhysicalActivityType) {
+    var PhysicalActivity = function (frequency, duration, type) {
+      this.id = 0;
+      this.frequency = frequency;
+      this.duration = duration;
+      if (!type instanceof PhysicalActivityType.constructor) {
+        throw 'The type must be a PhysicalActivityType';
+      }
+      this.type = type;
+    };
+    return PhysicalActivity;
+  })
+  .factory('RecomendationLevel', function () {
+    return {
+      CUSTOM: {key: "CUSTOM", value: "Customizado"},
+      MODERATE: {key: "MODERATE", value: "Moderada"},
+      INTENSE: {key: "INTENSE", value: "Intensa"}
+    }
+  })
+  .factory('Recomendation', function (PhysicalActivity) {
+    var Recomendation = function (level, medicationModified, exercises) {
+      this.id = 0;
+      this.medicationModified = medicationModified;
+      this.exercises = [];
+      if (!exercises instanceof Array.constructor) {
+        throw 'The exercises must be an array';
+      }
+      for (var i = 0; i < exercises.length; i++) {
+        var obj = exercises[i];
+        this.exercises[i] = new PhysicalActivity(obj.frequency, obj.duration, obj.type);
+      }
+      this.date = new Date().getTime();
+      this.level = level;
+    };
+    Recomendation.prototype.toJson = function () {
+      var exercises = [];
+      for (var i = 0; i < this.exercises.length; i++) {
+        var obj = this.exercises[i];
+        exercises[i] = {
+          frequency: obj.frequency,
+          duration: obj.duration,
+          type: obj.type};
+      }
+      console.log(this.level);
+      return {
+        exercises: exercises,
+        date: this.date,
+        level: this.level ? this.level.key : undefined,
+        medicationModified: this.medicationModified
+      }
+    };
+    return Recomendation;
+  })
   .factory('AbdominalGirth', function (Biomedic, BiomedicType) {
     var AbdominalGirth = function () {
       Biomedic.apply(this, arguments);

@@ -1,0 +1,41 @@
+<ion-view title="<i class='icon ion-android-clipboard positive'></i>">
+  <ion-content id="pnlContentMain" class="stable-bg">
+    <div ng-if="!recomendation" class="text-center">
+      <h1 class="positive">Nenhuma recomendação efetuada até à data</h1>
+    </div>
+
+    <div ng-if="recomendation">
+      <div class="row responsive-md">
+        <div class="col positive">{{getFormattedDate(recomendation.date)}}</div>
+        <div class="col"><span class="positive">Nível:</span> {{recomendation.level.value}}</div>
+      </div>
+      <div class="row responsive-md positive">
+
+      </div>
+      <div class="row responsive-md" ng-repeat="rec in recomendation.exercises">
+        <div class="col">
+          <label class="item item-input-inset">
+            <span class="positive" style="font-weight: bold">{{rec.duration}}</span>&nbsp;
+            Minutos&nbsp;A&nbsp;
+
+            <span class="positive" style="font-weight: bold">{{rec.type.value}}</span>&nbsp;
+            <span class="positive" style="font-weight: bold">{{rec.frequency}}</span>&nbsp;vezes por Semana
+          </label>
+        </div>
+      </div>
+      <div class="row responsive-md">
+        <div class="col">
+          <li class="item item-toggle positive">
+            Houve alteração da medicação durante a recomendação?
+            <label class="toggle toggle-positive">
+              <input disabled type="checkbox" name="{{key}}" ng-model="recomendation.medicationModified">
+              <div class="track">
+                <div class="handle"></div>
+              </div>
+            </label>
+          </li>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
