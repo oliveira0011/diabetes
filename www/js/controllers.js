@@ -1,8 +1,8 @@
 angular.module('app.controllers', [])
-  /**
-   *
-   * APPLICATION CONTROLLER
-   */
+/**
+ *
+ * APPLICATION CONTROLLER
+ */
   .controller('AppCtrl', function ($scope, $state, FirebaseService, MessageService) {
     $scope.logout = function () {
       FirebaseService.getDBConnection().unauth();
@@ -229,80 +229,149 @@ angular.module('app.controllers', [])
         $scope.timestampAux = ($scope.timestamp - $scope.currentIterationTimestamp) / 1000;
         if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 10) {
           if ($scope.currentIterationSpeed > 6) {//TODO: check, for now we reduced to -2
-            var runRef = FirebaseService.getDBConnection().child('physical_activity')
-              .child(FirebaseService.getCurrentUserUid())
-              .child($scope.getFormattedDate(new Date().getTime()))
-              .child("run");
-            runRef.transaction(function (current_value) {
-              return (current_value || 0) + 10;
-            });
 
-            var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
-              .child(FirebaseService.getCurrentUserUid())
-              .child($scope.getFormattedDate(new Date().getTime()))
-              .child("runSpeed");
-            runSpeedRef.transaction(function (current_value) {
-              return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
-            });
-            //  .push().set({
-            //  timestamp: $scope.timestamp,
-            //  x: $scope.x,
-            //  y: $scope.y,
-            //  z: $scope.z,
-            //  speed: $scope.currentIterationSpeed
-            //});
+
+            if (window.Connection && navigator.connection.type == Connection.NONE) {
+              var dataToStore = window.localStorage.getItem('dataToStore');
+              var date = $scope.getFormattedDate(new Date().getTime());
+              if (!dataToStore) {
+                dataToStore = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()]) {
+                dataToStore[FirebaseService.getCurrentUserUid()] = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = 0;
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["run"]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date]["run"] = 0;
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["run"]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date]["runSpeed"] = 0;
+              }
+              dataToStore[FirebaseService.getCurrentUserUid()][date]["run"] = dataToStore[FirebaseService.getCurrentUserUid()][date]["run"] + 10;
+              dataToStore[FirebaseService.getCurrentUserUid()][date]["runSpeed"] = !dataToStore[FirebaseService.getCurrentUserUid()][date]["runSpeed"] ? $scope.currentIterationSpeed : ((dataToStore[FirebaseService.getCurrentUserUid()][date]["runSpeed"] + $scope.currentIterationSpeed) / 2);
+
+              window.localStorage.setItem("dataToStore", dataToStore);
+
+            } else {
+              var runRef = FirebaseService.getDBConnection().child('physical_activity')
+                .child(FirebaseService.getCurrentUserUid())
+                .child($scope.getFormattedDate(date))
+                .child("run");
+              runRef.transaction(function (current_value) {
+                return (current_value || 0) + 10;
+              });
+
+              var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                .child(FirebaseService.getCurrentUserUid())
+                .child($scope.getFormattedDate(new Date().getTime()))
+                .child("runSpeed");
+              runSpeedRef.transaction(function (current_value) {
+                return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
+              });
+            }
+
+
           } else if ($scope.currentIterationSpeed > 0.2) {//TODO: check, for now we reduced to -2
-            var walkRef = FirebaseService.getDBConnection().child('physical_activity')
-              .child(FirebaseService.getCurrentUserUid())
-              .child($scope.getFormattedDate(new Date().getTime()))
-              .child("walk");
 
-            walkRef.transaction(function (current_value) {
-              return (current_value || 0) + 10;
-            });
+            if (window.Connection && navigator.connection.type == Connection.NONE) {
+              dataToStore = window.localStorage.getItem('dataToStore');
+              date = $scope.getFormattedDate(new Date().getTime());
+              if (!dataToStore) {
+                dataToStore = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()]) {
+                dataToStore[FirebaseService.getCurrentUserUid()] = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = 0;
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["walk"]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date]["walk"] = 0;
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["walkSpeed"]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date]["walkSpeed"] = 0;
+              }
+              dataToStore[FirebaseService.getCurrentUserUid()][date]["walk"] = dataToStore[FirebaseService.getCurrentUserUid()][date]["walk"] + 10;
+              dataToStore[FirebaseService.getCurrentUserUid()][date]["walkSpeed"] = !dataToStore[FirebaseService.getCurrentUserUid()][date]["walkSpeed"] ? $scope.currentIterationSpeed : ((dataToStore[FirebaseService.getCurrentUserUid()][date]["walkSpeed"] + $scope.currentIterationSpeed) / 2);
+
+              window.localStorage.setItem("dataToStore", dataToStore);
+
+            } else {
+              var walkRef = FirebaseService.getDBConnection().child('physical_activity')
+                .child(FirebaseService.getCurrentUserUid())
+                .child($scope.getFormattedDate(new Date().getTime()))
+                .child("walk");
+
+              walkRef.transaction(function (current_value) {
+                return (current_value || 0) + 10;
+              });
 
 
-            var walkSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
-              .child(FirebaseService.getCurrentUserUid())
-              .child($scope.getFormattedDate(new Date().getTime()))
-              .child("walkSpeed");
-            walkSpeedRef.transaction(function (current_value) {
-              return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
-            });
-            //.push().set({
-            //    timestamp: $scope.timestamp,
-            //    x: $scope.x,
-            //    y: $scope.y,
-            //    z: $scope.z,
-            //    speed: $scope.currentIterationSpeed
-            //  });
-            $scope.currentIterationTimestamp = $scope.timestamp;
-            $scope.currentIterationSpeed = 0;
+              var walkSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                .child(FirebaseService.getCurrentUserUid())
+                .child($scope.getFormattedDate(new Date().getTime()))
+                .child("walkSpeed");
+              walkSpeedRef.transaction(function (current_value) {
+                return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
+              });
+
+            }
           } else {
-            var idleRef = FirebaseService.getDBConnection().child('physical_activity')
-              .child(FirebaseService.getCurrentUserUid())
-              .child($scope.getFormattedDate(new Date().getTime()))
-              .child("idle");
 
-            idleRef.transaction(function (current_value) {
-              return (current_value || 0) + 10;
-            });
+            if (window.Connection && navigator.connection.type == Connection.NONE) {
+              dataToStore = window.localStorage.getItem('dataToStore');
+              date = $scope.getFormattedDate(new Date().getTime());
+              if (!dataToStore) {
+                dataToStore = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()]) {
+                dataToStore[FirebaseService.getCurrentUserUid()] = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = 0;
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = [];
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["idle"]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date]["idle"] = 0;
+              }
+              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["idleSpeed"]) {
+                dataToStore[FirebaseService.getCurrentUserUid()][date]["idleSpeed"] = 0;
+              }
+              dataToStore[FirebaseService.getCurrentUserUid()][date]["idle"] = dataToStore[FirebaseService.getCurrentUserUid()][date]["idle"] + 10;
+              dataToStore[FirebaseService.getCurrentUserUid()][date]["idleSpeed"] = !dataToStore[FirebaseService.getCurrentUserUid()][date]["idleSpeed"] ? $scope.currentIterationSpeed : ((dataToStore[FirebaseService.getCurrentUserUid()][date]["idleSpeed"] + $scope.currentIterationSpeed) / 2);
+
+              window.localStorage.setItem("dataToStore", dataToStore);
+
+            } else {
+              var idleRef = FirebaseService.getDBConnection().child('physical_activity')
+                .child(FirebaseService.getCurrentUserUid())
+                .child($scope.getFormattedDate(new Date().getTime()))
+                .child("idle");
+
+              idleRef.transaction(function (current_value) {
+                return (current_value || 0) + 10;
+              });
 
 
-            var idleSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
-              .child(FirebaseService.getCurrentUserUid())
-              .child($scope.getFormattedDate(new Date().getTime()))
-              .child("idleSpeed");
-            idleSpeedRef.transaction(function (current_value) {
-              return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
-            });
-            //.push().set({
-            //    timestamp: $scope.timestamp,
-            //    x: $scope.x,
-            //    y: $scope.y,
-            //    z: $scope.z,
-            //    speed: $scope.currentIterationSpeed
-            //  });
+              var idleSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                .child(FirebaseService.getCurrentUserUid())
+                .child($scope.getFormattedDate(new Date().getTime()))
+                .child("idleSpeed");
+              idleSpeedRef.transaction(function (current_value) {
+                return (!current_value ? $scope.currentIterationSpeed : ((current_value + $scope.currentIterationSpeed) / 2));
+              });
+            }
+
           }
           $scope.currentIterationTimestamp = $scope.timestamp;
           $scope.currentIterationSpeed = 0;
@@ -464,8 +533,10 @@ angular.module('app.controllers', [])
       $state.go('app.main');
     }
     $scope.loginData = {
-      username: 'oliveira_011@hotmail.com',
-      password: 'xptoxpto',
+      // username: 'oliveira_011@hotmail.com',
+      // password: 'xptoxpto',
+      username: '',
+      password: ''
     };
     $scope.doLogin = function (form) {
       delete $scope.errorMessage;
@@ -992,8 +1063,7 @@ angular.module('app.controllers', [])
       return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
     };
   })
-  .
-  controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+  .controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
     //$scope.user = {firstName:1,lastName:1,address:1,oldPassword:1};
     $scope.user = {};
     var dbConnection = FirebaseService.getDBConnection();
@@ -1250,9 +1320,9 @@ angular.module('app.controllers', [])
 
     init();
 
-    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams ){
+    $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
       console.log('stateChanged to: ', toState, toState.name === 'app.biomedic');
-      if(toState.name === 'app.biomedic'){
+      if (toState.name === 'app.biomedic') {
         init();
       }
     });
@@ -1335,17 +1405,69 @@ angular.module('app.controllers', [])
     }
   })
   .controller('RecomendationCtrl', function ($scope, FirebaseService, RecomendationService) {
-    RecomendationService.getCurrentRecomendation(FirebaseService.getCurrentUserUid(), function (recomendation) {
-      if (recomendation && recomendation !== null) {
-        var obj = recomendation;
-        var level = obj.level;
-        var aux = obj.toJson();
-        aux.level = level;
-        $scope.recomendation = aux;
-      } else {
-        $scope.recomendation = undefined;
+    $scope.currentIndex = 0;
+
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+      var month = date.getMonth() + 1;
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var seconds = date.getSeconds();
+      month = month < 10 ? '0' + month : month;
+      hours = hours < 10 ? '0' + hours : hours;
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      seconds = seconds < 10 ? '0' + seconds : seconds;
+      var year = date.getFullYear();
+      return day + "/" + month + '/' + year + " " + hours + ":" + minutes + ":" + seconds;
+    };
+
+    $scope.recomendations = [];
+    $scope.recomendation = undefined;
+
+    RecomendationService.getRecomendations(FirebaseService.getCurrentUserUid(), function (recomendations) {
+      if (recomendations && recomendations !== null) {
+        for (var i = 0; i < recomendations.length; i++) {
+          var obj = recomendations[i];
+
+          var level = obj.level;
+
+          var aux = obj.toJson();
+          aux.level = level;
+          $scope.recomendations.push(aux);
+        }
+        $scope.currentIndex = $scope.recomendations.length - 2;
+        $scope.recomendation = $scope.recomendations[$scope.currentIndex];
       }
     });
+
+    $scope.nextRecomendation = function () {
+
+      if ($scope.currentIndex == $scope.recomendations.length - 1) {
+        return;
+      }
+      $scope.recomendation = $scope.recomendations[$scope.currentIndex++];
+
+    };
+    $scope.previousRecomendation = function () {
+
+      if ($scope.currentIndex == 0) {
+        return;
+      }
+      $scope.recomendation = $scope.recomendations[$scope.currentIndex--];
+    };
+
+    // RecomendationService.getCurrentRecomendation(FirebaseService.getCurrentUserUid(), function (recomendation) {
+    //   if (recomendation && recomendation !== null) {
+    //     var obj = recomendation;
+    //     var level = obj.level;
+    //     var aux = obj.toJson();
+    //     aux.level = level;
+    //     $scope.recomendation = aux;
+    //   } else {
+    //     $scope.recomendation = undefined;
+    //   }
+    // });
   })
   .controller('MessageCtrl', function ($scope, MessageService, $stateParams, $state) {
     if ($stateParams.id) {

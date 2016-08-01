@@ -6,6 +6,14 @@
 
     <div ng-if="recomendation">
       <div class="row responsive-md">
+        <div class="col text-right">
+          <button class="button button-positive icon ion-chevron-left" ng-disabled="currentIndex === 0" ng-click="previousRecomendation()"></button>
+          <button class="text-right button button-positive icon ion-chevron-right" ng-disabled="recomendations.length - 2 <= currentIndex" ng-click="nextRecomendation()"></button>
+        </div>
+      </div>
+
+      <div class="row responsive-md">
+        <div class="col positive">Recomendação nº {{currentIndex}}</div>
         <div class="col positive">{{getFormattedDate(recomendation.date)}}</div>
         <div class="col"><span class="positive">Nível:</span> {{recomendation.level.value}}</div>
       </div>
