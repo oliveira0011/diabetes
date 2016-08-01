@@ -3,7 +3,7 @@ angular.module('app.controllers', [])
  *
  * APPLICATION CONTROLLER
  */
-  .controller('AppCtrl', function ($scope, $state, FirebaseService, MessageService) {
+  .controller('AppCtrl', function ($scope, $rootScope, $state, FirebaseService, MessageService) {
     $scope.logout = function () {
       FirebaseService.getDBConnection().unauth();
       FirebaseService.logoutCurrentUser();
