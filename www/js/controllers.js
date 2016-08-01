@@ -33,6 +33,61 @@ angular.module('app.controllers', [])
       }
       MessageService.registerNewNotificationsListener();
     });
+
+    $rootScope.$on('$cordovaNetwork:online', function (event, networkState) {
+      var dataToStore = window.localStorage.getItem("dataToStore");
+      alert(dataToStore);
+      if (!dataToStore) {
+        return
+      }
+      for (var userId in dataToStore) {
+        if (dataToStore.hasOwnProperty(userId)) {
+          for (var date in userId) {
+            if (userId.hasOwnProperty(date)) {
+              if (date["run"]) {
+                FirebaseService.getDBConnection().child('physical_activity')
+                  .child(userId)
+                  .child(date)
+                  .child("run").push(date["run"]);
+              }
+              if (date["runSpeed"]) {
+                FirebaseService.getDBConnection().child('physical_activity')
+                  .child(userId)
+                  .child(date)
+                  .child("runSpeed").push(date["runSpeed"]);
+              }
+              if (date["walk"]) {
+                FirebaseService.getDBConnection().child('physical_activity')
+                  .child(userId)
+                  .child(date)
+                  .child("walk").push(date["walk"]);
+              }
+              if (date["walkSpeed"]) {
+                FirebaseService.getDBConnection().child('physical_activity')
+                  .child(userId)
+                  .child(date)
+                  .child("walkSpeed").push(date["walkSpeed"]);
+              }
+              if (date["idle"]) {
+                FirebaseService.getDBConnection().child('physical_activity')
+                  .child(userId)
+                  .child(date)
+                  .child("idle").push(date["idle"]);
+              }
+              if (date["idleSpeed"]) {
+                FirebaseService.getDBConnection().child('physical_activity')
+                  .child(userId)
+                  .child(date)
+                  .child("idleSpeed").push(date["idleSpeed"]);
+              }
+            }
+          }
+        }
+      }
+      dataToStore = undefined;
+    });
+
+
   })
   .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http, TimerService) {
 
