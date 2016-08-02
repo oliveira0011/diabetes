@@ -86,10 +86,11 @@ angular.module('app.controllers', [])
       }
       dataToStore = undefined;
     });
-
+    var dataToStore = window.localStorage.getItem("dataToStore");
+    console.log("------>", dataToStore);
 
   })
-  .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http, TimerService) {
+  .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $cordovaNetwork, $ionicPlatform, FirebaseService, $http, TimerService) {
 
     $scope.getFormattedDate = function (timestamp) {
       var date = new Date(timestamp);
@@ -281,12 +282,13 @@ angular.module('app.controllers', [])
 
         $scope.currentIterationSpeed = ($scope.currentIterationSpeed + $scope.speedKm) / 2;
 
+        console.log($cordovaNetwork.isOffline());
+        console.log("------<" + navigator.connection.type);
         $scope.timestampAux = ($scope.timestamp - $scope.currentIterationTimestamp) / 1000;
         if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 10) {
           if ($scope.currentIterationSpeed > 6) {//TODO: check, for now we reduced to -2
 
-
-            if (window.Connection && navigator.connection.type == Connection.NONE) {
+            if ($cordovaNetwork.isOffline()) {
               var dataToStore = window.localStorage.getItem('dataToStore');
               var date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore) {
@@ -333,7 +335,7 @@ angular.module('app.controllers', [])
 
           } else if ($scope.currentIterationSpeed > 0.2) {//TODO: check, for now we reduced to -2
 
-            if (window.Connection && navigator.connection.type == Connection.NONE) {
+            if ($cordovaNetwork.isOffline()) {
               dataToStore = window.localStorage.getItem('dataToStore');
               date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore) {
@@ -381,7 +383,7 @@ angular.module('app.controllers', [])
             }
           } else {
 
-            if (window.Connection && navigator.connection.type == Connection.NONE) {
+            if ($cordovaNetwork.isOffline()) {
               dataToStore = window.localStorage.getItem('dataToStore');
               date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore) {
