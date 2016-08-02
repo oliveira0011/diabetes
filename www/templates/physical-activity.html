@@ -1,6 +1,20 @@
 <ion-view title="<i class='icon ion-ios-pulse positive'></i>">
   <ion-content id="pnlContentMain" class="stable-bg">
-    <div class="item item-text-wrap balanced">
+    <div ng-if="offline" class="assertive">
+      <div class="card text-center">
+        <i style="font-size: 30px" class=" icon ion-android-warning"></i>
+        <br/>
+        <br/>
+        <p style="font-size: 30px">
+          Sem ligação à rede.
+        </p>
+        <br/>
+        <p style="padding-left: 20px" class="text-left">
+          Por favor conecte-se a uma rede Wi-Fi ou ligue os seus dados móveis para poder ver o seu gráfico de atividade.
+        </p>
+      </div>
+    </div>
+    <div ng-if="!offline" class="item item-text-wrap balanced">
       <div class="row responsive-lg">
         <div class="col">
           <div fusioncharts width="100%" height="200"

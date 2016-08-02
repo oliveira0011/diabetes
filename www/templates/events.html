@@ -1,12 +1,26 @@
 <ion-view title="<i class='icon ion-ios-location positive'></i>">
   <ion-nav-buttons side="secondary">
-    <a class="button button-clear button-positive" href="#/app/event/new">
+    <a  ng-if="!offline" class="button button-clear button-positive" href="#/app/event/new">
       <i class="icon ion-ios-plus-outline"></i>
       <!--Novo Evento-->
     </a>
   </ion-nav-buttons>
   <ion-content class="stable-bg">
-    <ion-list class="list">
+    <div ng-if="offline" class="assertive">
+      <div class="card text-center">
+        <i style="font-size: 30px" class=" icon ion-android-warning"></i>
+        <br/>
+        <br/>
+        <p style="font-size: 30px">
+          Sem ligação à rede.
+        </p>
+        <br/>
+        <p style="padding-left: 20px" class="text-left">
+          Por favor conecte-se a uma rede Wi-Fi ou ligue os seus dados móveis para poder gerir os seus eventos.
+        </p>
+      </div>
+    </div>
+    <ion-list ng-if="!offline" class="list">
       <ion-item ng-class="{'item-stable': event.outdated, 'new-item-border': !event.seen}"
                 class="item item-icon-right positive" href="#/app/event/{{event.id}}"
                 ng-repeat="event in filteredEvents track by $index">

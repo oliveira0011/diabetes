@@ -52,18 +52,25 @@
         </div>
         <div class="row">
           <div class="col">
-            <button class="button button-outline button-block button-positive" type="submit">Iniciar
+            <button ng-disabled="offline" class="button button-outline button-block button-positive" type="submit">
+              Iniciar
               sessão
             </button>
           </div>
         </div>
         <div class="row">
           <button class="text-right button-small button-clear button-block button-positive" type="button"
-                  ng-click="resetPassword()">Esqueci-me da
+                  ng-disabled="offline" ng-click="resetPassword()">Esqueci-me da
             minha palavra-passe
           </button>
         </div>
-      </div>
+        <div ng-if="offline" class="row energized">
+          <div class="col">
+          <div><i style="font-size: 30px" class=" icon ion-android-warning"></i>
+            Sem ligação à rede.
+          </div>
+          </div>
+        </div>
     </form>
   </ion-content>
 </ion-view>

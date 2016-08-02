@@ -547,6 +547,22 @@ angular.module('app.services', [])
         handler();
       });
     };
+    recomendationService.transformRecomendations = function (value, userId, handler) {
+      if (!FirebaseService.isUserLogged()) {
+        console.log('invalidUser');
+        $rootScope.$broadcast('logoutUser');
+      }
+      var arrayToReturn = [];
+      for (var first in value) {
+        if (value.hasOwnProperty(first)) {
+          var rec = new Recomendation(RecomendationLevel[value[first].level], value[first].medicationModified, value[first].exercises);
+          rec.id = first;
+          rec.date = value[first].date;
+          arrayToReturn.push(rec);
+        }
+      }
+      handler(arrayToReturn);
+    };
     recomendationService.getRecomendations = function (userId, handler) {
       if (!FirebaseService.isUserLogged()) {
         console.log('invalidUser');

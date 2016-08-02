@@ -9,7 +9,21 @@
 </style>
 <ion-view view-title="{{newEvent? 'Novo' : 'Editar'}} Evento">
   <ion-content class="stable-bg">
-    <form name="form" class="" novalidate ng-submit="saveEvent(form)">
+    <div ng-if="offline" class="assertive">
+      <div class="card text-center">
+        <i style="font-size: 30px" class=" icon ion-android-warning"></i>
+        <br/>
+        <br/>
+        <p style="font-size: 30px">
+          Sem ligação à rede.
+        </p>
+        <br/>
+        <p style="padding-left: 20px" class="text-left">
+          Por favor conecte-se a uma rede Wi-Fi ou ligue os seus dados móveis para poder gerir os seus eventos.
+        </p>
+      </div>
+    </div>
+    <form ng-if="!offline" name="form" class="" novalidate ng-submit="saveEvent(form)">
       <div class="row responsive-sm">
         <div class="col">
           <label class="item item-input">

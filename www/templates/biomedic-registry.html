@@ -1,6 +1,20 @@
 <ion-view view-title="Novo Registo Biomédico" class="">
   <ion-content>
-    <div class="row responsive-sm">
+    <div ng-if="offline" class="assertive">
+      <div class="card text-center">
+        <i style="font-size: 30px" class=" icon ion-android-warning"></i>
+        <br/>
+        <br/>
+        <p style="font-size: 30px">
+          Sem ligação à rede.
+        </p>
+        <br/>
+        <p style="padding-left: 20px" class="text-left">
+          Por favor conecte-se a uma rede Wi-Fi ou ligue os seus dados móveis para poder registar um novo dado biomédico.
+        </p>
+      </div>
+    </div>
+    <div ng-if="!offline" class="row responsive-sm">
       <form name="form" novalidate class="col-offset-25 col col-50" ng-submit="saveBiomedic(form)">
         <div class="list">
           <div class="list">

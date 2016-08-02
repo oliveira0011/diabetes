@@ -1,6 +1,20 @@
 <ion-view title="Caixa de Mensagens">
   <ion-content>
-    <ion-list class="list">
+    <div ng-if="offline" class="assertive">
+      <div class="card text-center">
+        <i style="font-size: 30px" class=" icon ion-android-warning"></i>
+        <br/>
+        <br/>
+        <p style="font-size: 30px">
+          Sem ligação à rede.
+        </p>
+        <br/>
+        <p style="padding-left: 20px" class="text-left">
+          Por favor conecte-se a uma rede Wi-Fi ou ligue os seus dados móveis para poder consultar as suas mensagens.
+        </p>
+      </div>
+    </div>
+    <ion-list ng-if="!offline" class="list">
       <ion-item ng-if="message.type !== 'event'" ng-click="markAsSeen(message)" ng-class="{'item-stable': message.seen, 'new-message-border': !message.seen}" class="item item-avatar item-icon-right positive" href="#/app/message/{{message.id}}" ng-repeat="message in messages track by message.id">
         <h2 class="positive">{{message.title}}</h2>
         <h3 class="dark">{{getFormattedDate(message.date)}}</h3>

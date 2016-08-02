@@ -9,8 +9,21 @@
 </style>
 <ion-view view-title="{{event.name}}">
   <ion-content padding="16" class="stable-bg">
-
-    <div class="row responsive-sm" style="max-height: 45px;">
+    <div ng-if="offline" class="assertive">
+      <div class="card text-center">
+        <i style="font-size: 30px" class=" icon ion-android-warning"></i>
+        <br/>
+        <br/>
+        <p style="font-size: 30px">
+          Sem ligação à rede.
+        </p>
+        <br/>
+        <p style="padding-left: 20px" class="text-left">
+          Por favor conecte-se a uma rede Wi-Fi ou ligue os seus dados móveis para poder consultar os seus eventos.
+        </p>
+      </div>
+    </div>
+    <div ng-if="!offline" class="row responsive-sm" style="max-height: 45px;">
       <div class="col">
         <h2 class="positive"><i ng-if="participate" class="balanced ion-ios-checkmark"></i> {{event.name}}</h2>
       </div>

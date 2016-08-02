@@ -1,75 +1,91 @@
 <ion-view title="<i class='icon ion-heart positive'></i>">
   <ion-nav-buttons side="secondary">
-    <a class="button button-clear button-positive" href="#/app/biomedic/registry">
+    <a class="button button-clear button-positive" ng-if="!offline" href="#/app/biomedic/registry">
       <i class="icon ion-ios-plus-outline"></i>
       <!--Novo Dado Biomédico-->
     </a>
   </ion-nav-buttons>
   <ion-content class="stable-bg">
-    <div class="row responsive-lg">
-      <div class="col col-50">
-        <div class="card">
-          <div class="item item-body">
-            <fusioncharts width="100%"
-                          id="lineCardiacFrequency"
-                          type="zoomline"
-                          chart="{{chartCardiacFrequency.attrs}}" categories="{{chartCardiacFrequency.categories}}"
-                          dataset="{{chartCardiacFrequency.dataset}}">
-            </fusioncharts>
+    <div ng-if="!offline">
+      <div class="row responsive-lg">
+        <div class="col col-50">
+          <div class="card">
+            <div class="item item-body">
+              <fusioncharts width="100%"
+                            id="lineCardiacFrequency"
+                            type="zoomline"
+                            chart="{{chartCardiacFrequency.attrs}}" categories="{{chartCardiacFrequency.categories}}"
+                            dataset="{{chartCardiacFrequency.dataset}}">
+              </fusioncharts>
+            </div>
+          </div>
+        </div>
+        <div class="col col-50">
+          <div class="card">
+            <div class="item item-body">
+              <fusioncharts width="100%"
+                            id="lineBloodPressure"
+                            type="zoomline"
+                            chart="{{chartBloodPressure.attrs}}" categories="{{chartBloodPressure.categories}}"
+                            dataset="{{chartBloodPressure.dataset}}">
+              </fusioncharts>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col col-50">
-        <div class="card">
-          <div class="item item-body">
-            <fusioncharts width="100%"
-                          id="lineBloodPressure"
-                          type="zoomline"
-                          chart="{{chartBloodPressure.attrs}}" categories="{{chartBloodPressure.categories}}"
-                          dataset="{{chartBloodPressure.dataset}}">
-            </fusioncharts>
+      <div class="row responsive-lg">
+        <div class="col col-50">
+          <div class="card">
+            <div class="item item-body">
+              <fusioncharts width="100%"
+                            id="lineCholesterol"
+                            type="zoomline"
+                            chart="{{chartCholesterol.attrs}}" categories="{{chartCholesterol.categories}}"
+                            dataset="{{chartCholesterol.dataset}}">
+              </fusioncharts>
+            </div>
+          </div>
+        </div>
+        <div class="col col-50">
+          <div class="card">
+            <div class="item item-body">
+              <fusioncharts width="100%"
+                            id="zoomline"
+                            type="msline"
+                            chart="{{chartWeight.attrs}}" categories="{{chartWeight.categories}}"
+                            dataset="{{chartWeight.dataset}}">
+              </fusioncharts>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row responsive-lg">
+        <div class="col col-50">
+          <div class="card">
+            <div class="item item-body">
+              <fusioncharts width="100%"
+                            id="lineAbdominalGirth"
+                            type="zoomline"
+                            chart="{{chartAbdominalGirth.attrs}}" categories="{{chartAbdominalGirth.categories}}"
+                            dataset="{{chartAbdominalGirth.dataset}}">
+              </fusioncharts>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="row responsive-lg">
-      <div class="col col-50">
-        <div class="card">
-          <div class="item item-body">
-            <fusioncharts width="100%"
-                          id="lineCholesterol"
-                          type="zoomline"
-                          chart="{{chartCholesterol.attrs}}" categories="{{chartCholesterol.categories}}"
-                          dataset="{{chartCholesterol.dataset}}">
-            </fusioncharts>
-          </div>
-        </div>
-      </div>
-      <div class="col col-50">
-        <div class="card">
-          <div class="item item-body">
-            <fusioncharts width="100%"
-                          id="zoomline"
-                          type="msline"
-                          chart="{{chartWeight.attrs}}" categories="{{chartWeight.categories}}"
-                          dataset="{{chartWeight.dataset}}">
-            </fusioncharts>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row responsive-lg">
-      <div class="col col-50">
-        <div class="card">
-          <div class="item item-body">
-            <fusioncharts width="100%"
-                          id="lineAbdominalGirth"
-                          type="zoomline"
-                          chart="{{chartAbdominalGirth.attrs}}" categories="{{chartAbdominalGirth.categories}}"
-                          dataset="{{chartAbdominalGirth.dataset}}">
-            </fusioncharts>
-          </div>
-        </div>
+    <div ng-if="offline" class="assertive">
+      <div class="card text-center">
+        <i style="font-size: 30px" class=" icon ion-android-warning"></i>
+        <br/>
+        <br/>
+        <p style="font-size: 30px">
+          Sem ligação à rede.
+        </p>
+        <br/>
+        <p style="padding-left: 20px" class="text-left">
+          Por favor conecte-se a uma rede Wi-Fi ou ligue os seus dados móveis para poder ver os gráficos relativos aos seus dados biomédicos e registar novos dados.
+        </p>
       </div>
     </div>
   </ion-content>

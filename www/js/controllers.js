@@ -34,60 +34,103 @@ angular.module('app.controllers', [])
       MessageService.registerNewNotificationsListener();
     });
 
+    $rootScope.$on('$cordovaNetwork:offline', function (event, networkState) {
+      $rootScope.$broadcast('offline');
+    });
     $rootScope.$on('$cordovaNetwork:online', function (event, networkState) {
+      $rootScope.$broadcast('online');
       var dataToStore = window.localStorage.getItem("dataToStore");
-      alert(dataToStore);
+      dataToStore = JSON.parse(dataToStore);
       if (!dataToStore) {
         return
       }
       for (var userId in dataToStore) {
         if (dataToStore.hasOwnProperty(userId)) {
-          for (var date in userId) {
-            if (userId.hasOwnProperty(date)) {
+          for (var datee in dataToStore[userId]) {
+            if (dataToStore[userId].hasOwnProperty(datee)) {
+              var date = dataToStore[userId][datee];
               if (date["run"]) {
-                FirebaseService.getDBConnection().child('physical_activity')
-                  .child(userId)
-                  .child(date)
-                  .child("run").push(date["run"]);
+                (function () {
+                  var runRef = FirebaseService.getDBConnection().child('physical_activity')
+                    .child(userId)
+                    .child(datee)
+                    .child("run");
+                  var x = date["run"];
+                  runRef.transaction(function (current_value) {
+                    return (current_value || 0) + x;
+                  });
+                })();
+
+
               }
               if (date["runSpeed"]) {
-                FirebaseService.getDBConnection().child('physical_activity')
-                  .child(userId)
-                  .child(date)
-                  .child("runSpeed").push(date["runSpeed"]);
+                (function () {
+                  var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                    .child(userId)
+                    .child(datee)
+                    .child("runSpeed");
+
+                  var x = date["runSpeed"];
+                  runSpeedRef.transaction(function (current_value) {
+                    return (!current_value ? x : ((current_value + x) / 2));
+                  });
+                })();
               }
               if (date["walk"]) {
-                FirebaseService.getDBConnection().child('physical_activity')
-                  .child(userId)
-                  .child(date)
-                  .child("walk").push(date["walk"]);
+                (function () {
+                  var runRef = FirebaseService.getDBConnection().child('physical_activity')
+                    .child(userId)
+                    .child(datee)
+                    .child("walk");
+                  var x = date["walk"];
+                  runRef.transaction(function (current_value) {
+                    return (current_value || 0) + x;
+                  });
+                })();
               }
               if (date["walkSpeed"]) {
-                FirebaseService.getDBConnection().child('physical_activity')
-                  .child(userId)
-                  .child(date)
-                  .child("walkSpeed").push(date["walkSpeed"]);
+                (function () {
+                  var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                    .child(userId)
+                    .child(datee)
+                    .child("walkSpeed");
+                  var x = date["walkSpeed"];
+                  runSpeedRef.transaction(function (current_value) {
+                    return (!current_value ? x : ((current_value + x) / 2));
+                  });
+                })();
               }
               if (date["idle"]) {
-                FirebaseService.getDBConnection().child('physical_activity')
-                  .child(userId)
-                  .child(date)
-                  .child("idle").push(date["idle"]);
+                (function () {
+                  var runRef = FirebaseService.getDBConnection().child('physical_activity')
+                    .child(userId)
+                    .child(datee)
+                    .child("idle");
+                  var x = date["idle"];
+                  runRef.transaction(function (current_value) {
+                    return (current_value || 0) + x;
+                  });
+                })();
               }
               if (date["idleSpeed"]) {
-                FirebaseService.getDBConnection().child('physical_activity')
-                  .child(userId)
-                  .child(date)
-                  .child("idleSpeed").push(date["idleSpeed"]);
+                (function () {
+                  var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                    .child(userId)
+                    .child(datee)
+                    .child("idleSpeed");
+                  var x = date["idleSpeed"];
+                  runSpeedRef.transaction(function (current_value) {
+                    return (!current_value ? x : ((current_value + x) / 2));
+                  });
+                })();
               }
             }
           }
         }
       }
       dataToStore = undefined;
+      window.localStorage.removeItem("dataToStore");
     });
-    var dataToStore = window.localStorage.getItem("dataToStore");
-    console.log("------>", dataToStore);
 
   })
   .controller('MainCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $cordovaNetwork, $ionicPlatform, FirebaseService, $http, TimerService) {
@@ -282,26 +325,21 @@ angular.module('app.controllers', [])
 
         $scope.currentIterationSpeed = ($scope.currentIterationSpeed + $scope.speedKm) / 2;
 
-        console.log($cordovaNetwork.isOffline());
-        console.log("------<" + navigator.connection.type);
         $scope.timestampAux = ($scope.timestamp - $scope.currentIterationTimestamp) / 1000;
         if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 10) {
           if ($scope.currentIterationSpeed > 6) {//TODO: check, for now we reduced to -2
 
             if ($cordovaNetwork.isOffline()) {
-              var dataToStore = window.localStorage.getItem('dataToStore');
+              var dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               var date = $scope.getFormattedDate(new Date().getTime());
-              if (!dataToStore) {
-                dataToStore = [];
+              if (!dataToStore || dataToStore.length > 0) {
+                dataToStore = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()]) {
-                dataToStore[FirebaseService.getCurrentUserUid()] = [];
+                dataToStore[FirebaseService.getCurrentUserUid()] = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
-                dataToStore[FirebaseService.getCurrentUserUid()][date] = 0;
-              }
-              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
-                dataToStore[FirebaseService.getCurrentUserUid()][date] = [];
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["run"]) {
                 dataToStore[FirebaseService.getCurrentUserUid()][date]["run"] = 0;
@@ -312,7 +350,7 @@ angular.module('app.controllers', [])
               dataToStore[FirebaseService.getCurrentUserUid()][date]["run"] = dataToStore[FirebaseService.getCurrentUserUid()][date]["run"] + 10;
               dataToStore[FirebaseService.getCurrentUserUid()][date]["runSpeed"] = !dataToStore[FirebaseService.getCurrentUserUid()][date]["runSpeed"] ? $scope.currentIterationSpeed : ((dataToStore[FirebaseService.getCurrentUserUid()][date]["runSpeed"] + $scope.currentIterationSpeed) / 2);
 
-              window.localStorage.setItem("dataToStore", dataToStore);
+              window.localStorage.setItem("dataToStore", JSON.stringify(dataToStore));
 
             } else {
               var runRef = FirebaseService.getDBConnection().child('physical_activity')
@@ -336,19 +374,16 @@ angular.module('app.controllers', [])
           } else if ($scope.currentIterationSpeed > 0.2) {//TODO: check, for now we reduced to -2
 
             if ($cordovaNetwork.isOffline()) {
-              dataToStore = window.localStorage.getItem('dataToStore');
+              dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               date = $scope.getFormattedDate(new Date().getTime());
-              if (!dataToStore) {
-                dataToStore = [];
+              if (!dataToStore || dataToStore.length > 0) {
+                dataToStore = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()]) {
-                dataToStore[FirebaseService.getCurrentUserUid()] = [];
+                dataToStore[FirebaseService.getCurrentUserUid()] = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
-                dataToStore[FirebaseService.getCurrentUserUid()][date] = 0;
-              }
-              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
-                dataToStore[FirebaseService.getCurrentUserUid()][date] = [];
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["walk"]) {
                 dataToStore[FirebaseService.getCurrentUserUid()][date]["walk"] = 0;
@@ -359,7 +394,7 @@ angular.module('app.controllers', [])
               dataToStore[FirebaseService.getCurrentUserUid()][date]["walk"] = dataToStore[FirebaseService.getCurrentUserUid()][date]["walk"] + 10;
               dataToStore[FirebaseService.getCurrentUserUid()][date]["walkSpeed"] = !dataToStore[FirebaseService.getCurrentUserUid()][date]["walkSpeed"] ? $scope.currentIterationSpeed : ((dataToStore[FirebaseService.getCurrentUserUid()][date]["walkSpeed"] + $scope.currentIterationSpeed) / 2);
 
-              window.localStorage.setItem("dataToStore", dataToStore);
+              window.localStorage.setItem("dataToStore", JSON.stringify(dataToStore));
 
             } else {
               var walkRef = FirebaseService.getDBConnection().child('physical_activity')
@@ -384,19 +419,16 @@ angular.module('app.controllers', [])
           } else {
 
             if ($cordovaNetwork.isOffline()) {
-              dataToStore = window.localStorage.getItem('dataToStore');
+              dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               date = $scope.getFormattedDate(new Date().getTime());
-              if (!dataToStore) {
-                dataToStore = [];
+              if (!dataToStore || dataToStore.length > 0) {
+                dataToStore = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()]) {
-                dataToStore[FirebaseService.getCurrentUserUid()] = [];
+                dataToStore[FirebaseService.getCurrentUserUid()] = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
-                dataToStore[FirebaseService.getCurrentUserUid()][date] = 0;
-              }
-              if (!dataToStore[FirebaseService.getCurrentUserUid()][date]) {
-                dataToStore[FirebaseService.getCurrentUserUid()][date] = [];
+                dataToStore[FirebaseService.getCurrentUserUid()][date] = {};
               }
               if (!dataToStore[FirebaseService.getCurrentUserUid()][date]["idle"]) {
                 dataToStore[FirebaseService.getCurrentUserUid()][date]["idle"] = 0;
@@ -407,8 +439,7 @@ angular.module('app.controllers', [])
               dataToStore[FirebaseService.getCurrentUserUid()][date]["idle"] = dataToStore[FirebaseService.getCurrentUserUid()][date]["idle"] + 10;
               dataToStore[FirebaseService.getCurrentUserUid()][date]["idleSpeed"] = !dataToStore[FirebaseService.getCurrentUserUid()][date]["idleSpeed"] ? $scope.currentIterationSpeed : ((dataToStore[FirebaseService.getCurrentUserUid()][date]["idleSpeed"] + $scope.currentIterationSpeed) / 2);
 
-              window.localStorage.setItem("dataToStore", dataToStore);
-
+              window.localStorage.setItem("dataToStore", JSON.stringify(dataToStore));
             } else {
               var idleRef = FirebaseService.getDBConnection().child('physical_activity')
                 .child(FirebaseService.getCurrentUserUid())
@@ -446,145 +477,172 @@ angular.module('app.controllers', [])
       }
     });
   })
-  .controller('PhysicalActivityCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $ionicPlatform, FirebaseService, $http, TimerService) {
+  .controller('PhysicalActivityCtrl', function ($scope, $timeout, $window, $state, $cordovaDeviceMotion, $cordovaNetwork, $ionicPlatform, FirebaseService, $http, TimerService) {
 
-    $scope.getFormattedDate = function (timestamp) {
-      var date = new Date(timestamp);
-      var day = date.getDate();
-      var month = date.getMonth() + 1;
-      month = month < 10 ? '0' + month : month;
-      day = day < 10 ? '0' + day : day;
-      var year = date.getFullYear();
-      return day + "-" + month + '-' + year;
-    };
+    var init = function () {
+      $scope.getFormattedDate = function (timestamp) {
+        var date = new Date(timestamp);
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        month = month < 10 ? '0' + month : month;
+        day = day < 10 ? '0' + day : day;
+        var year = date.getFullYear();
+        return day + "-" + month + '-' + year;
+      };
 
-    $scope.attrs = {
-      caption: "Minutos / Categoria de Exercício",
-      yaxisname: "Segundos",
-      xaxisname: "Categoria de exercício",
-      bgcolor: "FFFFFF",
-      animation: "0",
-      showalternatehgridcolor: "0",
-      divlinecolor: "CCCCCC",
-      showvalues: "0",
-      showcanvasborder: "0",
-      legendshadow: "0",
-      legendborderalpha: "0",
-      showborder: "0",
-      anchorAlpha: '0'
-    };
-
-
-    $scope.categories = [{
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }, {
-      category: []
-    }];
-
-    $scope.dataset = [{
-      "seriesName": "Andar",
-      "data": [{}, {}, {}, {}, {}, {}, {}]
-    }, {
-      "seriesName": "Correr",
-      "data": [{}, {}, {}, {}, {}, {}, {}]
-    }];
+      $scope.attrs = {
+        caption: "Minutos / Categoria de Exercício",
+        yaxisname: "Segundos",
+        xaxisname: "Categoria de exercício",
+        bgcolor: "FFFFFF",
+        animation: "0",
+        showalternatehgridcolor: "0",
+        divlinecolor: "CCCCCC",
+        showvalues: "0",
+        showcanvasborder: "0",
+        legendshadow: "0",
+        legendborderalpha: "0",
+        showborder: "0",
+        anchorAlpha: '0'
+      };
 
 
-    var roundedMinutesWalk = 0;
-    var roundedSecondsWalk = 0;
+      $scope.categories = [{
+        category: []
+      }, {
+        category: []
+      }, {
+        category: []
+      }, {
+        category: []
+      }, {
+        category: []
+      }, {
+        category: []
+      }, {
+        category: []
+      }];
 
-    var roundedMinutesRun = 0;
-    var roundedSecondsRun = 0;
-    $scope.trendlines = [
-      {
-        "line": [
-          {
-            "startvalue": "600",
-            "color": "#0075c2",
-            "displayvalue": "Caminhada",
-            "valueOnRight": "1",
-            "thickness": "1",
-            "showBelow": "1",
-            "tooltext": "Andar: " + roundedMinutesWalk + ":" + roundedSecondsWalk + "m"
-          },
-          {
-            "startvalue": "200",
-            "color": "#1aaf5d",
-            "displayvalue": "Corrida",
-            "valueOnRight": "1",
-            "thickness": "1",
-            "showBelow": "1",
-            "tooltext": "Corrida: " + roundedMinutesRun + ":" + roundedSecondsRun + "m"
-          }
-        ]
+      $scope.dataset = [{
+        "seriesName": "Andar",
+        "data": [{}, {}, {}, {}, {}, {}, {}]
+      }, {
+        "seriesName": "Correr",
+        "data": [{}, {}, {}, {}, {}, {}, {}]
+      }];
+
+
+      var roundedMinutesWalk = 0;
+      var roundedSecondsWalk = 0;
+
+      var roundedMinutesRun = 0;
+      var roundedSecondsRun = 0;
+      $scope.trendlines = [
+        {
+          "line": [
+            {
+              "startvalue": "600",
+              "color": "#0075c2",
+              "displayvalue": "Caminhada",
+              "valueOnRight": "1",
+              "thickness": "1",
+              "showBelow": "1",
+              "tooltext": "Andar: " + roundedMinutesWalk + ":" + roundedSecondsWalk + "m"
+            },
+            {
+              "startvalue": "200",
+              "color": "#1aaf5d",
+              "displayvalue": "Corrida",
+              "valueOnRight": "1",
+              "thickness": "1",
+              "showBelow": "1",
+              "tooltext": "Corrida: " + roundedMinutesRun + ":" + roundedSecondsRun + "m"
+            }
+          ]
+        }
+      ];
+
+      var fillSerie = function (serieNumber) {
+        serieNumber = 6 - serieNumber;
+        var formattedDate = $scope.getFormattedDate(new Date().getTime() - (86400000 * serieNumber));
+        $scope.categories[0].category[serieNumber] = {label: formattedDate};
+        if (serieNumber == 0) {
+          FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
+            .on('value', function (snap) {
+              $scope.dataset[0].data[serieNumber] = {};
+              $scope.dataset[1].data[serieNumber] = {};
+              var items = snap.val();
+              console.log(formattedDate, items);
+              if (items == null) {
+                items = {
+                  walk: 0,
+                  run: 0
+                }
+              }
+              //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
+              $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: items.walk});
+              $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: items.run});
+            });
+        } else {
+          FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
+            .once('value', function (snap) {
+              $scope.dataset[0].data[serieNumber] = {};
+              $scope.dataset[1].data[serieNumber] = {};
+              var items = snap.val();
+              console.log(formattedDate, items);
+              if (items == null) {
+                items = {
+                  idle: 0,
+                  walk: 0,
+                  run: 0
+                }
+              }
+              if (items == null) {
+                items = {
+                  idle: 0,
+                  walk: 0,
+                  run: 0
+                }
+              }
+              console.log(serieNumber);
+              //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
+              $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: items.walk});
+              $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: items.run});
+            });
+        }
+      };
+
+      for (var i = 0; i < 7; i++) {
+        fillSerie(i);
       }
-    ];
-
-    var fillSerie = function (serieNumber) {
-      serieNumber = 6 - serieNumber;
-      var formattedDate = $scope.getFormattedDate(new Date().getTime() - (86400000 * serieNumber));
-      $scope.categories[0].category[serieNumber] = {label: formattedDate};
-      if (serieNumber == 0) {
-        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
-          .on('value', function (snap) {
-            $scope.dataset[0].data[serieNumber] = {};
-            $scope.dataset[1].data[serieNumber] = {};
-            var items = snap.val();
-            console.log(formattedDate, items);
-            if (items == null) {
-              items = {
-                walk: 0,
-                run: 0
-              }
-            }
-            //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
-            $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: items.walk});
-            $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: items.run});
-          });
-      } else {
-        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
-          .once('value', function (snap) {
-            $scope.dataset[0].data[serieNumber] = {};
-            $scope.dataset[1].data[serieNumber] = {};
-            var items = snap.val();
-            console.log(formattedDate, items);
-            if (items == null) {
-              items = {
-                idle: 0,
-                walk: 0,
-                run: 0
-              }
-            }
-            if (items == null) {
-              items = {
-                idle: 0,
-                walk: 0,
-                run: 0
-              }
-            }
-            console.log(serieNumber);
-            //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
-            $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: items.walk});
-            $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: items.run});
-          });
-      }
     };
 
-    for (var i = 0; i < 7; i++) {
-      fillSerie(i);
-    }
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        init();
+      });
+      if (!$scope.offline) {
+        init();
+      }
+    });
   })
-  .controller('LoginCtrl', function ($scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
+  .controller('LoginCtrl', function ($rootScope, $cordovaNetwork, $ionicPlatform, $scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
+    // $scope.offline = true;
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+    });
+    $rootScope.$on('$cordovaNetwork:offline', function (event, networkState) {
+      $scope.offline = true;
+    });
+    $rootScope.$on('$cordovaNetwork:online', function (event, networkState) {
+      $scope.offline = false;
+    });
+
     if (FirebaseService.isUserLogged()) {
       FirebaseService.checkDeviceToken();
       $state.go('app.main');
@@ -734,8 +792,8 @@ angular.module('app.controllers', [])
   })
   .controller('PlaylistCtrl', function ($scope, $stateParams) {
   })
-  .controller('EventsCtrl', function (FirebaseService, EventsService, $scope, $ionicTabsDelegate, $ionicPlatform) {
-    $scope.events = [];
+  .controller('EventsCtrl', function ($ionicPlatform, FirebaseService, $cordovaNetwork, EventsService, $scope, $ionicTabsDelegate) {
+
     function clone(obj) {
       if (null == obj || "object" != typeof obj) return obj;
       var copy = obj.constructor();
@@ -791,11 +849,11 @@ angular.module('app.controllers', [])
       }
 
     };
+    var init = function () {
+      $scope.events = [];
 
-
-    $scope.filter = 'new';
-    $scope.filteredEvents = [];
-    $ionicPlatform.ready(function () {
+      $scope.filter = 'new';
+      $scope.filteredEvents = [];
       EventsService.getAllEvents(function (evt1) {
         if (!$scope.filter) {
           return;
@@ -828,25 +886,41 @@ angular.module('app.controllers', [])
           $scope.$apply();
         }
       });
-    });
-    $scope.getFormattedDate = function (timestamp) {
-      var date = new Date(timestamp);
-      var day = date.getDate();
-      var month = date.getMonth() + 1;
-      var hour = date.getHours();
-      var minute = date.getMinutes();
-      var second = date.getSeconds();
-      month = month < 10 ? '0' + month : month;
-      day = day < 10 ? '0' + day : day;
-      hour = hour < 10 ? '0' + hour : hour;
-      minute = minute < 10 ? '0' + minute : minute;
-      second = second < 10 ? '0' + second : second;
-      var year = date.getFullYear();
-      return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
+      $scope.getFormattedDate = function (timestamp) {
+        var date = new Date(timestamp);
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var hour = date.getHours();
+        var minute = date.getMinutes();
+        var second = date.getSeconds();
+        month = month < 10 ? '0' + month : month;
+        day = day < 10 ? '0' + day : day;
+        hour = hour < 10 ? '0' + hour : hour;
+        minute = minute < 10 ? '0' + minute : minute;
+        second = second < 10 ? '0' + second : second;
+        var year = date.getFullYear();
+        return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
+      };
+
     };
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        init();
+      });
+      if (!$scope.offline) {
+        init();
+      }
+    });
 
   })
-  .controller('EventCtrl', function (Friend, Event, EventsService, $scope, $ionicLoading, $compile, $state, $stateParams, $ionicModal, FriendsService) {
+  .controller('EventCtrl', function ($ionicPlatform, Friend, Event, EventsService, $cordovaNetwork, $scope, $ionicLoading, $compile, $state, $stateParams, $ionicModal, FriendsService) {
+
+
     if ($stateParams.id) {
       $scope.event = EventsService.events[$stateParams.id];
       $scope.newEvent = false;
@@ -875,18 +949,6 @@ angular.module('app.controllers', [])
       }
       $scope.selectAll = !$scope.selectAll;
     };
-
-    FriendsService.getFriends(function (friends) {
-      $scope.friends = friends;
-      $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
-      if ($scope.selectAll) {
-        $scope.toggleAll();
-      }
-    });
-
-    $scope.friends = [];
-    $scope.selectedFriends = [];
-    $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
 
     $scope.toggleFriend = function (friend) {
       if (friend.selected) {
@@ -1043,8 +1105,34 @@ angular.module('app.controllers', [])
       delete $scope.geoLocation;
       $scope.closeModalLocation();
     }
+
+    var init = function () {
+      $scope.friends = [];
+      $scope.selectedFriends = [];
+      $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
+      FriendsService.getFriends(function (friends) {
+        $scope.friends = friends;
+        $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
+        if ($scope.selectAll) {
+          $scope.toggleAll();
+        }
+      });
+    };
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        init();
+      });
+      if (!$scope.offline) {
+        init();
+      }
+    });
   })
-  .controller('EventFindCtrl', function ($scope, $ionicLoading, $compile, $state, $stateParams, EventsService, FirebaseService) {
+  .controller('EventFindCtrl', function ($ionicPlatform, $cordovaNetwork, $scope, $ionicLoading, $compile, $state, $stateParams, EventsService, FirebaseService) {
     function initialize(lat, lng) {
       var myLatlng = new google.maps.LatLng(lat, lng);
       var mapOptions = {
@@ -1065,33 +1153,6 @@ angular.module('app.controllers', [])
       }
     }
 
-    $scope.participate = false;
-    EventsService.getEvent($stateParams.id, function (event) {
-      $scope.event = event;
-      EventsService.markAsSeen($stateParams.id, function () {
-      });
-      $scope.canEditParticipation = (event.date > new Date().getTime()) && (event.owner !== FirebaseService.getCurrentUserUid());
-      if (event.geoLocation) {
-        initialize(event.geoLocation.lat, event.geoLocation.lng);
-      }
-      $scope.participate = false;
-      for (var i = 0; i < $scope.event.friends.length; i++) {
-        var obj = $scope.event.friends[i];
-        if (obj.id == FirebaseService.getCurrentUserUid()) {
-          $scope.participate = true;
-        }
-      }
-    }, function () {
-      for (var i = 0; i < $scope.event.friends.length; i++) {
-        var obj = $scope.event.friends[i];
-        if (obj.id == FirebaseService.getCurrentUserUid()) {
-          $scope.participate = true;
-        }
-      }
-      if (!$scope.$$phase) {
-        $scope.$apply();
-      }
-    });
 
     $scope.editParticipation = function () {
       if ($scope.participate == false) {
@@ -1119,39 +1180,105 @@ angular.module('app.controllers', [])
       var year = date.getFullYear();
       return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
     };
-  })
-  .controller('ProfileCtrl', function ($scope, UserFormFactory, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
-    //$scope.user = {firstName:1,lastName:1,address:1,oldPassword:1};
-    $scope.user = {};
-    var dbConnection = FirebaseService.getDBConnection();
-    //If you want to use URL attributes before the website is loaded
-    $scope.init = function () {
-      //$scope.user = UserFormFactory.getUserStructure(false);
-      angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
-        $scope.user[retrievedUserKey] = retrievedUserValue;
-      });
-      if ($scope.retrievedUser && $scope.retrievedUser.id && $scope.retrievedUser.id !== '') {
-        dbConnection.child("profileImages").child($scope.retrievedUser.id).once('value', function (data) {
-          if (data.val() != null) {
-            $scope.user.profileImage = data.val().image;
-            if (!$scope.$$phase) {
-              $scope.$apply();
-            }
-          }
+
+    var init = function () {
+      $scope.participate = false;
+      EventsService.getEvent($stateParams.id, function (event) {
+        $scope.event = event;
+        EventsService.markAsSeen($stateParams.id, function () {
         });
+        $scope.canEditParticipation = (event.date > new Date().getTime()) && (event.owner !== FirebaseService.getCurrentUserUid());
+        if (event.geoLocation) {
+          initialize(event.geoLocation.lat, event.geoLocation.lng);
+        }
+        $scope.participate = false;
+        for (var i = 0; i < $scope.event.friends.length; i++) {
+          var obj = $scope.event.friends[i];
+          if (obj.id == FirebaseService.getCurrentUserUid()) {
+            $scope.participate = true;
+          }
+        }
+      }, function () {
+        for (var i = 0; i < $scope.event.friends.length; i++) {
+          var obj = $scope.event.friends[i];
+          if (obj.id == FirebaseService.getCurrentUserUid()) {
+            $scope.participate = true;
+          }
+        }
+        if (!$scope.$$phase) {
+          $scope.$apply();
+        }
+      });
+    };
+
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        init();
+      });
+      if (!$scope.offline) {
+        init();
+      }
+    });
+  })
+  .controller('ProfileCtrl', function ($ionicPlatform, $scope, UserFormFactory, $cordovaNetwork, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+
+
+    var init = function () {
+
+      //$scope.user = {firstName:1,lastName:1,address:1,oldPassword:1};
+      $scope.user = {};
+      var dbConnection = FirebaseService.getDBConnection();
+      //If you want to use URL attributes before the website is loaded
+      $scope.init = function () {
+        //$scope.user = UserFormFactory.getUserStructure(false);
+        angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
+          $scope.user[retrievedUserKey] = retrievedUserValue;
+        });
+        if ($scope.retrievedUser && $scope.retrievedUser.id && $scope.retrievedUser.id !== '') {
+          dbConnection.child("profileImages").child($scope.retrievedUser.id).once('value', function (data) {
+            if (data.val() != null) {
+              $scope.user.profileImage = data.val().image;
+              if (!$scope.$$phase) {
+                $scope.$apply();
+              }
+            }
+          });
+        }
+      };
+      if (FirebaseService.isUserLogged()) {
+        dbConnection.child('users').child(FirebaseService.getCurrentUserUid()).once('value', function (user) {
+          $scope.retrievedUser = user.val();
+          $scope.retrievedUser.id = FirebaseService.getCurrentUserUid();
+          $scope.init();
+        });
+      } else {
+        $state.go('login');
       }
     };
-    if (FirebaseService.isUserLogged()) {
-      dbConnection.child('users').child(FirebaseService.getCurrentUserUid()).once('value', function (user) {
-        $scope.retrievedUser = user.val();
-        $scope.retrievedUser.id = FirebaseService.getCurrentUserUid();
-        $scope.init();
+
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
       });
-    } else {
-      $state.go('login');
-    }
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        init();
+      });
+      if (!$scope.offline) {
+        init();
+      }
+    });
   })
-  .controller('BiomedicCtrl', function ($scope, BiomedicService, BiomedicType) {
+  .controller('BiomedicCtrl', function ($ionicPlatform, $scope, $cordovaNetwork, BiomedicService, BiomedicType) {
+
+
+    // $scope.offline = false;
 
     var initChart = function (caption, subcaption, colors) {
       return {
@@ -1375,7 +1502,6 @@ angular.module('app.controllers', [])
       BiomedicService.getAbdominalGirthRecords(handler);
     };
 
-    init();
 
     $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
       console.log('stateChanged to: ', toState, toState.name === 'app.biomedic');
@@ -1383,8 +1509,23 @@ angular.module('app.controllers', [])
         init();
       }
     });
+
+
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        init();
+      });
+      if (!$scope.offline) {
+        init();
+      }
+    });
   })
-  .controller('BiomedicRegistryCtrl', function ($scope, BiomedicService, CardiacFrequency, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state, AbdominalGirth, $rootScope) {
+  .controller('BiomedicRegistryCtrl', function ($ionicPlatform, $cordovaNetwork, $scope, BiomedicService, CardiacFrequency, MinBloodPressure, MaxBloodPressure, Cholesterol, Weight, BiomedicType, $ionicLoading, $state, AbdominalGirth, $rootScope) {
     $scope.maxDate = new Date();
     $scope.maxDate.setDate($scope.maxDate.getDate() + 1);
     $scope.biomedic = {};
@@ -1459,9 +1600,21 @@ angular.module('app.controllers', [])
           BiomedicService.addAbdominalGirthRecord(new AbdominalGirth($scope.biomedic.biomedicDate, $scope.biomedic.value), handler);
           break;
       }
+
+
     }
+
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+      });
+    });
   })
-  .controller('RecomendationCtrl', function ($scope, FirebaseService, RecomendationService) {
+  .controller('RecomendationCtrl', function ($ionicPlatform, $cordovaNetwork, $scope, FirebaseService, RecomendationService) {
     $scope.currentIndex = 0;
 
     $scope.getFormattedDate = function (timestamp) {
@@ -1482,21 +1635,6 @@ angular.module('app.controllers', [])
     $scope.recomendations = [];
     $scope.recomendation = undefined;
 
-    RecomendationService.getRecomendations(FirebaseService.getCurrentUserUid(), function (recomendations) {
-      if (recomendations && recomendations !== null) {
-        for (var i = 0; i < recomendations.length; i++) {
-          var obj = recomendations[i];
-
-          var level = obj.level;
-
-          var aux = obj.toJson();
-          aux.level = level;
-          $scope.recomendations.push(aux);
-        }
-        $scope.currentIndex = $scope.recomendations.length - 2;
-        $scope.recomendation = $scope.recomendations[$scope.currentIndex];
-      }
-    });
 
     $scope.nextRecomendation = function () {
 
@@ -1514,6 +1652,61 @@ angular.module('app.controllers', [])
       $scope.recomendation = $scope.recomendations[$scope.currentIndex--];
     };
 
+    var processRecomendations = function (recomendations) {
+      $scope.recomendations = [];
+      $scope.recomendation = undefined;
+      if (recomendations && recomendations !== null) {
+        for (var i = 0; i < recomendations.length; i++) {
+          var obj = recomendations[i];
+
+          var level = obj.level;
+
+          var aux = obj.toJson();
+          aux.level = level;
+          $scope.recomendations.push(aux);
+        }
+        $scope.currentIndex = $scope.recomendations.length - 2;
+        $scope.recomendation = $scope.recomendations[$scope.currentIndex];
+      }
+    };
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        alert(window.localStorage.getItem("recomendation"));
+        var recomendations = JSON.parse(window.localStorage.getItem("recomendation"));
+        if (recomendations && recomendations !== null) {
+          RecomendationService.transformRecomendations(recomendations, FirebaseService.getCurrentUserUid(), function (recs) {
+            processRecomendations(recs);
+          });
+        }
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        RecomendationService.getRecomendations(FirebaseService.getCurrentUserUid(), function (recomendations) {
+          processRecomendations(recomendations);
+          if (!recomendations || recomendations === null) {
+            recomendations = [];
+          }
+          window.localStorage.setItem("recomendation",  JSON.stringify(recomendations));
+        });
+      });
+      if (!$scope.offline) {
+        RecomendationService.getRecomendations(FirebaseService.getCurrentUserUid(), function (recomendations) {
+          processRecomendations(recomendations);
+          if (!recomendations || recomendations === null) {
+            recomendations = [];
+          }
+          window.localStorage.setItem("recomendation", JSON.stringify(recomendations));
+        });
+      } else {
+        var recomendations = JSON.parse(window.localStorage.getItem("recomendation"));
+        if (recomendations && recomendations !== null) {
+          RecomendationService.transformRecomendations(recomendations, FirebaseService.getCurrentUserUid(), function (recs) {
+            processRecomendations(recs);
+          });
+        }
+      }
+    });
     // RecomendationService.getCurrentRecomendation(FirebaseService.getCurrentUserUid(), function (recomendation) {
     //   if (recomendation && recomendation !== null) {
     //     var obj = recomendation;
@@ -1551,8 +1744,9 @@ angular.module('app.controllers', [])
       return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
     };
   })
-  .controller('MessagesCtrl', function ($scope, MessageService) {
-    $scope.notifications = [];
+  .controller('MessagesCtrl', function ($ionicPlatform, $scope, $cordovaNetwork, MessageService) {
+
+
     $scope.$on('new_notification', function (e, value) {
       $scope.notifications.unshift(value);
       if (!$scope.$$phase) {
@@ -1574,14 +1768,33 @@ angular.module('app.controllers', [])
       var year = date.getFullYear();
       return day + "-" + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
     };
-    MessageService.getMessages(function (messages) {
-      $scope.messages = messages;
-      if (!$scope.$$phase) {
-        $scope.$apply();
-      }
-    });
+
     $scope.markAsSeen = function (message) {
       MessageService.markAsSeen(message.id, function (x) {
       });
-    }
+    };
+
+    var init = function () {
+      $scope.notifications = [];
+      MessageService.getMessages(function (messages) {
+        $scope.messages = messages;
+        if (!$scope.$$phase) {
+          $scope.$apply();
+        }
+      });
+    };
+
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        init();
+      });
+      if (!$scope.offline) {
+        init();
+      }
+    });
   });
