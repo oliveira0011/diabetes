@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d2701ed3-0294-42ed-a1e6-1389f1c2657b" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/templates/stats.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/css/style.css" afterPath="$PROJECT_DIR$/www/css/style.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/js/app.js" afterPath="$PROJECT_DIR$/www/js/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/js/controllers.js" afterPath="$PROJECT_DIR$/www/js/controllers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/templates/login.html" afterPath="$PROJECT_DIR$/www/templates/login.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/templates/menu.html" afterPath="$PROJECT_DIR$/www/templates/menu.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/templates/recomendation.html" afterPath="$PROJECT_DIR$/www/templates/recomendation.html" />
-    </list>
+    <list default="true" id="d2701ed3-0294-42ed-a1e6-1389f1c2657b" name="Default" comment="" />
     <ignored path="Diabetes.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -135,7 +125,7 @@
             <state vertical-scroll-proportion="0.0">
               <caret line="0" column="58" selection-start-line="0" selection-start-column="58" selection-end-line="0" selection-end-column="58" />
               <folding>
-                <marker date="1470651879000" expanded="true" signature="3527:3540" placeholder="..." />
+                <marker date="1470653836000" expanded="true" signature="3527:3540" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -1005,12 +995,12 @@
       <workItem from="1470652919500" duration="357000" />
       <workItem from="1470653300026" duration="206000" />
       <workItem from="1470653520976" duration="121000" />
-      <workItem from="1470653657911" duration="160000" />
+      <workItem from="1470653657911" duration="186000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="356598000" />
+    <option name="totallyTimeSpent" value="356624000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1680" height="964" extended-state="6" />
@@ -1416,7 +1406,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="58" selection-start-line="0" selection-start-column="58" selection-end-line="0" selection-end-column="58" />
           <folding>
-            <marker date="1470651879000" expanded="true" signature="3527:3540" placeholder="..." />
+            <marker date="1470653836000" expanded="true" signature="3527:3540" placeholder="..." />
           </folding>
         </state>
       </provider>
