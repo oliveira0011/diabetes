@@ -45,5 +45,31 @@
         </div>
       </div>
     </div>
+    <div class="row responsive-lg" ng-if="recomendation">
+      <div class="col">
+        <div class="row">
+          <div class="col">
+            <div class="">
+              <div class="left-border positive-border card">
+                <div class="row">
+                  <div class="col">
+                    <div class="text-center">Atividade Completada</div>
+                    <div class="circle circle-green" ng-class="physicalActivity.classPercentage">
+                      {{physicalActivity.labelPercentage}}
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="text-center">Semanas Cumpridas</div>
+                    <div class="circle circle-green" ng-class="physicalActivity.classWeeks">
+                      {{physicalActivity.labelWeeks}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </ion-content>
 </ion-view>

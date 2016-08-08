@@ -1,0 +1,37 @@
+<ion-view title="<i class='icon ion-stats-bars positive'></i>">
+  <ion-content id="pnlContentMain" class="stable-bg">
+    <div ng-if="offline" class="assertive">
+      <div class="card text-center">
+        <i style="font-size: 30px" class=" icon ion-android-warning"></i>
+        <br/>
+        <br/>
+        <p style="font-size: 30px">
+          Sem ligação à rede.
+        </p>
+        <br/>
+        <p style="padding-left: 20px" class="text-left">
+          Por favor conecte-se a uma rede Wi-Fi ou ligue os seus dados móveis para poder ver o seu gráfico de atividade.
+        </p>
+      </div>
+    </div>
+    <div ng-if="!offline">
+      <div ng-if="!currentRecomendation" class="text-center">
+        <h1 class="positive">Nenhuma recomendação efetuada até à data</h1>
+      </div>
+      <div class="row responsive-lg card" ng-if="currentRecomendation">
+        <div class="col">
+          <div class="text-center">Atividade Completada</div>
+          <div class="circle-x circle-green" ng-class="physicalActivity.classPercentage">
+            {{physicalActivity.labelPercentage}}
+          </div>
+        </div>
+        <div class="col">
+          <div class="text-center">Semanas Cumpridas</div>
+          <div class="circle-x circle-green" ng-class="physicalActivity.classWeeks">
+            {{physicalActivity.labelWeeks}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

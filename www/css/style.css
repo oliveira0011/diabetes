@@ -106,3 +106,294 @@ CLOCK
   background-image: radial-gradient(45px 45px 45deg, circle cover, white 100%, #EEEEEE 100%, #33cd5f 100%);
 }
 
+.float-button {
+
+  background-color: #303f9f;
+  opacity: 0.9;
+  color: white;
+  border-radius: 50%;
+  /*border-radius:15% 0 0 0;*/
+  width: 30px;
+  padding: 25px;
+  font-size: 40px;
+  position: fixed;
+  bottom: 5%; /* Adjust height */
+  right: 5%; /* Adjust position */
+  z-index: 1000;
+}
+
+.float-button .height_fix {
+  margin-top: 100%;
+  border: 1px solid red;
+}
+
+.float-button .content {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  margin-top: -20px;
+  color: white;
+}
+
+/*
+
+  Custom colors
+
+*/
+
+.main-bar {
+  /*margin-top: 10px;*/
+  height: 80px;
+}
+
+.main-bar .button {
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+.main-bg {
+  background-color: #ecf0f5
+}
+
+.main-pnl {
+  margin-top: 20px;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.left-border {
+  box-shadow: -5px -5px 40px rgba(0, 0, 0, 0.3) !important;
+  border-left-style: solid;
+  border-left-width: 5px;
+}
+
+.main-dark-bg {
+  background-color: #262626;
+}
+
+.main-dark-bg .item {
+  background-color: #262626;
+}
+
+.main-dark-bg .item-complex .item-content, .dark .item-radio .item-content {
+  background-color: transparent;
+  color: #FFF;
+}
+
+/* Empty. Add your own CSS if you like */
+.avatar {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+
+  -webkit-box-shadow: 0 0 0 3px #fff, 0 2px 5px 4px #999;
+  -moz-box-shadow: 0 0 0 3px #fff, 0 2px 5px 4px #999;
+  box-shadow: 0 0 0 1px #fff, 0 2px 5px 2px #999;
+}
+
+.avatar-border {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+
+  -webkit-box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0, 0, 0, .2);
+  -moz-box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0, 0, 0, .2);
+  box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0, 0, 0, .2);
+}
+
+.invalid-input {
+  border: 1px solid red;
+  color: #E00000;
+}
+
+.invalid-input-label {
+  color: #E00000;
+}
+
+.invalid-input ::-webkit-input-placeholder {
+  /* WebKit, Blink, Edge */
+  color: #E00000;
+}
+
+.invalid-input :-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: #E00000;
+  opacity: 1;
+}
+
+.invalid-input ::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: #E00000;
+  opacity: 1;
+}
+
+.invalid-input :-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #E00000;
+  opacity: 1;
+}
+
+/*
+  TIMELINE
+*/
+
+.section-header, .steps-header, .steps-name {
+  /*color: #387ef5;*/
+  font-weight: 400;
+  font-size: 1.4em;
+}
+
+.steps-header {
+  margin-bottom: 20px;
+  /*text-align: center;*/
+}
+
+.steps-timeline {
+  outline: 1px dashed rgba(255, 0, 0, 0);
+}
+@media screen and (max-width: 500px) {
+  .steps-timeline {
+    border-left: 2px solid #387ef5;
+    margin-left: 25px;
+  }
+}
+@media screen and (min-width: 500px) {
+  .steps-timeline {
+    border-top: 2px solid #387ef5;
+    padding-top: 40px;
+    margin-top: 40px;
+    margin-left: 16.65%;
+    margin-right: 16.65%;
+  }
+}
+.steps-timeline:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.steps-one,
+.steps-two,
+.steps-three {
+  outline: 1px dashed rgba(0, 128, 0, 0);
+}
+@media screen and (max-width: 500px) {
+  .steps-one,
+  .steps-two,
+  .steps-three {
+    margin-left: -25px;
+  }
+}
+@media screen and (min-width: 500px) {
+  .steps-one,
+  .steps-two,
+  .steps-three {
+    float: left;
+    width: 33%;
+    margin-top: -50px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .steps-one,
+  .steps-two {
+    padding-bottom: 40px;
+  }
+}
+
+@media screen and (min-width: 500px) {
+  .steps-one {
+    margin-left: -16.65%;
+    margin-right: 16.65%;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .steps-three {
+    margin-bottom: -100%;
+  }
+}
+@media screen and (min-width: 500px) {
+  .steps-three {
+    margin-left: 16.65%;
+    margin-right: -16.65%;
+  }
+}
+
+.steps-img {
+  background-color: #3498DB;
+  display: block;
+  margin: auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+@media screen and (max-width: 500px) {
+  .steps-img {
+    float: left;
+    margin-right: 20px;
+  }
+}
+
+.steps-name,
+.steps-description {
+  margin: 0;
+}
+
+@media screen and (min-width: 500px) {
+  .steps-name {
+    text-align: center;
+  }
+}
+
+.steps-description {
+  overflow: hidden;
+}
+@media screen and (min-width: 500px) {
+  .steps-description {
+    text-align: center;
+  }
+}
+
+
+
+.circle-x {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  margin: auto;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 95px;
+  font-size: 23px;
+  /* width and height can be anything, as long as they're equal */
+}
+.circle-grey {
+  color: white;
+  background-image: -webkit-radial-gradient(50px 50px, circle cover, white 0%, #387ef5 0%);
+}
+.circle-green {
+  color: white;
+  background-image: -webkit-radial-gradient(50px 50px, circle cover, white 0%, #33cd5f 0%);
+}
+.circle-orange {
+  color: white;
+  background-image: -webkit-radial-gradient(50px 50px, circle cover, white 0%, orange 0%);
+}
+.circle-red {
+  color: white;
+  background-image: -webkit-radial-gradient(50px 50px, circle cover, white 0%, red 0%);
+}
+.btn-light:hover{
+  color: white;
+}
+.circle-grey:hover{
+  background-image: -webkit-radial-gradient(50px 50px, circle cover, #387ef5 0%, #387ef5 10%, #fff 60%);
+}

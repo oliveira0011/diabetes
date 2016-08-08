@@ -632,7 +632,7 @@ angular.module('app.controllers', [])
     });
   })
   .controller('LoginCtrl', function ($rootScope, $cordovaNetwork, $ionicPlatform, $scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
-    // $scope.offline = true;
+     $scope.offline = true;
     $ionicPlatform.ready(function () {
       $scope.offline = $cordovaNetwork.isOffline();
     });
@@ -1797,4 +1797,221 @@ angular.module('app.controllers', [])
         init();
       }
     });
+  })
+
+  .controller('StatsCtrl', function ($ionicPlatform, $cordovaNetwork, $scope, $timeout, $window, $state, RecomendationService, FirebaseService, PhysicalActivityType, PhysicalActivityType) {
+    $scope.getFormattedDateSpeed = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      month = month < 10 ? '0' + month : month;
+      day = day < 10 ? '0' + day : day;
+      var year = date.getFullYear();
+      return day + "-" + month + '-' + year;
+    };
+
+    $scope.getUserFormattedDate = function (timestamp) {
+      var currentYear = new Date().getFullYear();
+      var currentMonth = new Date().getMonth() + 1;
+      var date = new Date(timestamp);
+      var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+      var month = date.getMonth() + 1;
+      month = month < 10 ? '0' + month : month;
+      var year = date.getFullYear();
+      if (isNaN(day) || isNaN(month) || isNaN(year)) {
+        return "N/D";
+      }
+      return day + "/" + month + '/' + year + ' (' + (currentYear - year - (currentMonth < month ? 1 : 0)) + ' anos)';
+    };
+    $scope.getFormattedDate = function (timestamp) {
+      var date = new Date(timestamp);
+      var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+      var month = date.getMonth() + 1;
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var seconds = date.getSeconds();
+      month = month < 10 ? '0' + month : month;
+      hours = hours < 10 ? '0' + hours : hours;
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      seconds = seconds < 10 ? '0' + seconds : seconds;
+      var year = date.getFullYear();
+      if (isNaN(day) || isNaN(month) || isNaN(year) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+        return "N/D";
+      }
+      return day + "/" + month + '/' + year + " " + hours + ":" + minutes + ":" + seconds;
+    };
+
+
+
+    $scope.calculatePhysicalActivityStats = function (recomendation) {
+      var startDate = $scope.getFormattedDateSpeed(recomendation.date);
+      var dateDate = new Date(recomendation.date);
+      var maxDate = new Date();
+
+      var auxDay = 0;
+      var auxWeek = 0;
+      var dates = [];
+      dates[0] = {
+        startDate: recomendation.date,
+        formattedStartDate: $scope.getFormattedDateSpeed(recomendation.date),
+        endDate: dateDate.setDate(dateDate.getDate() + 7),
+        formattedEndDate: $scope.getFormattedDateSpeed(dateDate),
+        days: []
+      };
+      dates[0].days[0] = {date: recomendation.date, formattedDate: startDate};
+      var nextDate = new Date(recomendation.date);
+      while (nextDate.getTime() < maxDate.getTime()) {
+        if (!dates[auxWeek]) {
+          dateDate = new Date(nextDate.getTime());
+          dates[auxWeek] = {
+            startDate: nextDate.getTime(),
+            formattedStartDate: $scope.getFormattedDateSpeed(nextDate.getTime()),
+            endDate: dateDate.setDate(dateDate.getDate() + 7),
+            formattedEndDate: $scope.getFormattedDateSpeed(dateDate.getTime()),
+            days: []
+          };
+        }
+        nextDate.setDate(nextDate.getDate() + 1);
+        var formattedDate = $scope.getFormattedDateSpeed(nextDate.getTime());
+        if (++auxDay == 7) {
+          auxWeek++;
+          auxDay = 0;
+          continue;
+        }
+        dates[auxWeek].days[auxDay] = {date: recomendation.date, formattedDate: formattedDate};
+      }
+      $scope.physicalActivityTotalWeeks = dates.length;
+
+      for (var i = 0; i < dates.length; i++) {
+        var obj = dates[i];
+        FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).orderByKey()
+          .startAt(obj.formattedStartDate)
+          .endAt(obj.formattedEndDate)
+          .once('value', function (snap) {
+            var physicalActivityTotalSeconds = 0;
+            var frequencies = {};
+            for (var j = 0; j < recomendation.exercises.length; j++) {
+              var obj1 = recomendation.exercises[j];
+              frequencies[obj1.type.key] = {
+                duration: obj1.duration,
+                durationPerformed: 0,
+                frequency: obj1.frequency,
+                frequencyPerformed: 0
+              };
+              physicalActivityTotalSeconds += obj1.duration * obj1.frequency;
+            }
+
+
+            var items = snap.val();
+            if (!items || items == null) {
+              $scope.physicalActivityWeeks = 0;
+              $scope.physicalActivityPercentage = 0;
+              $scope.physicalActivity = {
+                classPercentage: 'circle-red',
+                labelPercentage: $scope.physicalActivityPercentage + '%',
+                classWeeks: 'circle-red',
+                labelWeeks: $scope.physicalActivityWeeks + " / " + $scope.physicalActivityTotalWeeks
+              };
+              if (!$scope.$$phase) {
+                $scope.$apply();
+              }
+              return;
+            }
+
+            var itemsArray = Object.keys(items).map(function (key) {
+              return items[key]
+            });
+
+            var physicalSecondsAux = 0;
+            for (var x = 0; x < itemsArray.length; x++) {
+              var obj2 = itemsArray[x];
+              if (obj2 != null) {
+                if (frequencies[PhysicalActivityType.WALK.key]) {
+                  frequencies[PhysicalActivityType.WALK.key].durationPerformed += (!obj2.walk ? 0 : obj2.walk);
+                  physicalSecondsAux += (!obj2.walk ? 0 : obj2.walk);
+                  if (obj2.walk && obj2.walk >= frequencies[PhysicalActivityType.WALK.key].duration) {
+                    frequencies[PhysicalActivityType.WALK.key].frequencyPerformed++;
+                  }
+                }
+                if (frequencies[PhysicalActivityType.RUN.key]) {
+                  frequencies[PhysicalActivityType.RUN.key].durationPerformed += (!obj2.run ? 0 : obj2.run);
+                  physicalSecondsAux += (!obj2.run ? 0 : obj2.run);
+                  if (obj2.run && obj2.run >= frequencies[PhysicalActivityType.RUN.key].duration) {
+                    frequencies[PhysicalActivityType.RUN.key].frequencyPerformed++;
+                  }
+                }
+              }
+            }
+
+            var frequenciesArray = Object.keys(frequencies).map(function (key) {
+              return frequencies[key]
+            });
+
+            var addValidWeek = true;
+            for (var c = 0; c < frequenciesArray.length; c++) {
+              var obj3 = frequenciesArray[c];
+              if (obj3 && obj3.frequency > obj3.frequencyPerformed) {
+                addValidWeek = false;
+                break;
+              }
+            }
+            if (addValidWeek) {
+              $scope.physicalActivityWeeks++;
+            }
+            $scope.physicalActivityPercentage = physicalSecondsAux * 100 / physicalActivityTotalSeconds;
+            var physicalActivityPercentageAux = $scope.physicalActivityPercentage / 100;
+            $scope.physicalActivity = {
+
+              classPercentage: physicalActivityPercentageAux < 75 ? 'circle-red' : physicalActivityPercentageAux < 100 ? 'circle-orange' : 'circle-green',
+              labelPercentage: Math.round($scope.physicalActivityPercentage) / 100 + '%',
+              classWeeks: $scope.physicalActivityTotalWeeks / 2 > $scope.physicalActivityWeeks ? 'circle-red' : $scope.physicalActivityTotalWeeks < $scope.physicalActivityWeeks ? 'circle-green' : 'circle-orange',
+              labelWeeks: $scope.physicalActivityWeeks + " / " + $scope.physicalActivityTotalWeeks
+            };
+
+            if (!$scope.$$phase) {
+              $scope.$apply();
+            }
+          });
+
+      }
+
+    };
+
+    var init = function() {
+      $scope.currentRecomendation = undefined;
+      $scope.physicalActivity = {
+        classPercentage: '0',
+        labelPercentage: '',
+        classWeeks: '',
+        labelWeeks: '0 / 0'
+      };
+      $scope.physicalActivityWeeks = 0;
+      $scope.physicalActivityPercentage = 0;
+      $scope.physicalActivityTotalWeeks = 0;
+      RecomendationService.getCurrentRecomendation(FirebaseService.getCurrentUserUid(), function (recomendation) {
+        if (recomendation) {
+          $scope.currentRecomendation = {};
+          var level = recomendation.level;
+          $scope.currentRecomendation = recomendation.toJson();
+          $scope.currentRecomendation.level = level;
+
+          $scope.calculatePhysicalActivityStats(recomendation);
+        }
+      });
+    }
+
+    $ionicPlatform.ready(function () {
+      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.$on('offline', function () {
+        $scope.offline = true;
+      });
+      $scope.$on('online', function () {
+        $scope.offline = false;
+        init();
+      });
+      if (!$scope.offline) {
+        init();
+      }
+    });
+
   });

@@ -99,6 +99,15 @@ angular.module('app', ['ionic', 'ionic.service.core', 'ngCordova', 'app.controll
           }
         }
       })
+      .state('app.stats', {
+        url: '/stats',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/stats.html',
+            controller: 'StatsCtrl'
+          }
+        }
+      })
       .state('app.biomedic', {
         url: '/biomedic',
         views: {
