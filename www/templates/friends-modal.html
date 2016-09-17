@@ -18,7 +18,7 @@
         <span ng-repeat="friend in friends">
             <ion-checkbox class="item-checkbox-right" ng-model="friend.selected" toggle-class="toggle-positive"
                           ng-change="toggleFriend(friend)">
-              <img class="item-checkbox-img" ng-src="{{friend.profileImage}}">
+              <img class="avatar" style="width: 50px;height: 50px;margin-left: 10px" ng-src="{{friend.profileImage}}">
               <p style="margin-left: 60px;">{{friend.name}}</p>
             </ion-checkbox>
           </span>

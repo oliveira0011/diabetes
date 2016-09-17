@@ -13,16 +13,15 @@ angular.module('app.services', [])
           var result = Object.keys(results)[i];
           if (results.hasOwnProperty(result)) {
             var friend = results[result];
+            friend.id = result;
             if (friend.id !== FirebaseService.getCurrentUserUid()) {
               const fr = friend;
               const counter = i + 1;
               dbConnection.child("profileImages").child(friend.id).once('value', function (data) {
-                if (data.val() != null) {
-                  var frind = new Friend(fr.id, fr.firstName + " " + fr.lastName, data.val().image);
-                  friends.push(frind);
-                  if (counter === Object.keys(results).length - 1) {
-                    handler(friends);
-                  }
+                var frind = new Friend(fr.id, fr.firstName + " " + fr.lastName, data.val() != null ? data.val().image : null);
+                friends.push(frind);
+                if (counter === Object.keys(results).length - 1) {
+                  handler(friends);
                 }
               });
             }
@@ -31,6 +30,23 @@ angular.module('app.services', [])
       });
     };
     return FriendsService;
+  })
+  .service('UsersService', function (FirebaseService) {
+    function UsersService() {
+    }
+    UsersService.getUser = function (userId, handler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child("users").child(userId).once('value', function (userSnap) {
+        var user = userSnap.val();
+        if(user == null){
+          handler();
+          return;
+        }
+        user.id = userId;
+        handler(user);
+      });
+    };
+    return UsersService;
   })
   .service('EventsService', function (Event, FirebaseService, MessageService, Message, MessageType) {
     function EventsService() {
@@ -218,12 +234,7 @@ angular.module('app.services', [])
     };
     firebaseService.registerDevice = function () {
       console.log("registering device");
-      var callback = function (token) {
-        console.log("Device token:", token.token);
-        //push.addTokenToUser(user);
-        //user.save();
-        deviceToken = token.token;
-      };
+
       Ionic.io();
       push = new Ionic.Push({
         "onNotification": function (notification) {
@@ -238,6 +249,14 @@ angular.module('app.services', [])
           }
         }
       });
+      var callback = function (token) {
+        console.log("Device token:", token.token);
+        //push.addTokenToUser(user);
+        //user.save();
+        deviceToken = token.token;
+        push.saveToken(token);
+        console.log("New token ---------->" + token + "<----------");
+      };
       try {
         push.register(callback);
       } catch (e) {

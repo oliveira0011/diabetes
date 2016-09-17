@@ -329,7 +329,7 @@ angular.module('app.controllers', [])
         if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 10) {
           if ($scope.currentIterationSpeed > 6) {//TODO: check, for now we reduced to -2
 
-            if ($cordovaNetwork.isOffline()) {
+            if (/*$cordovaNetwork.isOffline()*/1==1) {
               var dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               var date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore || dataToStore.length > 0) {
@@ -373,7 +373,7 @@ angular.module('app.controllers', [])
 
           } else if ($scope.currentIterationSpeed > 0.2) {//TODO: check, for now we reduced to -2
 
-            if ($cordovaNetwork.isOffline()) {
+            if (/*$cordovaNetwork.isOffline()*/1==1) {
               dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore || dataToStore.length > 0) {
@@ -418,7 +418,7 @@ angular.module('app.controllers', [])
             }
           } else {
 
-            if ($cordovaNetwork.isOffline()) {
+            if (/*$cordovaNetwork.isOffline()*/1!=1) {
               dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore || dataToStore.length > 0) {
@@ -618,7 +618,7 @@ angular.module('app.controllers', [])
     };
 
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -631,10 +631,10 @@ angular.module('app.controllers', [])
       }
     });
   })
-  .controller('LoginCtrl', function ($rootScope, $cordovaNetwork, $ionicPlatform, $scope, $state, $stateParams, FirebaseService, $ionicPopup, $ionicLoading) {
+  .controller('LoginCtrl', function ($rootScope, $cordovaNetwork, $ionicPlatform, $scope, $state, $stateParams, FirebaseService, UsersService, $ionicPopup, $ionicLoading) {
      $scope.offline = true;
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
     });
     $rootScope.$on('$cordovaNetwork:offline', function (event, networkState) {
       $scope.offline = true;
@@ -647,87 +647,95 @@ angular.module('app.controllers', [])
       FirebaseService.checkDeviceToken();
       $state.go('app.main');
     }
+    $scope.errorMessages = [];
     $scope.loginData = {
-      // username: 'oliveira_011@hotmail.com',
-      // password: 'xptoxpto',
+      //username: 'm1@hotmail.com',
       username: '',
+      //password: 'xptoxpto'
       password: ''
     };
     $scope.doLogin = function (form) {
-      delete $scope.errorMessage;
+      $scope.errorMessages = [];
       if (form.$valid) {
         $ionicLoading.show({template: 'A autenticar...'});
         var dbConnection = FirebaseService.getDBConnection();
 
         function authHandler(error, authData) {
           if (error) {
-            //console.log("Login Failed!", error);
-            $scope.errorMessages =
-              ["A autenticação falhou, por favor verifique as suas credenciais."];
-
+            console.log("Login Failed!", error);
+            $scope.errorMessages.push("Não foi possível autenticar, por favor verifique os dados introduzidos.");
           } else {
             console.log("Authenticated successfully with payload:", authData);
-            FirebaseService.setCurrentUserUid(authData.uid);
-            if (authData.password.isTemporaryPassword) {
-              $ionicLoading.hide();
-              var tempPass = $scope.loginData.password;
-              $scope.data = {};
-              var myPopup = $ionicPopup.show({
-                template: '<input type="password" ng-model="data.newPassword">',
-                title: 'Nova Palavra-Passe',
-                subTitle: 'A palavra-passe introduzida, apesar de válida, é uma palavra-passe temporária, por favor introduza uma nova palavra passe. Esta passará a ser a sua palavra-chave de autenticação na plataforma',
-                scope: $scope,
-                buttons: [
-                  {text: 'Cancelar'},
-                  {
-                    text: '<b>Gravar</b>',
-                    type: 'button-positive',
-                    onTap: function (e) {
-                      if (!$scope.data.newPassword) {
-                        e.preventDefault();
-                      } else {
-                        return $scope.data.newPassword;
+            UsersService.getUser(authData.uid, function(user){
+              if(user == null || !user || user.doctor_uid === null || !user.doctor_uid){
+                $ionicLoading.hide();
+                $scope.errorMessages.push("Não foi possível autenticar, por favor verifique os dados introduzidos.");
+                //alert("Não foi possível autenticar, por favor verifique os dados introduzidos.");
+                return;
+              }
+              FirebaseService.setCurrentUserUid(authData.uid);
+              if (authData.password.isTemporaryPassword) {
+                $ionicLoading.hide();
+                var tempPass = $scope.loginData.password;
+                $scope.data = {};
+                var myPopup = $ionicPopup.show({
+                  template: '<input type="password" ng-model="data.newPassword">',
+                  title: 'Nova Palavra-Passe',
+                  subTitle: 'A palavra-passe introduzida, apesar de válida, é uma palavra-passe temporária, por favor introduza uma nova palavra passe. Esta passará a ser a sua palavra-chave de autenticação na plataforma',
+                  scope: $scope,
+                  buttons: [
+                    {text: 'Cancelar'},
+                    {
+                      text: '<b>Gravar</b>',
+                      type: 'button-positive',
+                      onTap: function (e) {
+                        if (!$scope.data.newPassword) {
+                          e.preventDefault();
+                        } else {
+                          return $scope.data.newPassword;
+                        }
                       }
                     }
-                  }
-                ]
-              });
-
-              myPopup.then(function (res) {
-                delete $scope.data;
-                dbConnection.changePassword({
-                  email: $scope.loginData.username,
-                  newPassword: res,
-                  oldPassword: tempPass
-                }, function (error) {
-                  if (error) {
-                    switch (error.code) {
-                      case "INVALID_PASSWORD":
-                        console.log("The specified user account password is incorrect.");
-                        break;
-                      case "INVALID_USER":
-                        console.log("The specified user account does not exist.");
-                        break;
-                      default:
-                        console.log("Error changing password:", error);
-                    }
-                  } else {
-                    console.log("User password changed successfully!");
-
-                    dbConnection.authWithPassword({
-                      email: $scope.loginData.username,
-                      password: res
-                    }, authHandler);
-
-                  }
+                  ]
                 });
-              });
-              return;
-            }
-            FirebaseService.checkDeviceToken();
-            $state.go('app.main');
-            $scope.loginData = {};
-            form.$setPristine(false);
+
+                myPopup.then(function (res) {
+                  delete $scope.data;
+                  dbConnection.changePassword({
+                    email: $scope.loginData.username,
+                    newPassword: res,
+                    oldPassword: tempPass
+                  }, function (error) {
+                    if (error) {
+                      switch (error.code) {
+                        case "INVALID_PASSWORD":
+                          console.log("The specified user account password is incorrect.");
+                          break;
+                        case "INVALID_USER":
+                          console.log("The specified user account does not exist.");
+                          break;
+                        default:
+                          console.log("Error changing password:", error);
+                      }
+                      $scope.errorMessages.push("Não foi possível alterar a password.");
+                    } else {
+                      console.log("User password changed successfully!");
+
+                      dbConnection.authWithPassword({
+                        email: $scope.loginData.username,
+                        password: res
+                      }, authHandler);
+
+                    }
+                  });
+                });
+                return;
+              }
+              FirebaseService.checkDeviceToken();
+              $state.go('app.main');
+              $scope.loginData = {};
+              form.$setPristine(false);
+            });
           }
           $ionicLoading.hide();
         }
@@ -768,6 +776,9 @@ angular.module('app.controllers', [])
       });
 
       myPopup.then(function (res) {
+        if(!res){
+          return;
+        }
         $ionicLoading.show({
           template: "A enviar email de reposição de palavra-passe..."
         });
@@ -904,7 +915,7 @@ angular.module('app.controllers', [])
 
     };
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1119,7 +1130,7 @@ angular.module('app.controllers', [])
       });
     };
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1212,7 +1223,7 @@ angular.module('app.controllers', [])
     };
 
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1262,7 +1273,7 @@ angular.module('app.controllers', [])
     };
 
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1512,7 +1523,7 @@ angular.module('app.controllers', [])
 
 
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1605,7 +1616,7 @@ angular.module('app.controllers', [])
     }
 
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1670,7 +1681,7 @@ angular.module('app.controllers', [])
       }
     };
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         alert(window.localStorage.getItem("recomendation"));
         var recomendations = JSON.parse(window.localStorage.getItem("recomendation"));
@@ -1785,7 +1796,7 @@ angular.module('app.controllers', [])
     };
 
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -2001,7 +2012,7 @@ angular.module('app.controllers', [])
     }
 
     $ionicPlatform.ready(function () {
-      $scope.offline = $cordovaNetwork.isOffline();
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
