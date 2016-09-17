@@ -42,8 +42,16 @@ angular.module('app.controllers', [])
       var dataToStore = window.localStorage.getItem("dataToStore");
       dataToStore = JSON.parse(dataToStore);
       if (!dataToStore) {
-        return
+        return;
       }
+      var dbConnection = FirebaseService.getDBConnection();
+      console.log("----------------------------");
+      console.log(FirebaseService.getCurrentUserDoctorUid());
+      console.log("----------------------------");
+      var ref = FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child("doctor_uid");
+      ref.transaction(function (current_value) {
+        return current_value == null ? FirebaseService.getCurrentUserDoctorUid() : current_value;
+      });
       for (var userId in dataToStore) {
         if (dataToStore.hasOwnProperty(userId)) {
           for (var datee in dataToStore[userId]) {
@@ -51,7 +59,7 @@ angular.module('app.controllers', [])
               var date = dataToStore[userId][datee];
               if (date["run"]) {
                 (function () {
-                  var runRef = FirebaseService.getDBConnection().child('physical_activity')
+                  var runRef = dbConnection.child('physical_activity')
                     .child(userId)
                     .child(datee)
                     .child("run");
@@ -65,7 +73,7 @@ angular.module('app.controllers', [])
               }
               if (date["runSpeed"]) {
                 (function () {
-                  var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                  var runSpeedRef = dbConnection.child('physical_activity')
                     .child(userId)
                     .child(datee)
                     .child("runSpeed");
@@ -78,7 +86,7 @@ angular.module('app.controllers', [])
               }
               if (date["walk"]) {
                 (function () {
-                  var runRef = FirebaseService.getDBConnection().child('physical_activity')
+                  var runRef = dbConnection.child('physical_activity')
                     .child(userId)
                     .child(datee)
                     .child("walk");
@@ -90,7 +98,7 @@ angular.module('app.controllers', [])
               }
               if (date["walkSpeed"]) {
                 (function () {
-                  var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                  var runSpeedRef = dbConnection.child('physical_activity')
                     .child(userId)
                     .child(datee)
                     .child("walkSpeed");
@@ -102,7 +110,7 @@ angular.module('app.controllers', [])
               }
               if (date["idle"]) {
                 (function () {
-                  var runRef = FirebaseService.getDBConnection().child('physical_activity')
+                  var runRef = dbConnection.child('physical_activity')
                     .child(userId)
                     .child(datee)
                     .child("idle");
@@ -114,7 +122,7 @@ angular.module('app.controllers', [])
               }
               if (date["idleSpeed"]) {
                 (function () {
-                  var runSpeedRef = FirebaseService.getDBConnection().child('physical_activity')
+                  var runSpeedRef = dbConnection.child('physical_activity')
                     .child(userId)
                     .child(datee)
                     .child("idleSpeed");
@@ -353,6 +361,10 @@ angular.module('app.controllers', [])
               window.localStorage.setItem("dataToStore", JSON.stringify(dataToStore));
 
             } else {
+              var ref = FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child("doctor_uid");
+              ref.transaction(function (current_value) {
+                return current_value == null ? FirebaseService.getCurrentUserDoctorUid() : current_value;
+              });
               var runRef = FirebaseService.getDBConnection().child('physical_activity')
                 .child(FirebaseService.getCurrentUserUid())
                 .child($scope.getFormattedDate(date))
@@ -397,6 +409,10 @@ angular.module('app.controllers', [])
               window.localStorage.setItem("dataToStore", JSON.stringify(dataToStore));
 
             } else {
+              var ref = FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child("doctor_uid");
+              ref.transaction(function (current_value) {
+                return current_value == null ? FirebaseService.getCurrentUserDoctorUid() : current_value;
+              });
               var walkRef = FirebaseService.getDBConnection().child('physical_activity')
                 .child(FirebaseService.getCurrentUserUid())
                 .child($scope.getFormattedDate(new Date().getTime()))
@@ -441,6 +457,10 @@ angular.module('app.controllers', [])
 
               window.localStorage.setItem("dataToStore", JSON.stringify(dataToStore));
             } else {
+              var ref = FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child("doctor_uid");
+              ref.transaction(function (current_value) {
+                return current_value == null ? FirebaseService.getCurrentUserDoctorUid() : current_value;
+              });
               var idleRef = FirebaseService.getDBConnection().child('physical_activity')
                 .child(FirebaseService.getCurrentUserUid())
                 .child($scope.getFormattedDate(new Date().getTime()))
@@ -572,16 +592,24 @@ angular.module('app.controllers', [])
               $scope.dataset[0].data[serieNumber] = {};
               $scope.dataset[1].data[serieNumber] = {};
               var items = snap.val();
+              var itemstoReturn = {};
               console.log(formattedDate, items);
               if (items == null) {
-                items = {
+                itemstoReturn = {
                   walk: 0,
                   run: 0
                 }
+              }else{
+                for (var first in items) {
+                  if (first !== 'doctor_uid' && items.hasOwnProperty(first)) {
+                    itemstoReturn[first] = items[first];
+                  }
+                }
               }
+
               //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
-              $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: items.walk});
-              $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: items.run});
+              $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: itemstoReturn.walk});
+              $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: itemstoReturn.run});
             });
         } else {
           FirebaseService.getDBConnection().child('physical_activity').child(FirebaseService.getCurrentUserUid()).child(formattedDate)
@@ -590,24 +618,24 @@ angular.module('app.controllers', [])
               $scope.dataset[1].data[serieNumber] = {};
               var items = snap.val();
               console.log(formattedDate, items);
+              var itemstoReturn = {};
               if (items == null) {
-                items = {
+                itemstoReturn = {
                   idle: 0,
                   walk: 0,
                   run: 0
                 }
-              }
-              if (items == null) {
-                items = {
-                  idle: 0,
-                  walk: 0,
-                  run: 0
+              }else{
+                for (var first in items) {
+                  if (first !== 'doctor_uid' && items.hasOwnProperty(first)) {
+                    itemstoReturn[first] = items[first];
+                  }
                 }
               }
               console.log(serieNumber);
               //$scope.dataset[0].data[serieNumber] = ({label: 'Idle', value: items.idle});
-              $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: items.walk});
-              $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: items.run});
+              $scope.dataset[0].data[serieNumber] = ({label: 'Andar', value: itemstoReturn.walk});
+              $scope.dataset[1].data[serieNumber] = ({label: 'Correr', value: itemstoReturn.run});
             });
         }
       };
@@ -674,6 +702,7 @@ angular.module('app.controllers', [])
                 return;
               }
               FirebaseService.setCurrentUserUid(authData.uid);
+              FirebaseService.setCurrentUserDoctorUid(user.doctor_uid);
               if (authData.password.isTemporaryPassword) {
                 $ionicLoading.hide();
                 var tempPass = $scope.loginData.password;
@@ -1506,11 +1535,11 @@ angular.module('app.controllers', [])
       $scope.cholesterolRecords = [];
       $scope.weightRecords = [];
       $scope.abdominalGirthRecords = [];
-      BiomedicService.getCardiacFrequencyRecords(handler);
-      BiomedicService.getBloodPressureRecords(handler);
       BiomedicService.getCholesterolRecords(handler);
       BiomedicService.getWeightRecords(handler);
       BiomedicService.getAbdominalGirthRecords(handler);
+      BiomedicService.getCardiacFrequencyRecords(handler);
+      BiomedicService.getBloodPressureRecords(handler);
     };
 
 
@@ -1532,7 +1561,7 @@ angular.module('app.controllers', [])
         init();
       });
       if (!$scope.offline) {
-        init();
+        //init();
       }
     });
   })

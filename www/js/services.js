@@ -218,6 +218,13 @@ angular.module('app.services', [])
         }
       }
     };
+
+    firebaseService.setCurrentUserDoctorUid = function (currentUserDoctorUid) {
+      window.localStorage.setItem('currentUserDoctorUid', currentUserDoctorUid);
+    };
+    firebaseService.getCurrentUserDoctorUid = function () {
+      return window.localStorage.getItem('currentUserDoctorUid');
+    };
     firebaseService.setCurrentUserUid = function (currentUserUid) {
       window.localStorage.setItem('currentUserUid', currentUserUid);
     };
@@ -295,6 +302,7 @@ angular.module('app.services', [])
 
     BiomedicService.addRecord = function (biomedic, handler) {
       var dbConnection = FirebaseService.getDBConnection();
+      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid()).update({"doctor_uid":FirebaseService.getCurrentUserDoctorUid()});
       dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
         .push({
           value: biomedic.value,
@@ -306,12 +314,14 @@ angular.module('app.services', [])
       var dbConnection = FirebaseService.getDBConnection();
       dbConnection.child(type).child(FirebaseService.getCurrentUserUid()).on('value', function (data) {
         var results = data.val();
+        var resultsToReturn = {};
         for (var result in results) {
-          if (results.hasOwnProperty(result)) {
+          if (result !== 'doctor_uid' && results.hasOwnProperty(result)) {
             results[result].type = type;
+            resultsToReturn[result] = results[result];
           }
         }
-        handler(type, results);
+        handler(type, resultsToReturn);
       });
     };
 
@@ -443,6 +453,7 @@ angular.module('app.services', [])
         console.log('invalidUser');
         $rootScope.$broadcast('logoutUser');
       }
+      FirebaseService.getDBConnection().child('messages').child("in").child(userId).update({"doctor_uid":FirebaseService.getCurrentUserDoctorUid()});
       var ref = FirebaseService.getDBConnection().child('messages').child("in").child(userId)
         .push();
       ref.set({
@@ -554,7 +565,7 @@ angular.module('app.services', [])
       FirebaseService.getDBConnection().child('recomendations').child(userId).orderByChild("date").limitToLast(1).on('value', function (snap) {
         var value = snap.val();
         for (var first in value) {
-          if (value.hasOwnProperty(first)) {
+          if (first !== 'doctor_uid' && value.hasOwnProperty(first)) {
             var rec = new Recomendation(RecomendationLevel[value[first].level], value[first].medicationModified, value[first].exercises);
             rec.id = first;
             rec.date = value[first].date;
@@ -591,7 +602,7 @@ angular.module('app.services', [])
         var value = snap.val();
         var arrayToReturn = [];
         for (var first in value) {
-          if (value.hasOwnProperty(first)) {
+          if (first !== 'doctor_uid' && value.hasOwnProperty(first)) {
             var rec = new Recomendation(RecomendationLevel[value[first].level], value[first].medicationModified, value[first].exercises);
             rec.id = first;
             rec.date = value[first].date;
