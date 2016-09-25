@@ -851,11 +851,6 @@ angular.module('app.controllers', [])
       if (!$scope.events) {
         return;
       }
-
-      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      for (var j = 0; j < $scope.events.length; j++) {
-        console.log($scope.events[j].id);
-      }
       for (var i = 0; i < $scope.events.length; i++) {
         var obj = clone($scope.events[i]);
         var add = false;
@@ -873,7 +868,7 @@ angular.module('app.controllers', [])
             $ionicTabsDelegate.select(1);
             break;
           case 'participated':
-            if (obj.outdated && obj.participate) {
+            if (obj.outdated && (obj.participate || (obj.friends[FirebaseService.getCurrentUserUid()] && obj.friends[FirebaseService.getCurrentUserUid()].participate))) {
               add = true;
             }
             $ionicTabsDelegate.select(2);
@@ -917,10 +912,6 @@ angular.module('app.controllers', [])
           }
         }
         $scope.events.push(evt);
-        console.log("????????????????????????????????");
-        for (var j = 0; j < $scope.events.length; j++) {
-          console.log($scope.events[j].id);
-        }
         $scope.filterEvents($scope.filter);
         if (!$scope.$$phase) {
           $scope.$apply();
@@ -967,6 +958,7 @@ angular.module('app.controllers', [])
     } else {
       $scope.event = new Event();
       $scope.event.date = new Date();
+      $scope.event.friends = {};
       $scope.newEvent = true;
     }
     $scope.minDate = new Date();
@@ -975,7 +967,7 @@ angular.module('app.controllers', [])
 
     $scope.toggleAll = function () {
       if (!$scope.selectAll) {
-        $scope.selectedFriends = [];
+        $scope.event.friends = {};
         angular.forEach($scope.friends, function (friend) {
           friend.selected = false;
         });
@@ -983,7 +975,7 @@ angular.module('app.controllers', [])
         angular.forEach($scope.friends, function (friend) {
           if (friend instanceof Friend) {
             friend.selected = true;
-            $scope.selectedFriends[friend.id] = friend;
+            $scope.event.friends[friend.id] = friend;
           }
         });
       }
@@ -992,10 +984,10 @@ angular.module('app.controllers', [])
 
     $scope.toggleFriend = function (friend) {
       if (friend.selected) {
-        $scope.selectedFriends[friend.id] = friend;
+        $scope.event.friends[friend.id] = friend;
         $scope.selectAll = false;
       } else {
-        delete $scope.selectedFriends[friend.id];
+        delete $scope.event.friends[friend.id];
         $scope.selectAll = true;
       }
     };
@@ -1009,7 +1001,7 @@ angular.module('app.controllers', [])
       $scope.modal.remove();
     };
     $scope.openModalFriends = function () {
-      $ionicModal.fromTemplateUrl('/templates/friends-modal.html', {
+      $ionicModal.fromTemplateUrl('templates/friends-modal.html', {
         scope: $scope,
         animation: 'slide-in-up'
       }).then(function (modal) {
@@ -1022,7 +1014,7 @@ angular.module('app.controllers', [])
       $scope.modal.remove();
     };
     $scope.openModalLocation = function () {
-      $ionicModal.fromTemplateUrl('/templates/event-location-modal.html', {
+      $ionicModal.fromTemplateUrl('templates/event-location-modal.html', {
         scope: $scope,
         animation: 'slide-in-up'
       }).then(function (modal) {
@@ -1039,8 +1031,9 @@ angular.module('app.controllers', [])
     };
 
     $scope.saveEvent = function (form) {
-      if ($scope.event.date != null) {
+      if ($scope.event.date == null) {
         form.date.$setValidity('required', true);
+        return
       }
       if ($scope.event.friends.length == 0) {
         return;
@@ -1148,11 +1141,11 @@ angular.module('app.controllers', [])
 
     var init = function () {
       $scope.friends = [];
-      $scope.selectedFriends = [];
-      $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
+      $scope.event.friends = {};
+      $scope.selectAll = $scope.event.friends.length == 0 || $scope.event.friends.length == $scope.friends.length;
       FriendsService.getFriends(function (friends) {
         $scope.friends = friends;
-        $scope.selectAll = $scope.selectedFriends.length == 0 || $scope.selectedFriends.length == $scope.friends.length;
+        $scope.selectAll = $scope.event.friends.length == 0 || $scope.event.friends.length == $scope.friends.length;
         if ($scope.selectAll) {
           $scope.toggleAll();
         }

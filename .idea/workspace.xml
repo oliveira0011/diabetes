@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="d2701ed3-0294-42ed-a1e6-1389f1c2657b" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.xml" afterPath="$PROJECT_DIR$/config.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/index.html" afterPath="$PROJECT_DIR$/www/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/js/controllers.js" afterPath="$PROJECT_DIR$/www/js/controllers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/js/services.js" afterPath="$PROJECT_DIR$/www/js/services.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/templates/events.html" afterPath="$PROJECT_DIR$/www/templates/events.html" />
     </list>
     <ignored path="Diabetes.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -31,8 +31,28 @@
       <file leaf-file-name="controllers.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/www/js/controllers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6827731">
-              <caret line="701" column="23" selection-start-line="701" selection-start-column="23" selection-end-line="701" selection-end-column="23" />
+            <state vertical-scroll-proportion="0.79831934">
+              <caret line="881" column="18" selection-start-line="881" selection-start-column="18" selection-end-line="881" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="events.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/www/templates/events.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="35" column="25" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/www/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="25" column="97" selection-start-line="25" selection-start-column="97" selection-end-line="25" selection-end-column="97" />
               <folding />
             </state>
           </provider>
@@ -42,31 +62,11 @@
         <entry file="file://$PROJECT_DIR$/www/js/services.js">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="38" column="43" selection-start-line="38" selection-start-column="43" selection-end-line="38" selection-end-column="43" />
+              <caret line="53" column="5" selection-start-line="53" selection-start-column="5" selection-end-line="53" selection-end-column="5" />
               <folding>
                 <element signature="e#99#1260#0" expanded="false" />
                 <element signature="e#21188#21876#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="config.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="2" column="22" selection-start-line="2" selection-start-column="22" selection-end-line="2" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/package.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -106,6 +106,16 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="53" column="25" selection-start-line="53" selection-start-column="25" selection-end-line="53" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="friends-modal.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/www/templates/friends-modal.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -159,7 +169,6 @@
         <option value="$PROJECT_DIR$/www/templates/messages.html" />
         <option value="$PROJECT_DIR$/www/templates/eventfind.html" />
         <option value="$PROJECT_DIR$/www/templates/message.html" />
-        <option value="$PROJECT_DIR$/www/index.html" />
         <option value="$PROJECT_DIR$/bower.json" />
         <option value="$PROJECT_DIR$/www/templates/main-page.html" />
         <option value="$PROJECT_DIR$/ionic.project" />
@@ -180,7 +189,6 @@
         <option value="$PROJECT_DIR$/www/templates/physical-activity.html" />
         <option value="$PROJECT_DIR$/www/templates/profile.html" />
         <option value="$PROJECT_DIR$/www/templates/about.html" />
-        <option value="$PROJECT_DIR$/www/templates/events.html" />
         <option value="$PROJECT_DIR$/www/js/app.js" />
         <option value="$PROJECT_DIR$/www/css/style.css" />
         <option value="$PROJECT_DIR$/www/templates/stats.html" />
@@ -193,7 +201,9 @@
         <option value="$PROJECT_DIR$/www/templates/biomedic.html" />
         <option value="$PROJECT_DIR$/config.xml" />
         <option value="$PROJECT_DIR$/www/js/services.js" />
+        <option value="$PROJECT_DIR$/www/index.html" />
         <option value="$PROJECT_DIR$/www/js/controllers.js" />
+        <option value="$PROJECT_DIR$/www/templates/events.html" />
       </list>
     </option>
   </component>
@@ -217,7 +227,7 @@
   <component name="ProjectFrameBounds">
     <option name="y" value="22" />
     <option name="width" value="1440" />
-    <option name="height" value="829" />
+    <option name="height" value="826" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -244,6 +254,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -356,9 +367,8 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -366,7 +376,7 @@
     <property name="recentsLimit" value="5" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="SearchEverywhereHistoryKey" value="biomedic&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/biomedic.html&#10;ser&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;confi&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/config.xml&#10;android&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/platforms/android/CordovaLib/AndroidManifest.xml&#10;androidma&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/platforms/android/AndroidManifest.xml&#10;controll&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;contro&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;app.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/app.js&#10;login&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/login.html&#10;style&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/css/style.css&#10;app&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/app.js&#10;recome&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/recomendation.html&#10;menu&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/menu.html&#10;biomed&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/biomedic-registry.html&#10;control&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;service&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;controlle&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;app.js&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/app.js&#10;config.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/config.xml&#10;fac&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/factories.js&#10;plugin.xml&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/plugins/com.phonegap.plugins.PushPlugin/plugin.xml&#10;main-page&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/main-page.html&#10;main&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/main-page.html&#10;menu.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/menu.html&#10;biome&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/biomedic.html&#10;controllers.js&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;index&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/index.html&#10;profile&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/profile.html&#10;message&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/message.html&#10;eventfind&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/eventfind.html&#10;event.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/event.html&#10;events&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/events.html&#10;messa&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/messages.html&#10;style.c&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/css/style.css&#10;mainp&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/main-page.html&#10;new-ite&#9;null&#9;null&#10;messages&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/messages.html&#10;eve&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/events.html&#10;services.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;style.cs&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/css/style.css&#10;event&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/event.html&#10;services&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;fact&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/factories.js&#10;facto&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/factories.js&#10;serv&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;index.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/index.html&#10;profile.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/profile.html&#10;controller&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;index.html&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/index.html&#10;main.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/main-page.html" />
+    <property name="SearchEverywhereHistoryKey" value="events&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/events.html&#10;contr&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;event&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/event.html&#10;index.html&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/index.html&#10;biomedic&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/biomedic.html&#10;ser&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;confi&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/config.xml&#10;android&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/platforms/android/CordovaLib/AndroidManifest.xml&#10;androidma&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/platforms/android/AndroidManifest.xml&#10;controll&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;contro&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;app.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/app.js&#10;login&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/login.html&#10;style&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/css/style.css&#10;app&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/app.js&#10;recome&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/recomendation.html&#10;menu&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/menu.html&#10;biomed&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/biomedic-registry.html&#10;control&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;service&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;controlle&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;app.js&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/app.js&#10;config.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/config.xml&#10;fac&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/factories.js&#10;plugin.xml&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/plugins/com.phonegap.plugins.PushPlugin/plugin.xml&#10;main-page&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/main-page.html&#10;main&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/main-page.html&#10;menu.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/menu.html&#10;biome&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/biomedic.html&#10;controllers.js&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js&#10;index&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/index.html&#10;profile&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/profile.html&#10;message&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/message.html&#10;eventfind&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/eventfind.html&#10;event.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/event.html&#10;messa&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/messages.html&#10;style.c&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/css/style.css&#10;mainp&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/main-page.html&#10;new-ite&#9;null&#9;null&#10;messages&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/messages.html&#10;eve&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/events.html&#10;services.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;style.cs&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/css/style.css&#10;services&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;fact&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/factories.js&#10;facto&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/factories.js&#10;serv&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/services.js&#10;index.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/index.html&#10;profile.&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/templates/profile.html&#10;controller&#9;FILE&#9;file:///Users/ivooliveira/IdeaProjects/Diabetes/www/js/controllers.js" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../Diabetes-Admin" />
     <property name="editor.config.accepted" value="true" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
@@ -1056,15 +1066,19 @@
       <workItem from="1474137338267" duration="278000" />
       <workItem from="1474137955185" duration="454000" />
       <workItem from="1474138443981" duration="82000" />
+      <workItem from="1474739203680" duration="1150000" />
+      <workItem from="1474786494436" duration="377000" />
+      <workItem from="1474786888565" duration="2301000" />
+      <workItem from="1474790623613" duration="40000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="377219000" />
+    <option name="totallyTimeSpent" value="381087000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1440" height="829" extended-state="6" />
-    <editor active="false" />
+    <frame x="0" y="22" width="1440" height="826" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32951945" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1072,25 +1086,25 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3215103" sideWeight="0.504884" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295063" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31614655" sideWeight="0.495116" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32561308" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3133515" sideWeight="0.495116" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gulp" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1874106" sideWeight="0.49403748" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1874106" sideWeight="0.49403748" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2492364" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24969475" sideWeight="0.50596255" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Dynamic Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32951945" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32561308" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32561308" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -1137,7 +1151,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/www/js/controllers.js</url>
-          <line>1728</line>
+          <line>1721</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -1146,7 +1160,7 @@
           <option name="timeStamp" value="36" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="41" />
+      <option name="time" value="43" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1155,11 +1169,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/resources/android/splash/drawable-land-mdpi-screen.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/resources/android/splash/drawable-land-xxxhdpi-screen.png">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -1359,13 +1368,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/www/templates/events.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="23" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/www/templates/menu.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1391,13 +1393,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5524862">
           <caret line="20" column="83" selection-start-line="20" selection-start-column="83" selection-end-line="20" selection-end-column="83" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/www/templates/friends-modal.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
         </state>
       </provider>
     </entry>
@@ -1430,25 +1425,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/www/js/controllers.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6827731">
-          <caret line="701" column="23" selection-start-line="701" selection-start-column="23" selection-end-line="701" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/www/js/services.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="38" column="43" selection-start-line="38" selection-start-column="43" selection-end-line="38" selection-end-column="43" />
-          <folding>
-            <element signature="e#99#1260#0" expanded="false" />
-            <element signature="e#21188#21876#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1461,7 +1437,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1489,6 +1464,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/www/templates/biomedic.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="40" column="48" selection-start-line="40" selection-start-column="48" selection-end-line="40" selection-end-column="48" />
+          <folding>
+            <marker date="1474132446000" expanded="true" signature="3527:3540" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/www/templates/event.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1497,13 +1482,46 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/www/templates/biomedic.html">
+    <entry file="file://$PROJECT_DIR$/www/templates/friends-modal.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="40" column="48" selection-start-line="40" selection-start-column="48" selection-end-line="40" selection-end-column="48" />
+          <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="25" column="97" selection-start-line="25" selection-start-column="97" selection-end-line="25" selection-end-column="97" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/js/services.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="53" column="5" selection-start-line="53" selection-start-column="5" selection-end-line="53" selection-end-column="5" />
           <folding>
-            <marker date="1474132446000" expanded="true" signature="3527:3540" placeholder="..." />
+            <element signature="e#99#1260#0" expanded="false" />
+            <element signature="e#21188#21876#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/templates/events.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="35" column="25" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/js/controllers.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.79831934">
+          <caret line="881" column="18" selection-start-line="881" selection-start-column="18" selection-end-line="881" selection-end-column="18" />
+          <folding />
         </state>
       </provider>
     </entry>
