@@ -34,17 +34,100 @@ angular.module('app.services', [])
   .service('UsersService', function (FirebaseService) {
     function UsersService() {
     }
+
     UsersService.getUser = function (userId, handler) {
       var dbConnection = FirebaseService.getDBConnection();
       dbConnection.child("users").child(userId).once('value', function (userSnap) {
         var user = userSnap.val();
-        if(user == null){
+        if (user == null) {
           handler();
           return;
         }
         user.id = userId;
         handler(user);
       });
+    };
+    UsersService.saveImageData = function (userId, image, user, retrievedUser, successHandler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      /**
+       * save the image if changed
+       */
+      if (user.profileImage && user.profileImage.changed) {
+        console.log("image changed");
+        if (!retrievedUser.profileImageUid || retrievedUser.profileImageUid === '') {
+          delete image.changed;
+          var newImagesRef = dbConnection.child("profileImages").child(userId).set({
+            image: image
+          });
+          successHandler();
+        } else {
+          dbConnection.child("profileImages").child(userId).update({
+            image: image
+          }, function (error) {
+            if (error) {
+              console.log('Image save failed');
+              console.log(error);
+            } else {
+              console.log('Image updated');
+              successHandler(userId);
+            }
+          });
+        }
+      } else {
+        console.log('no need for any update on the image');
+        successHandler(userId);
+      }
+    };
+    UsersService.saveUser = function (uid, user, retrievedUser, successHandler, errorHandler) {
+      var dbConnection = FirebaseService.getDBConnection();
+      /*console.log(user);
+       console.log(retrievedUser);
+       angular.forEach(user, function (userValue, userKey) {
+       var changed = false;
+       angular.forEach(retrievedUser, function (retrievedUserValue, retrievedUserKey) {
+       if (!changed && retrievedUserKey === userKey) {
+       retrievedUser[retrievedUserKey] = userValue.value;
+       changed = true;
+       }
+       });
+       if (!changed) {
+       retrievedUser[userKey] = userValue.value;
+       }
+       });*/
+      var image = user.profileImage;
+      delete  retrievedUser.profileImage;
+      var userId = uid;
+      /**
+       * SAVE THE CURRENT USER NEW INFO
+       */
+      if (user.resetPassword && user.oldPassword && user.newPassword) {
+        dbConnection.changePassword({
+          email: retrievedUser.email,
+          oldPassword: user.oldPassword,
+          newPassword: user.newPassword
+        }, function (error) {
+          if (error) {
+            switch (error.code) {
+              case "INVALID_USER":
+                console.log("The specified user account does not exist.");
+                break;
+              default:
+                console.log("Error resetting password:", error);
+            }
+            errorHandler(["A palavra passe atual não está correta. Por favor reveja a palavra passe introduzida."]);
+          } else {
+            UsersService.saveImageData(userId, image, user, retrievedUser, successHandler);
+          }
+        });
+      } else {
+        UsersService.saveImageData(userId, image, user, retrievedUser, successHandler);
+      }
+      delete retrievedUser.newPassword;
+      delete retrievedUser.oldPassword;
+      /*usersRef.child(uid).update(retrievedUser, function () {
+       console.log("user update");
+       });*/
+
     };
     return UsersService;
   })
@@ -302,7 +385,7 @@ angular.module('app.services', [])
 
     BiomedicService.addRecord = function (biomedic, handler) {
       var dbConnection = FirebaseService.getDBConnection();
-      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid()).update({"doctor_uid":FirebaseService.getCurrentUserDoctorUid()});
+      dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid()).update({"doctor_uid": FirebaseService.getCurrentUserDoctorUid()});
       dbConnection.child(biomedic.type).child(FirebaseService.getCurrentUserUid())
         .push({
           value: biomedic.value,
@@ -453,7 +536,7 @@ angular.module('app.services', [])
         console.log('invalidUser');
         $rootScope.$broadcast('logoutUser');
       }
-      FirebaseService.getDBConnection().child('messages').child("in").child(userId).update({"doctor_uid":FirebaseService.getCurrentUserDoctorUid()});
+      FirebaseService.getDBConnection().child('messages').child("in").child(userId).update({"doctor_uid": FirebaseService.getCurrentUserDoctorUid()});
       var ref = FirebaseService.getDBConnection().child('messages').child("in").child(userId)
         .push();
       ref.set({

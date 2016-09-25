@@ -1,8 +1,8 @@
 angular.module('app.controllers', [])
-/**
- *
- * APPLICATION CONTROLLER
- */
+  /**
+   *
+   * APPLICATION CONTROLLER
+   */
   .controller('AppCtrl', function ($scope, $rootScope, $state, FirebaseService, MessageService) {
     $scope.logout = function () {
       FirebaseService.getDBConnection().unauth();
@@ -337,7 +337,7 @@ angular.module('app.controllers', [])
         if (($scope.timestamp - $scope.currentIterationTimestamp) / 1000 > 10) {
           if ($scope.currentIterationSpeed > 6) {//TODO: check, for now we reduced to -2
 
-            if (/*$cordovaNetwork.isOffline()*/1==1) {
+            if (/*$cordovaNetwork.isOffline()*/1 == 1) {
               var dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               var date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore || dataToStore.length > 0) {
@@ -385,7 +385,7 @@ angular.module('app.controllers', [])
 
           } else if ($scope.currentIterationSpeed > 0.2) {//TODO: check, for now we reduced to -2
 
-            if (/*$cordovaNetwork.isOffline()*/1==1) {
+            if (/*$cordovaNetwork.isOffline()*/1 == 1) {
               dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore || dataToStore.length > 0) {
@@ -434,7 +434,7 @@ angular.module('app.controllers', [])
             }
           } else {
 
-            if (/*$cordovaNetwork.isOffline()*/1!=1) {
+            if (/*$cordovaNetwork.isOffline()*/1 != 1) {
               dataToStore = JSON.parse(window.localStorage.getItem('dataToStore'));
               date = $scope.getFormattedDate(new Date().getTime());
               if (!dataToStore || dataToStore.length > 0) {
@@ -599,7 +599,7 @@ angular.module('app.controllers', [])
                   walk: 0,
                   run: 0
                 }
-              }else{
+              } else {
                 for (var first in items) {
                   if (first !== 'doctor_uid' && items.hasOwnProperty(first)) {
                     itemstoReturn[first] = items[first];
@@ -625,7 +625,7 @@ angular.module('app.controllers', [])
                   walk: 0,
                   run: 0
                 }
-              }else{
+              } else {
                 for (var first in items) {
                   if (first !== 'doctor_uid' && items.hasOwnProperty(first)) {
                     itemstoReturn[first] = items[first];
@@ -646,7 +646,7 @@ angular.module('app.controllers', [])
     };
 
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -660,9 +660,9 @@ angular.module('app.controllers', [])
     });
   })
   .controller('LoginCtrl', function ($rootScope, $cordovaNetwork, $ionicPlatform, $scope, $state, $stateParams, FirebaseService, UsersService, $ionicPopup, $ionicLoading) {
-     $scope.offline = true;
+    $scope.offline = true;
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
     });
     $rootScope.$on('$cordovaNetwork:offline', function (event, networkState) {
       $scope.offline = true;
@@ -694,8 +694,8 @@ angular.module('app.controllers', [])
             $scope.errorMessages.push("Não foi possível autenticar, por favor verifique os dados introduzidos.");
           } else {
             console.log("Authenticated successfully with payload:", authData);
-            UsersService.getUser(authData.uid, function(user){
-              if(user == null || !user || user.doctor_uid === null || !user.doctor_uid){
+            UsersService.getUser(authData.uid, function (user) {
+              if (user == null || !user || user.doctor_uid === null || !user.doctor_uid) {
                 $ionicLoading.hide();
                 $scope.errorMessages.push("Não foi possível autenticar, por favor verifique os dados introduzidos.");
                 //alert("Não foi possível autenticar, por favor verifique os dados introduzidos.");
@@ -805,7 +805,7 @@ angular.module('app.controllers', [])
       });
 
       myPopup.then(function (res) {
-        if(!res){
+        if (!res) {
           return;
         }
         $ionicLoading.show({
@@ -935,7 +935,7 @@ angular.module('app.controllers', [])
 
     };
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1152,7 +1152,7 @@ angular.module('app.controllers', [])
       });
     };
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1245,7 +1245,7 @@ angular.module('app.controllers', [])
     };
 
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1258,56 +1258,97 @@ angular.module('app.controllers', [])
       }
     });
   })
-  .controller('ProfileCtrl', function ($ionicPlatform, $scope, UserFormFactory, $cordovaNetwork, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+  .controller('ProfileCtrl', function (UsersService, $ionicPlatform, $scope, UserFormFactory, $cordovaNetwork, FirebaseService, $stateParams, $rootScope, $ionicLoading, $ionicPopup, $state) {
+      $scope.saveimage = function (e1) {
+        var filename = e1[0];
+        var fr = new FileReader();
+        fr.onload = function (res) {
+          if (!$scope.user.profileImage) {
+            $scope.user.profileImage = {changed: false};
+          }
+          $scope.user.profileImage.value = res.target.result;
+          $scope.user.profileImage.changed = true;
+          if (!$scope.$$phase) {
+            $scope.$apply();
+          }
+        };
+        fr.readAsDataURL(filename);
+      };
+      var init = function () {
 
-
-    var init = function () {
-
-      //$scope.user = {firstName:1,lastName:1,address:1,oldPassword:1};
-      $scope.user = {};
-      var dbConnection = FirebaseService.getDBConnection();
-      //If you want to use URL attributes before the website is loaded
-      $scope.init = function () {
-        //$scope.user = UserFormFactory.getUserStructure(false);
-        angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
-          $scope.user[retrievedUserKey] = retrievedUserValue;
-        });
-        if ($scope.retrievedUser && $scope.retrievedUser.id && $scope.retrievedUser.id !== '') {
-          dbConnection.child("profileImages").child($scope.retrievedUser.id).once('value', function (data) {
-            if (data.val() != null) {
-              $scope.user.profileImage = data.val().image;
-              if (!$scope.$$phase) {
-                $scope.$apply();
-              }
-            }
+        //$scope.user = {firstName:1,lastName:1,address:1,oldPassword:1};
+        $scope.user = {};
+        var dbConnection = FirebaseService.getDBConnection();
+        //If you want to use URL attributes before the website is loaded
+        $scope.init = function () {
+          //$scope.user = UserFormFactory.getUserStructure(false);
+          angular.forEach($scope.retrievedUser, function (retrievedUserValue, retrievedUserKey) {
+            $scope.user[retrievedUserKey] = retrievedUserValue;
           });
+          if ($scope.retrievedUser && $scope.retrievedUser.id && $scope.retrievedUser.id !== '') {
+            dbConnection.child("profileImages").child($scope.retrievedUser.id).once('value', function (data) {
+              if (data.val() != null) {
+                $scope.user.profileImage = {changed: false};
+                $scope.user.profileImage.value = data.val().image;
+                if (!$scope.$$phase) {
+                  $scope.$apply();
+                }
+              }
+            });
+          }
+        };
+        if (FirebaseService.isUserLogged()) {
+          dbConnection.child('users').child(FirebaseService.getCurrentUserUid()).once('value', function (user) {
+            $scope.retrievedUser = user.val();
+            $scope.retrievedUser.id = FirebaseService.getCurrentUserUid();
+            $scope.init();
+          });
+        } else {
+          $state.go('login');
         }
       };
-      if (FirebaseService.isUserLogged()) {
-        dbConnection.child('users').child(FirebaseService.getCurrentUserUid()).once('value', function (user) {
-          $scope.retrievedUser = user.val();
-          $scope.retrievedUser.id = FirebaseService.getCurrentUserUid();
-          $scope.init();
-        });
-      } else {
-        $state.go('login');
-      }
-    };
+      $scope.saveUser = function (form) {
+        $scope.invalidMessages = {};
+        if ($scope.user.resetPassword && $scope.user.oldPassword === $scope.user.newPassword) {
+          $scope.invalidMessages = ["As palavras passe introduzidas são iguais."];
+          return;
+        }
+        if (form.$invalid) {
+          return;
+        }
+        $ionicLoading.show({template: "A gravar informação..."});
 
-    $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
-      $scope.$on('offline', function () {
-        $scope.offline = true;
+        UsersService.saveUser(FirebaseService.getCurrentUserUid(), $scope.user, $scope.retrievedUser, function (userId) {
+          $ionicLoading.hide();
+          $rootScope.$broadcast('userUpdated');
+          delete $scope.user.newPassword;
+          delete $scope.user.oldPassword;
+          $scope.user.resetPassword = false;
+
+          delete $scope.retrievedUser.newPassword;
+          delete $scope.retrievedUser.oldPassword;
+          $scope.retrievedUser.resetPassword = false;
+          $scope.validMessages = ["Perfil Atualizado com sucesso."];
+        }, function (invalidMessages) {
+          $scope.invalidMessages = invalidMessages;
+          $ionicLoading.hide();
+        });
+      };
+      $ionicPlatform.ready(function () {
+        $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
+        $scope.$on('offline', function () {
+          $scope.offline = true;
+        });
+        $scope.$on('online', function () {
+          $scope.offline = false;
+          init();
+        });
+        if (!$scope.offline) {
+          init();
+        }
       });
-      $scope.$on('online', function () {
-        $scope.offline = false;
-        init();
-      });
-      if (!$scope.offline) {
-        init();
-      }
-    });
-  })
+    }
+  )
   .controller('BiomedicCtrl', function ($ionicPlatform, $scope, $cordovaNetwork, BiomedicService, BiomedicType) {
 
 
@@ -1545,7 +1586,7 @@ angular.module('app.controllers', [])
 
 
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1638,7 +1679,7 @@ angular.module('app.controllers', [])
     }
 
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1703,7 +1744,7 @@ angular.module('app.controllers', [])
       }
     };
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         alert(window.localStorage.getItem("recomendation"));
         var recomendations = JSON.parse(window.localStorage.getItem("recomendation"));
@@ -1720,7 +1761,7 @@ angular.module('app.controllers', [])
           if (!recomendations || recomendations === null) {
             recomendations = [];
           }
-          window.localStorage.setItem("recomendation",  JSON.stringify(recomendations));
+          window.localStorage.setItem("recomendation", JSON.stringify(recomendations));
         });
       });
       if (!$scope.offline) {
@@ -1818,7 +1859,7 @@ angular.module('app.controllers', [])
     };
 
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });
@@ -1873,7 +1914,6 @@ angular.module('app.controllers', [])
       }
       return day + "/" + month + '/' + year + " " + hours + ":" + minutes + ":" + seconds;
     };
-
 
 
     $scope.calculatePhysicalActivityStats = function (recomendation) {
@@ -2010,7 +2050,7 @@ angular.module('app.controllers', [])
 
     };
 
-    var init = function() {
+    var init = function () {
       $scope.currentRecomendation = undefined;
       $scope.physicalActivity = {
         classPercentage: '0',
@@ -2034,7 +2074,7 @@ angular.module('app.controllers', [])
     }
 
     $ionicPlatform.ready(function () {
-      $scope.offline = /*$cordovaNetwork.isOffline()*/1!=1;
+      $scope.offline = /*$cordovaNetwork.isOffline()*/1 != 1;
       $scope.$on('offline', function () {
         $scope.offline = true;
       });

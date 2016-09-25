@@ -19,12 +19,12 @@
         <div class="list">
           <div class="col">
             <div class="row">
-              <img id="profileImageImg" class="avatar" ng-src="{{user.profileImage}}" src="img/ionic.png"
+              <img id="profileImageImg" class="avatar" ng-src="{{user.profileImage.value}}" src="img/ionic.png"
                    style="-webkit-user-select: none;width:200px; height:200px;margin: auto;">
             </div>
             <br/>
             <input type="file" ng-model="user.profileImage"
-                   onchange="angular.element(this).scope().saveimage(this.files)" accept="image/*" capture="camera"
+                   onchange="angular.element(this).scope().saveimage(this.files)" accept="image/*"
                    class="row"
                    id="profileImage">
           </div>
@@ -137,6 +137,9 @@
         </div>
         <div id="invalidMessages">
           <p class="row assertive" ng-repeat="invalidMessage in invalidMessages">{{invalidMessage}}</p>
+        </div>
+        <div id="validMessages">
+          <p class="row balanced" ng-repeat="validMessage in validMessages">{{validMessage}}</p>
         </div>
         <div class="row">
           <div class="col">
