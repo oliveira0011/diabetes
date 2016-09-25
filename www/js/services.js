@@ -327,7 +327,7 @@ angular.module('app.services', ['ionic.cloud'])
       //push.addTokenToUser(user);
       //user.save();
       deviceToken = token.token;
-      $ionicPush.saveToken(token).then(function(t) {
+      $ionicPush.saveToken(token).then(function (t) {
         console.log('Token saved:', t.token);
       });
       console.log("New token ---------->" + token + "<----------");
@@ -337,29 +337,29 @@ angular.module('app.services', ['ionic.cloud'])
 
       $ionicPush.register().then(callback);
       /*Ionic.io();
-      push = new Ionic.Push({
-        "onNotification": function (notification) {
-          //alert('Received push notification!');
-          console.log(notification);
-          $rootScope.$broadcast('newNotification', notification);
-        },
-        "debug": true,
-        "pluginConfig": {
-          "android": {
-            "iconColor": "#0000FF"
-          }
-        }
-      });
-      try {
-        push.register(callback, function(e){
-          console.log(e);
-        });
-      } catch (e) {
-        console.log("push notification is not present, ignored");
-      }
-      console.log("registering started for device");*/
+       push = new Ionic.Push({
+       "onNotification": function (notification) {
+       //alert('Received push notification!');
+       console.log(notification);
+       $rootScope.$broadcast('newNotification', notification);
+       },
+       "debug": true,
+       "pluginConfig": {
+       "android": {
+       "iconColor": "#0000FF"
+       }
+       }
+       });
+       try {
+       push.register(callback, function(e){
+       console.log(e);
+       });
+       } catch (e) {
+       console.log("push notification is not present, ignored");
+       }
+       console.log("registering started for device");*/
     };
-    $rootScope.$on('cloud:push:notification', function(event, data) {
+    $rootScope.$on('cloud:push:notification', function (event, data) {
       var msg = data.message;
       alert(msg.title + ': ' + msg.text);
       console.log(data);
@@ -498,8 +498,10 @@ angular.module('app.services', ['ionic.cloud'])
         var retrievedNotifications = [];
         if (handler) {
           angular.forEach(value, function (notification, key) {
-            notification.id = key;
-            retrievedNotifications.unshift(notification);
+            if (key !== 'doctor_uid') {
+              notification.id = key;
+              retrievedNotifications.unshift(notification);
+            }
           });
           messages = retrievedNotifications;
           handler(messages.slice());
