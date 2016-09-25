@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d2701ed3-0294-42ed-a1e6-1389f1c2657b" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/js/controllers.js" afterPath="$PROJECT_DIR$/www/js/controllers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/js/services.js" afterPath="$PROJECT_DIR$/www/js/services.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/templates/profile.html" afterPath="$PROJECT_DIR$/www/templates/profile.html" />
     </list>
     <ignored path="Diabetes.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,8 +28,8 @@
       <file leaf-file-name="controllers.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/www/js/controllers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4988864">
-              <caret line="1330" column="65" selection-start-line="1330" selection-start-column="65" selection-end-line="1330" selection-end-column="65" />
+            <state vertical-scroll-proportion="-2.908686">
+              <caret line="369" column="67" selection-start-line="369" selection-start-column="67" selection-end-line="369" selection-end-column="67" />
               <folding />
             </state>
           </provider>
@@ -190,9 +188,9 @@
         <option value="$PROJECT_DIR$/config.xml" />
         <option value="$PROJECT_DIR$/www/index.html" />
         <option value="$PROJECT_DIR$/www/templates/events.html" />
-        <option value="$PROJECT_DIR$/www/js/controllers.js" />
         <option value="$PROJECT_DIR$/www/templates/profile.html" />
         <option value="$PROJECT_DIR$/www/js/services.js" />
+        <option value="$PROJECT_DIR$/www/js/controllers.js" />
       </list>
     </option>
   </component>
@@ -1058,12 +1056,12 @@
       <workItem from="1474739203680" duration="1150000" />
       <workItem from="1474786494436" duration="377000" />
       <workItem from="1474786888565" duration="2301000" />
-      <workItem from="1474790623613" duration="4275000" />
+      <workItem from="1474790623613" duration="4394000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="385322000" />
+    <option name="totallyTimeSpent" value="385441000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1440" height="826" extended-state="6" />
@@ -1512,8 +1510,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/www/js/controllers.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4988864">
-          <caret line="1330" column="65" selection-start-line="1330" selection-start-column="65" selection-end-line="1330" selection-end-column="65" />
+        <state vertical-scroll-proportion="-2.908686">
+          <caret line="369" column="67" selection-start-line="369" selection-start-column="67" selection-end-line="369" selection-end-column="67" />
           <folding />
         </state>
       </provider>

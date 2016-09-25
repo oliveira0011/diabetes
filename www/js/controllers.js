@@ -367,7 +367,7 @@ angular.module('app.controllers', [])
               });
               var runRef = FirebaseService.getDBConnection().child('physical_activity')
                 .child(FirebaseService.getCurrentUserUid())
-                .child($scope.getFormattedDate(date))
+                .child($scope.getFormattedDate(new Date().getTime()))
                 .child("run");
               runRef.transaction(function (current_value) {
                 return (current_value || 0) + 10;
