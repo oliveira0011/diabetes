@@ -1,4 +1,4 @@
-angular.module('app.services', [])
+angular.module('app.services', ['ionic.cloud'])
   .service('FriendsService', function (Friend, FirebaseService) {
     function FriendsService() {
       this.friends = {};
@@ -57,12 +57,12 @@ angular.module('app.services', [])
         if (!retrievedUser.profileImageUid || retrievedUser.profileImageUid === '') {
           delete image.changed;
           var newImagesRef = dbConnection.child("profileImages").child(userId).set({
-            image: image
+            image: image.value
           });
           successHandler();
         } else {
           dbConnection.child("profileImages").child(userId).update({
-            image: image
+            image: image.value
           }, function (error) {
             if (error) {
               console.log('Image save failed');
@@ -287,7 +287,7 @@ angular.module('app.services', [])
 
     return EventsService;
   })
-  .service('FirebaseService', function ($rootScope) {
+  .service('FirebaseService', function ($rootScope, $ionicPush) {
     var firebaseService = {};
     var deviceToken;
     var push;
@@ -322,10 +322,21 @@ angular.module('app.services', [])
       console.log("GET: " + deviceToken);
       return deviceToken;
     };
+    var callback = function (token) {
+      console.log("Device token:", token.token);
+      //push.addTokenToUser(user);
+      //user.save();
+      deviceToken = token.token;
+      $ionicPush.saveToken(token).then(function(t) {
+        console.log('Token saved:', t.token);
+      });
+      console.log("New token ---------->" + token + "<----------");
+    };
     firebaseService.registerDevice = function () {
       console.log("registering device");
 
-      Ionic.io();
+      $ionicPush.register().then(callback);
+      /*Ionic.io();
       push = new Ionic.Push({
         "onNotification": function (notification) {
           //alert('Received push notification!');
@@ -339,21 +350,21 @@ angular.module('app.services', [])
           }
         }
       });
-      var callback = function (token) {
-        console.log("Device token:", token.token);
-        //push.addTokenToUser(user);
-        //user.save();
-        deviceToken = token.token;
-        push.saveToken(token);
-        console.log("New token ---------->" + token + "<----------");
-      };
       try {
-        push.register(callback);
+        push.register(callback, function(e){
+          console.log(e);
+        });
       } catch (e) {
         console.log("push notification is not present, ignored");
       }
-      console.log("registering started for device");
+      console.log("registering started for device");*/
     };
+    $rootScope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+      console.log(data);
+      $rootScope.$broadcast('newNotification', data);
+    });
     firebaseService.checkDeviceToken = function () {
       if (!deviceToken) {
         firebaseService.registerDevice();
@@ -590,21 +601,21 @@ angular.module('app.services', [])
                 }
               }
             });
-            $http({
-              method: 'POST',
-              url: "https://push.ionic.io/api/v1/push/",
-              data: d,
-              headers: {
-                "Authorization": 'Basic ' + window.btoa("9838b15f3334b5c7ab4e27ddd5a370b2dcb2b2805be53fce"),
-                "Content-Type": "application/json",
-                "X-Ionic-Application-Id": '6cfedcfa'
-              }
-            }).error(function (e) {
-              console.log(e);
-            }).success(function (data, status) {
-              console.log(data);
-              console.log(status);
-            });
+            //$http({
+            //  method: 'POST',
+            //  url: "https://push.ionic.io/api/v1/push/",
+            //  data: d,
+            //  headers: {
+            //    "Authorization": 'Basic ' + window.btoa("9838b15f3334b5c7ab4e27ddd5a370b2dcb2b2805be53fce"),
+            //    "Content-Type": "application/json",
+            //    "X-Ionic-Application-Id": '6cfedcfa'
+            //  }
+            //}).error(function (e) {
+            //  console.log(e);
+            //}).success(function (data, status) {
+            //  console.log(data);
+            //  console.log(status);
+            //});
           });
         });
     };

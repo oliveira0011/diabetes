@@ -3,6 +3,8 @@
   "version": "1.1.1",
   "description": "example: An Ionic project",
   "dependencies": {
+    "@ionic/cloud": "^0.9.0",
+    "bluebird": "^3.4.6",
     "gulp": "^3.5.6",
     "gulp-concat": "^2.2.0",
     "gulp-minify-css": "^0.3.0",
@@ -21,10 +23,16 @@
     "cordova-plugin-splashscreen",
     "cordova-plugin-statusbar",
     "ionic-plugin-keyboard",
-    "phonegap-plugin-push",
     {
       "locator": "https://github.com/phonegap-build/PushPlugin.git",
       "id": "com.phonegap.plugins.PushPlugin"
+    },
+    {
+      "variables": {
+        "SENDER_ID": "1043474835870"
+      },
+      "locator": "phonegap-plugin-push",
+      "id": "phonegap-plugin-push"
     }
   ],
   "cordovaPlatforms": [
